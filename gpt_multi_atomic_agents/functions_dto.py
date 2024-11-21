@@ -21,7 +21,8 @@ class ParameterSpec(BaseIOSchema):
 
 class FunctionSpecSchema(BaseIOSchema):
     """This schema represents the definition of a function call that can be generated."""
-    agent_name: str = Field(description="The name of the agent that generated the function calls")
+    agent_name: str = Field(description="The name of the agent that generated the function calls")  # TODO review, this makes the f/w less flexible
+    description: str = Field(description="Describes what the function does")
     function_name: str = Field(description="The name of the function")
     parameters: list[ParameterSpec] = Field(description="Named parameters of the function")
 
