@@ -1,5 +1,11 @@
 # How to contribute to gpt-multi-atomic-agents
 
+## How to contribute
+
+Your contribution is welcome!
+
+Please open a matching Issue and a Pull Request, with some explanation of the changes.
+
 ## How to publish
 
 1. Install
