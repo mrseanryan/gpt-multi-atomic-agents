@@ -6,7 +6,6 @@ A simple dynamic multi-agent framework based on [atomic-agents](https://github.c
   - the router rewrites the user prompt, to best suit each agent
 - generate via OpenAI or AWS Bedrock or groq
 
-
 [url_repo]: https://github.com/mrseanryan/gpt-multi-atomic-agents
 [url_semver_org]: https://semver.org/
 
@@ -42,6 +41,7 @@ The framework is generic and allows agents to be defined in terms of a name, des
 The agents communicate indirectly using a blackboard. The language is a composed of function calls: each agent specifies what functions it understands as input, and what function calls it is able to generate. In this way, the agents can understand each other's output.
 
 A router takes the user prompt and selects the best sequence of the most suitable agents, to handle the user prompt.
+
 The router rewrites the user prompt to suit each agent, which improves quality and avoids unwanted output.
 
 Finally, the output is returned in the form of an ordered list of function calls.
@@ -58,7 +58,7 @@ The output is a series of Function Calls which can be implemented by the client,
 
 INPUT:
 
->> Add a sheep that eats grass
+> Add a sheep that eats grass
 
 
 OUTPUT:
@@ -69,11 +69,13 @@ Generated 3 function calls
 [Agent: Relationship Creator] AddCreatureRelationship( from_name=sheep, to_name=grass, relationship_name=eats )
 ```
 
-Becuase the framework has a dynamic router, it can handle more complex 'composite' prompts, such as:
+Because the framework has a dynamic router, it can handle more complex 'composite' prompts, such as:
 
->> Add a cow that eats grass. Add a human - the cow feeds the human. Add and alien that eats the human. The human also eats cows.
+> Add a cow that eats grass. Add a human - the cow feeds the human. Add and alien that eats the human. The human also eats cows.
 
 The router figures out which agents to use, what order to run them in, and what prompt to send to each agent.
+
+Finally, the framework combines the resulting function calls together and returns them to the client.
 
 ## Setup
 
