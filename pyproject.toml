@@ -1,0 +1,21 @@
+[tool.poetry]
+name = "gpt-multi-atomic-agents"
+version = "0.1.0"
+description = "Combine multiple agents with dynamic routing - based on atomic-agents."
+authors = ["Sean Ryan <str_ie@yahoo.co.uk>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+atomic-agents = "^1.0.15"
+openai = "^1.54.3"
+instructor = "^1.6.3"
+requests = "^2.32.3"
+rich = "^13.9.4"
+groq = "^0.11.0"
+pydantic = "^2.9.2"
+anthropic = {extras = ["bedrock"], version = "^0.39.0"}
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
