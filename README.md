@@ -54,12 +54,118 @@ When integrating, the client would implement the functions. The client executes 
 
 This is a demo 'Sim Life' world builder.
 It uses 3 agents (Creature Creature, Vegetation Creator, Relationship Creator) to process user prompts.
+The agents are defined in terms of functions.
 The output is a series of Function Calls which can be implemented by the client, to build the Sim Life world.
 
-INPUT:
+#### Function Defintions
 
-> Add a sheep that eats grass
+The AddCreature function:
 
+```python
+function_add_creature = FunctionSpecSchema(
+    agent_name=creature_agent_name,
+    function_name="AddCreature",
+    description="Adds a new creature to the world (not vegetation)",
+    parameters=[
+        ParameterSpec(name="creature_name", type=ParameterType.string),
+        ParameterSpec(name="allowed_terrain", type=ParameterType.string, allowed_values=terrain_types),
+        ParameterSpec(name="age", type=ParameterType.int),
+        ParameterSpec(name="icon_name", type=ParameterType.string, allowed_values=creature_icons),
+    ]
+)
+```
+
+The AddCreatureRelationship function:
+
+```python
+function_add_relationship = FunctionSpecSchema(
+    agent_name=relationship_agent_name,
+    function_name="AddCreatureRelationship",
+    description="Adds a new relationship between two creatures",
+    parameters=[
+        ParameterSpec(
+            name="from_name", type=ParameterType.string
+        ),
+        ParameterSpec(
+            name="to_name", type=ParameterType.string
+        ),
+        ParameterSpec(
+            name="relationship_name",
+            type=ParameterType.string,
+            allowed_values=["eats", "buys", "feeds", "sells"],
+        ),
+    ],
+)
+```
+
+#### Agent Definitions
+
+The Creature Creator agent is defined in terms of:
+
+- its description (a very short prompt)
+- its input schema (a list of accepted function definitions)
+- its output schema (a list of output function definitions)
+
+Agents can exchange information indirectly, by reusing the same function defintions.
+
+```python
+def build_creature_agent():
+    agent_definition = AgentDefinition(
+        agent_name="Creature Creator",
+        description="Creates new creatures given the user prompt. Ensures that ALL creatures mentioned by the user are created.",
+        accepted_functions=[function_add_creature, function_add_relationship],
+        input_schema=FunctionAgentInputSchema,
+        initial_input=FunctionAgentInputSchema(
+            functions_allowed_to_generate=[function_add_creature],
+            previously_generated_functions=[]
+        ),
+        output_schema=FunctionAgentOutputSchema,
+        topics=["creature"]
+    )
+
+    return agent_definition
+```
+
+Notes about this agent:
+- this agent can only generate "AddCreature" function calls.
+- the agent also accepts (understands) previous "AddCreature" calls, so that it knows what has already been created.
+- additionally, this agent understands a subset of function calls from agents: here, it understands the "AddRelationship" function defined by `function_add_relationship`. See the [example source code](./examples/sim_life/main.py) folder for more details.
+
+#### Using the Agents in a chat loop
+
+The agents can be used together to form a chat bot:
+
+```python
+from gpt_multi_atomic_agents import functions_expert_service, config
+from . import agents
+
+def run_chat_loop(given_user_prompt: str|None = None) -> list:
+    CHAT_AGENT_DESCRIPTION = "Handles users questions about an ecosystem game like Sim Life"
+
+    agent_definitions = [
+        build_creature_agent(), build_relationship_agent(), build_vegatation_agent()  # for more capabilities, add more agents here
+    ]
+
+    _config = config.Config(
+        ai_platform = config.AI_PLATFORM_Enum.bedrock_anthropic,
+        model = config.ANTHROPIC_MODEL,
+        max_tokens = config.ANTHROPIC_MAX_TOKENS,
+        is_debug = False
+        )
+
+    return functions_expert_service.run_chat_loop(agent_definitions=agent_definitions, chat_agent_description=CHAT_AGENT_DESCRIPTION, _config=_config, given_user_prompt=given_user_prompt)
+```
+
+> note: if `given_user_prompt` is not set, then `run_chat_loop()` will wait for user input from the keyboard
+
+See the [example source code](./examples/sim_life/main.py) folder for more details.
+
+#### Example Execution
+
+USER INPUT:
+```
+Add a sheep that eats grass
+```
 
 OUTPUT:
 ```
@@ -76,6 +182,8 @@ Because the framework has a dynamic router, it can handle more complex 'composit
 The router figures out which agents to use, what order to run them in, and what prompt to send to each agent.
 
 Finally, the framework combines the resulting function calls together and returns them to the client.
+
+![example run](./images/screenshot-example-run.png)
 
 ## Setup
 

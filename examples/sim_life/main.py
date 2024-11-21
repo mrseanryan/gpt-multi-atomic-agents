@@ -16,7 +16,7 @@ def run_chat_loop(test_prompt: str|None = None) -> list:
         is_debug = False
         )
 
-    return functions_expert_service.run_chat_loop(agent_definitions=agent_definitions, chat_agent_description=CHAT_AGENT_DESCRIPTION, _config=_config, test_prompt=test_prompt)
+    return functions_expert_service.run_chat_loop(agent_definitions=agent_definitions, chat_agent_description=CHAT_AGENT_DESCRIPTION, _config=_config, given_user_prompt=test_prompt)
 
 if __name__ == "__main__":
     run_chat_loop()

@@ -65,7 +65,7 @@ def _create_agent(agent_definition: AgentDefinition, _config: Config) -> BaseAge
     )
     return agent
 
-def run_chat_loop(agent_definitions: list[AgentDefinition], chat_agent_description: str, _config: Config, test_prompt: str|None = None) -> list:
+def run_chat_loop(agent_definitions: list[AgentDefinition], chat_agent_description: str, _config: Config, given_user_prompt: str|None = None) -> list:
     initial_message = FunctionAgentOutputSchema(
         chat_message="How can I help you?",
         generated_function_calls=[]
@@ -74,20 +74,20 @@ def run_chat_loop(agent_definitions: list[AgentDefinition], chat_agent_descripti
     _print_assistant(initial_message)
 
     # for more emojis - see "poetry run python -m rich.emoji"
-    if test_prompt:
-        console.print(f":sunglasses: You: {test_prompt}")
+    if given_user_prompt:
+        console.print(f":sunglasses: You: {given_user_prompt}")
 
     blackboard = Blackboard()
     while True:
-        user_input = test_prompt if test_prompt else console.input(":sunglasses: You: ")
-        if not user_input:
+        user_prompt = given_user_prompt if given_user_prompt else console.input(":sunglasses: You: ")
+        if not user_prompt:
             break
 
         with console.status("[bold green]Processing...") as status:
             try:
                 console.log(f"Routing...")
                 router_agent = prompts_router.create_router_agent(config=_config)
-                response = typing.cast(prompts_router.RouterAgentOutputSchema, router_agent.run(prompts_router.build_input(user_prompt=user_input, agents=agent_definitions, chat_agent_description=chat_agent_description)) )
+                response = typing.cast(prompts_router.RouterAgentOutputSchema, router_agent.run(prompts_router.build_input(user_prompt=user_prompt, agents=agent_definitions, chat_agent_description=chat_agent_description)) )
                 recommended_agents = response.recommended_agents
 
                 _print_router_assistant(response, _config=_config)
@@ -119,7 +119,7 @@ def run_chat_loop(agent_definitions: list[AgentDefinition], chat_agent_descripti
 
             console.log(":robot: (done)")
 
-        if test_prompt:
+        if given_user_prompt:
             break
     return blackboard.previously_generated_functions
 
