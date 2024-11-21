@@ -3,7 +3,7 @@ A simple dynamic multi-agent framework based on [atomic-agents](https://github.c
 
 - compose Agents made of Functions
 - a router uses an LLM to process complex 'composite' user prompts, and automatically route them to the best sequence of your agents
-  - the router rerites the user prompt, to best suit each agent
+  - the router rewrites the user prompt, to best suit each agent
 - generate via OpenAI or AWS Bedrock or groq
 
 
