@@ -6,6 +6,33 @@ A simple dynamic multi-agent framework based on [atomic-agents](https://github.c
   - the router rerites the user prompt, to best suit each agent
 - generate via OpenAI or AWS Bedrock or groq
 
+
+[url_repo]: https://github.com/mrseanryan/gpt-multi-atomic-agents
+[url_semver_org]: https://semver.org/
+
+[![MIT License][img_license]][url_license]
+[![Supported Python Versions][img_pyversions]][url_pyversions]
+[![gpt-multi-atomic-agents][img_version]][url_version]
+
+[![PyPI Releases][img_pypi]][url_pypi]
+[![PyPI - Downloads](https://img.shields.io/pypi/dm/gpt-multi-atomic-agents.svg)](https://pypi.org/project/gpt-multi-atomic-agents)
+
+[img_license]: https://img.shields.io/badge/License-MIT-blue.svg
+[url_license]: https://github.com/mrseanryan/gpt-multi-atomic-agents/blob/master/LICENSE
+
+[url_version]: https://pypi.org/project/gpt-multi-atomic-agents/
+
+[img_version]: https://img.shields.io/static/v1.svg?label=SemVer&message=gpt-multi-atomic-agents&color=blue
+[url_version]: https://pypi.org/project/bumpver/
+
+[img_pypi]: https://img.shields.io/badge/PyPI-wheels-green.svg
+[url_pypi]: https://pypi.org/project/gpt-multi-atomic-agents/#files
+
+[img_pyversions]: https://img.shields.io/pypi/pyversions/gpt-multi-atomic-agents.svg
+[url_pyversions]: https://pypi.python.org/pypi/gpt-multi-atomic-agents
+
+[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/K3K73ALBJ)
+
 ## Introduction
 
 This is an LLM based Agents Framework using an Agent Oriented Programming approach to orchestrate agents using a shared Function Calling language.
