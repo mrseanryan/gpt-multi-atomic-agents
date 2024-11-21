@@ -129,7 +129,7 @@ def build_creature_agent():
 Notes about this agent:
 - this agent can only generate "AddCreature" function calls.
 - the agent also accepts (understands) previous "AddCreature" calls, so that it knows what has already been created.
-- additionally, this agent understands a subset of function calls from agents: here, it understands the "AddRelationship" function defined by `function_add_relationship`. See the [example source code](./examples/sim_life/main.py) for more details.
+- additionally, this agent understands a subset of function calls from agents: here, it understands the "AddRelationship" function defined by `function_add_relationship`. See the [example source code](https://github.com/mrseanryan/gpt-multi-atomic-agents/tree/master/examples/sim_life) for more details.
 
 #### Using the Agents in a chat loop
 
@@ -158,7 +158,7 @@ def run_chat_loop(given_user_prompt: str|None = None) -> list:
 
 > note: if `given_user_prompt` is not set, then `run_chat_loop()` will wait for user input from the keyboard
 
-See the [example source code](./examples/sim_life/main.py) for more details.
+See the [example source code](https://github.com/mrseanryan/gpt-multi-atomic-agents/tree/master/examples/sim_life) for more details.
 
 #### Example Execution
 
@@ -183,7 +183,7 @@ The router figures out which agents to use, what order to run them in, and what 
 
 Finally, the framework combines the resulting function calls together and returns them to the client.
 
-![example run](./images/screenshot-example-run.png)
+![example run](https://raw.githubusercontent.com/mrseanryan/gpt-multi-atomic-agents/master/images/screenshot-example-run.png)
 
 ## Setup
 
@@ -218,3 +218,5 @@ Test script:
 ```
 ./test.sh
 ```
+
+See the [example source code](https://github.com/mrseanryan/gpt-multi-atomic-agents/tree/master/examples/sim_life) for more details.
