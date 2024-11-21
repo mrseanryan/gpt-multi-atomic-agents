@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "gpt-multi-atomic-agents"
-version = "0.1.0"
+version = "0.1.1"
 description = "Combine multiple function-based agents with dynamic routing - based on atomic-agents."
 authors = ["Sean Ryan <str_ie@yahoo.co.uk>"]
 readme = "README.md"
