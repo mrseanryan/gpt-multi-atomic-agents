@@ -1,4 +1,4 @@
-from gpt_multi_atomic_agents import functions_expert_service
+from gpt_multi_atomic_agents import functions_expert_service, config
 from . import agents
 
 def run_chat_loop(test_prompt: str|None = None) -> list:
@@ -8,7 +8,15 @@ def run_chat_loop(test_prompt: str|None = None) -> list:
         agents.build_creature_agent(), agents.build_relationship_agent(), agents.build_vegatation_agent()
     ]
 
-    return functions_expert_service.run_chat_loop(agent_definitions=agent_definitions, chat_agent_description=CHAT_AGENT_DESCRIPTION, test_prompt=test_prompt)
+    # TODO read from config.ini
+    _config = config.Config(
+        ai_platform = config.AI_PLATFORM_Enum.bedrock_anthropic,
+        model = config.ANTHROPIC_MODEL,
+        max_tokens = config.ANTHROPIC_MAX_TOKENS,
+        is_debug = False
+        )
+
+    return functions_expert_service.run_chat_loop(agent_definitions=agent_definitions, chat_agent_description=CHAT_AGENT_DESCRIPTION, _config=_config, test_prompt=test_prompt)
 
 if __name__ == "__main__":
     run_chat_loop()

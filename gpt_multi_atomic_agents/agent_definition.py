@@ -6,6 +6,7 @@ from pydantic import Field
 
 from . import util_output
 from .blackboard import Blackboard
+from .config import Config
 
 from .functions_dto import FunctionAgentInputSchema, FunctionAgentOutputSchema, FunctionSpecSchema
 
@@ -23,12 +24,12 @@ class AgentDefinition:
     topics: list[str] = Field(description="This agent ONLY generates if user mentioned one of these topics")
     # TODO: could add custom prompt/prompt-extension if needed
 
-    def build_input(self, user_input: str, blackboard: Blackboard) -> BaseIOSchema:
+    def build_input(self, user_input: str, blackboard: Blackboard, config: Config) -> BaseIOSchema:
         initial_input = self.initial_input
         initial_input.user_input = user_input
 
         initial_input.previously_generated_functions = blackboard.get_generated_functions_matching(self.get_accepted_function_names())
-        util_output.print_debug(f"[{self.agent_name}] Previously generated funs: {initial_input.previously_generated_functions}")
+        util_output.print_debug(f"[{self.agent_name}] Previously generated funs: {initial_input.previously_generated_functions}", config)
 
         return initial_input
 

@@ -1,6 +1,7 @@
 # A generic Agent prompt.
 # - more specialized prompts can be set when creating the relevant AgentSpec.
 from . import util_output
+from .config import Config
 
 
 GENERIC_AGENT_PROMPT_TEMPLATE = """
@@ -43,13 +44,13 @@ Notes:
 """
 
 
-def build_agent_prompt(allowed_functions_to_generate_names: list[str], topics: list[str]
+def build_agent_prompt(allowed_functions_to_generate_names: list[str], topics: list[str], _config: Config
 ) -> str:
     def _join(strings: list[str]):
         return ", ".join(strings)
 
     prompt = GENERIC_AGENT_PROMPT_TEMPLATE.replace("{TOPICS}", _join(topics)).replace("{AVAILABLE_FUNCTIONS}", _join(allowed_functions_to_generate_names))
 
-    util_output.print_debug(f"prompt: {prompt}")
+    util_output.print_debug(f"prompt: {prompt}", config=_config)
 
     return prompt

@@ -9,6 +9,7 @@ from pydantic import Field
 
 from . import util_ai
 from .agent_definition import AgentDefinition
+from .config import Config
 
 @dataclass
 class AgentDescription:
@@ -68,12 +69,12 @@ def _build_system_prompt_generator_custom() -> SystemPromptGenerator:
     )
 
 
-def create_router_agent() -> BaseAgent:
+def create_router_agent(config: Config) -> BaseAgent:
     """
     Create a Router agent which can recommend one or more agents to handle the user's prompt. For quality it rewrites the user prompt for each agent.
     - this approach prevents agents answering prompts that are not really for them
     """
-    client, model, max_tokens = util_ai.create_client()
+    client, model, max_tokens = util_ai.create_client(_config=config)
 
     agent = BaseAgent(
         config=BaseAgentConfig(
