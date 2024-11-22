@@ -1,0 +1,24 @@
+type Mutation {
+  addCreature(input: CreatureInput!): Creature!
+  addVegetation(input: VegetationInput!): Vegetation!
+  addCreatureRelationship(input: RelationshipInput!): Relationship!
+}
+
+input CreatureInput {
+  creature_name: String!
+  allowed_terrain: TerrainType!
+  age: Int!
+  icon_name: IconType!
+}
+
+input VegetationInput {
+  vegetation_name: String!
+  icon_name: IconType!
+  allowed_terrain: TerrainType!
+}
+
+input RelationshipInput {
+  from_name: String!
+  to_name: String!
+  relationship_kind: RelationshipType!
+}

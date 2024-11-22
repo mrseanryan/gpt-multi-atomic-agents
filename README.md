@@ -110,7 +110,7 @@ Agents can exchange information indirectly, by reusing the same function definti
 
 ```python
 def build_creature_agent():
-    agent_definition = AgentDefinition(
+    agent_definition = FunctionAgentDefinition(
         agent_name="Creature Creator",
         description="Creates new creatures given the user prompt. Ensures that ALL creatures mentioned by the user are created.",
         accepted_functions=[function_add_creature, function_add_relationship],

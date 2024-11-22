@@ -1,0 +1,50 @@
+type Query {
+  creatures: [Creature!]!
+  vegetations: [Vegetation!]!
+  relationships: [Relationship!]!
+}
+
+type Creature {
+  id: ID!
+  creature_name: String!
+  allowed_terrain: TerrainType!
+  age: Int!
+  icon_name: IconType!
+}
+
+type Vegetation {
+  id: ID!
+  vegetation_name: String!
+  icon_name: IconType!
+  allowed_terrain: TerrainType!
+}
+
+type Relationship {
+  id: ID!
+  from_name: String!
+  to_name: String!
+  relationship_kind: RelationshipType!
+}
+
+enum TerrainType {
+  MOUNTAIN
+  MARSH
+  PRAIRIE
+  COAST
+  WATER
+}
+
+enum IconType {
+  SHEEP_ICON
+  WOLF_ICON
+  GRASS_ICON
+  HUMAN_ICON
+  OTHER_ICON
+}
+
+enum RelationshipType {
+  EATS
+  BUYS
+  FEEDS
+  SELLS
+}

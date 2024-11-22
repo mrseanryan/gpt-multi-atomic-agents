@@ -24,7 +24,7 @@ For each generated function:
 [function-name]: [function-name]
   - name: [the name of the function]
   - parameters: [the parameters and their values]
-[Continue for all page elements]
+[Continue for all items]
 
 
 Overall analysis:

@@ -1,4 +1,3 @@
-from gpt_multi_atomic_agents import config
 from parameterized import parameterized
 import unittest
 
@@ -8,7 +7,7 @@ from . import main
 
 console = Console()
 
-class TestSimLife(unittest.TestCase):
+class TestSimLifeViaGraphQL(unittest.TestCase):
     @parameterized.expand(
         [
             ("test: Add cow, grass, human.", 
@@ -16,7 +15,7 @@ class TestSimLife(unittest.TestCase):
              )
         ]
     )
-    def test_generate_creatures(
+    def test_generate_creatures_via_graphql(
         self,
         _test_name_implicitly_used: str,
         prompt: str
@@ -26,7 +25,7 @@ class TestSimLife(unittest.TestCase):
         # Act
         console.print(f"PROMPT: {prompt}")
         result = main.run_chat_loop(prompt)
-        console.print("FINAL OUTPUT (function calls):")
+        console.print("FINAL OUTPUT (GraphQL mutations):")
         console.print(result)
 
         # Assert

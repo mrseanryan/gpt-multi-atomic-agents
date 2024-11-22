@@ -1,0 +1,9 @@
+type Mutation {
+  addCreatureRelationship(input: RelationshipInput!): Relationship!
+}
+
+input RelationshipInput {
+  from_name: String!
+  to_name: String!
+  relationship_kind: RelationshipType!
+}

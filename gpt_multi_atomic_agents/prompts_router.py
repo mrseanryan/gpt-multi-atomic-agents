@@ -8,7 +8,7 @@ from atomic_agents.lib.components.system_prompt_generator import SystemPromptGen
 from pydantic import Field
 
 from . import util_ai
-from .agent_definition import AgentDefinition
+from .agent_definition import AgentDefinitionBase
 from .config import Config
 
 @dataclass
@@ -44,11 +44,11 @@ class RouterAgentOutputSchema(BaseIOSchema):
     chat_message: str = Field(description="The chat response to the user's message")
     recommended_agents: list[RecommendedAgent] = Field(description="The list of agents that you recommend should be used to handle the user's prompt. Only the most relevant agents should be recommended.")
 
-def _serialize_agent(agent: AgentDefinition) -> AgentDescription:
+def _serialize_agent(agent: AgentDefinitionBase) -> AgentDescription:
     topics = ", ".join(agent.topics)
     return AgentDescription(agent_name=agent.agent_name, description=agent.description, topics=topics)
 
-def _serialize_agents(agents: list[AgentDefinition]) -> list[AgentDescription]:
+def _serialize_agents(agents: list[AgentDefinitionBase]) -> list[AgentDescription]:
     all_agents = agents
     return [_serialize_agent(a) for a in all_agents ]
 
@@ -88,6 +88,6 @@ def create_router_agent(config: Config) -> BaseAgent:
     )
     return agent
 
-def build_input(user_prompt: str, agents: list[AgentDefinition], chat_agent_description:str) -> RouterAgentInputSchema:
+def build_input(user_prompt: str, agents: list[AgentDefinitionBase], chat_agent_description:str) -> RouterAgentInputSchema:
     active_agents = agents + [_build_chat_agent(chat_agent_description)]
     return RouterAgentInputSchema(user_prompt=user_prompt, agent_descriptions=_serialize_agents(active_agents))
