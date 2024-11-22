@@ -1,9 +1,9 @@
 from gpt_multi_atomic_agents.functions_dto import FunctionAgentInputSchema, FunctionAgentOutputSchema
-from gpt_multi_atomic_agents.agent_definition import AgentDefinition
+from gpt_multi_atomic_agents.agent_definition import FunctionAgentDefinition
 from . import functions
 
 def build_creature_agent():
-    agent_definition = AgentDefinition(
+    agent_definition = FunctionAgentDefinition(
         agent_name=functions.creature_agent_name,
         description="Creates new creatures given the user prompt. Ensures that ALL creatures mentioned by the user are created.",
         accepted_functions=[functions.function_create_creature, functions.function_create_relationship],
@@ -19,7 +19,7 @@ def build_creature_agent():
     return agent_definition
 
 def build_vegatation_agent():
-    agent_definition = AgentDefinition(
+    agent_definition = FunctionAgentDefinition(
         agent_name=functions.vegetation_agent_name,
         description="Creates new vegetation matching the user prompt. IMPORTANT: Ensures that ALL vegetation and plants mentioned by the user are created.",
         accepted_functions=[functions.function_create_vegetation, functions.function_create_relationship],
@@ -35,7 +35,7 @@ def build_vegatation_agent():
     return agent_definition
 
 def build_relationship_agent():
-    agent_definition = AgentDefinition(
+    agent_definition = FunctionAgentDefinition(
         agent_name=functions.relationship_agent_name,
         description="Creates new relationships between creatures given the user prompt",
         accepted_functions=[functions.function_create_creature, functions.function_create_vegetation, functions.function_create_relationship],

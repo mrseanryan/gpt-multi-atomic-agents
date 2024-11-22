@@ -1,0 +1,10 @@
+type Mutation {
+  addCreature(input: CreatureInput!): Creature!
+}
+
+input CreatureInput {
+  creature_name: String!
+  allowed_terrain: TerrainType!
+  age: Int!
+  icon_name: IconType!
+}
