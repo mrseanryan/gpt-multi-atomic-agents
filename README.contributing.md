@@ -6,7 +6,21 @@ Your contribution is welcome!
 
 Please open a matching Issue and a Pull Request, with some explanation of the changes.
 
-## How to publish
+### To format and lint
+
+```
+./lint.sh
+```
+
+### To test
+
+```
+./test.sh
+```
+
+We wil try to process your PR in a reasonable time.
+
+## How to publish [for package owner]
 
 1. Install
 
@@ -37,5 +51,11 @@ poetry publish
 Or in one command:
 
 ```
-poetry publish --build
+./publsh.sh
+```
+
+6. Run e2e test, to see package is consumable
+
+```
+./test.e2e.sh
 ```

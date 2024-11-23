@@ -1,8 +1,10 @@
 # so future errors halt the script.
 set -e
 
-echo Linting ...
+echo Formatting ...
+ruff format
 
+echo Linting ...
 ruff check .
 
 echo [done]
