@@ -44,12 +44,15 @@ Notes:
 """
 
 
-def build_agent_prompt(allowed_functions_to_generate_names: list[str], topics: list[str], _config: Config
+def build_agent_prompt(
+    allowed_functions_to_generate_names: list[str], topics: list[str], _config: Config
 ) -> str:
     def _join(strings: list[str]):
         return ", ".join(strings)
 
-    prompt = GENERIC_AGENT_PROMPT_TEMPLATE.replace("{TOPICS}", _join(topics)).replace("{AVAILABLE_FUNCTIONS}", _join(allowed_functions_to_generate_names))
+    prompt = GENERIC_AGENT_PROMPT_TEMPLATE.replace("{TOPICS}", _join(topics)).replace(
+        "{AVAILABLE_FUNCTIONS}", _join(allowed_functions_to_generate_names)
+    )
 
     util_output.print_debug(f"prompt: {prompt}", config=_config)
 

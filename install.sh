@@ -1,1 +1,2 @@
+set -e
 poetry install

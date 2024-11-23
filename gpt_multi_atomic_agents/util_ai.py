@@ -9,11 +9,12 @@ from . import config
 
 console = Console()
 
+
 def create_client(_config: config.Config):
-    client: instructor.Instructor|None = None
-    model: str|None = None
-    max_tokens: int|None = None
-    match(_config.ai_platform):
+    client: instructor.Instructor | None = None
+    model: str | None = None
+    max_tokens: int | None = None
+    match _config.ai_platform:
         case config.AI_PLATFORM_Enum.groq:
             client = instructor.from_groq(Groq())
             model = _config.model
@@ -25,7 +26,9 @@ def create_client(_config: config.Config):
             model = _config.model
             max_tokens = _config.max_tokens
         case _:
-            raise RuntimeError(f"Not a recognised AI_PLATFORM: '{_config.ai_platform}' - please check Config.")
+            raise RuntimeError(
+                f"Not a recognised AI_PLATFORM: '{_config.ai_platform}' - please check Config."
+            )
 
     console.print(Text(f"  AI platform: {_config.ai_platform}", style="magenta"))
 
