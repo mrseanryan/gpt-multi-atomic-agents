@@ -80,7 +80,7 @@ class GraphQLAgentDefinition(AgentDefinitionBase):
         initial_input.user_input = user_input
 
         initial_input.previously_generated_mutations = blackboard.get_generated_mutations_matching(self.accepted_graphql_schemas)
-        util_output.print_debug(f"[{self.agent_name}] Previously generated mutations: {initial_input.previously_generated_mutations}", config)
+        util_output.print_debug(f"[{self.agent_name}] Matching previously generated mutations: {initial_input.previously_generated_mutations}", config)
 
         return initial_input
 

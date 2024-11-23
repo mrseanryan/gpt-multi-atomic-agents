@@ -19,7 +19,7 @@ from .graphql_dto import GraphQLAgentOutputSchema
 
 console = Console()
 
-logger = logging.getLogger("functions_expert")
+logger = logging.getLogger("main_service")
 
 # TODO extract util_agent_print
 def _print_agent(agent: prompts_router.RecommendedAgent, _config: config.Config, max_prompt_out_len: int=100, prefix="") -> None:

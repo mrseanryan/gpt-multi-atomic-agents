@@ -31,7 +31,8 @@ rich = "^13.9.4"
 groq = "^0.11.0"
 pydantic = "^2.9.2"
 anthropic = {extras = ["bedrock"], version = "^0.39.0"}
-cornsnake = "^0.0.66"
+cornsnake = "^0.0.67"
+ruff = "^0.8.0"
 
 [build-system]
 requires = ["poetry-core"]
