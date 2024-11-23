@@ -3,7 +3,6 @@ from dataclasses import dataclass
 from atomic_agents.agents.base_agent import (
     BaseIOSchema,
 )
-from pydantic import Field
 
 from .graphql_dto import GraphQLAgentInputSchema, GraphQLAgentOutputSchema
 

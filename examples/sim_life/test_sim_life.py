@@ -1,4 +1,3 @@
-from gpt_multi_atomic_agents import config
 from parameterized import parameterized
 import unittest
 

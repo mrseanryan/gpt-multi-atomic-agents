@@ -48,7 +48,7 @@ def _print_router_assistant(
     console.print(
         f":robot: [bold cyan]Assistant [router]: {message.chat_message}[/bold cyan]"
     )
-    console.print(Text(f"  - recommended agents:", style="blue"))
+    console.print(Text("  - recommended agents:", style="blue"))
     for agent in message.recommended_agents:
         _print_agent(agent, _config=_config, max_prompt_out_len=50)
 
@@ -57,7 +57,7 @@ def _print_assistant_base(chat_message: str, output: typing.Any, agent_name="gen
     console.print(
         f":robot: [bold green]Assistant [{agent_name}]: {chat_message}[/bold green]"
     )
-    console.print(Text(f"  New calls:", style="yellow"))
+    console.print(Text("  New calls:", style="yellow"))
     console.print(output)
 
 
@@ -83,7 +83,7 @@ def _print_assistant_output(
     elif isinstance(agent_definition, GraphQLAgentDefinition):
         return _print_assistant_graphql(response, agent_definition.agent_name)
     else:
-        raise RuntimeError(f"Not a recognised AgentDefinitionBase")
+        raise RuntimeError("Not a recognised AgentDefinitionBase")
 
 
 def _create_agent(agent_definition: AgentDefinitionBase, _config: Config) -> BaseAgent:
@@ -133,9 +133,9 @@ def run_chat_loop(
         if not user_prompt:
             break
 
-        with console.status("[bold green]Processing...") as status:
+        with console.status("[bold green]Processing...") as _status:
             try:
-                console.log(f"Routing...")
+                console.log("Routing...")
                 router_agent = prompts_router.create_router_agent(config=_config)
                 response = typing.cast(
                     prompts_router.RouterAgentOutputSchema,

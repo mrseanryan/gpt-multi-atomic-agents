@@ -3,6 +3,6 @@ set -e
 
 echo Linting ...
 
-ruff check cornsnake
+ruff check .
 
 echo [done]
