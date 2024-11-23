@@ -18,7 +18,7 @@ def run_chat_loop(test_prompt: str | None = None) -> list:
         ai_platform=config.AI_PLATFORM_Enum.bedrock_anthropic,
         model=config.ANTHROPIC_MODEL,
         max_tokens=config.ANTHROPIC_MAX_TOKENS,
-        is_debug=True,
+        is_debug=False,
     )
 
     return main_service.run_chat_loop(
