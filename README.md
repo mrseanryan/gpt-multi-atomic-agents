@@ -42,7 +42,7 @@ The framework is generic and allows agents to be defined in terms of a name, des
 
 The agents communicate indirectly using a blackboard. The language is a composed of (Function or GraphQL mutation) calls: each agent specifies what it understands as input, and what calls it is able to generate. In this way, the agents can understand each other's output.
 
-![System overview](./images/diagram-Multi-LLM-based-Agent-collaboration-via-Dynamic-Router-GraphQL-context.jpg)
+![System overview](https://raw.githubusercontent.com/mrseanryan/gpt-multi-atomic-agents/master/images/diagram-Multi-LLM-based-Agent-collaboration-via-Dynamic-Router-GraphQL-context.jpg)
 
 A router takes the user prompt and selects the best sequence of the most suitable agents, to handle the user prompt.
 
