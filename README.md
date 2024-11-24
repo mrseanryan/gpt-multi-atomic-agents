@@ -42,11 +42,19 @@ The framework is generic and allows agents to be defined in terms of a name, des
 
 The agents communicate indirectly using a blackboard. The language is a composed of (Function or GraphQL mutation) calls: each agent specifies what it understands as input, and what calls it is able to generate. In this way, the agents can understand each other's output.
 
+![System overview](./images/diagram-Multi-LLM-based-Agent-collaboration-via-Dynamic-Router-GraphQL-context.jpg)
+
 A router takes the user prompt and selects the best sequence of the most suitable agents, to handle the user prompt.
 
 The router rewrites the user prompt to suit each agent, which improves quality and avoids unwanted output.
 
 Finally, the output is returned in the form of an ordered list of (Function or GraphQL) calls.
+
+To read more about this approach, you can see this [Medium article](https://medium.com/@mr.sean.ryan/multi-llm-based-agent-collaboration-via-dynamic-router-and-graphql-handle-composite-prompts-with-83e16a22a1cb).
+
+- note: the `framework is at an early stage`. The Evaluator is not currently implemented.
+
+## Integration
 
 When integrating, depending on which kind of Agent Definitions are used, the client needs to:
 
