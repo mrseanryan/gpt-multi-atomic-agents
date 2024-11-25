@@ -1,6 +1,6 @@
 set -e
 
-./test.sh
+./test.unit.sh
 
 poetry publish --build
 
