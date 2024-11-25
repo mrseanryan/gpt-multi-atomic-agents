@@ -1,3 +1,4 @@
+from cornsnake import util_wait
 from parameterized import parameterized
 import unittest
 
@@ -6,6 +7,9 @@ from rich.console import Console
 from . import main
 
 console = Console()
+
+DELAY_SECONDS_BETWEEN_CALLS_TO_AVOID_RATE_LIMIT = 5
+DELAY_SECONDS_BETWEEN_TESTS_TO_AVOID_RATE_LIMIT = 10
 
 
 class TestSimLife(unittest.TestCase):
@@ -21,12 +25,16 @@ class TestSimLife(unittest.TestCase):
         self, _test_name_implicitly_used: str, prompt: str
     ) -> None:
         # Arrange
+        _config = main.get_default_config(
+            delay_between_calls_in_seconds=DELAY_SECONDS_BETWEEN_CALLS_TO_AVOID_RATE_LIMIT
+        )
 
         # Act
         console.print(f"PROMPT: {prompt}")
-        result = main.run_chat_loop_via_function_calls(prompt)
+        result = main.run_chat_loop_via_function_calls(prompt, _config=_config)
         console.print("FINAL OUTPUT (function calls):")
         console.print(result)
 
         # Assert
         self.assertGreater(len(result), 0)
+        util_wait.wait_seconds(DELAY_SECONDS_BETWEEN_TESTS_TO_AVOID_RATE_LIMIT)

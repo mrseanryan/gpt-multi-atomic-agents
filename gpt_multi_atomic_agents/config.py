@@ -22,3 +22,4 @@ class Config:
     model: str
     max_tokens: int
     is_debug: bool = False
+    delay_between_calls_in_seconds: float = 0.0

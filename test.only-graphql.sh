@@ -1,2 +1,2 @@
 set -e
-poetry run python -m unittest discover -s . -p test_sim_life_via*.py --verbose
+poetry run python -m unittest discover -s . -p test_sim_life_via_g*.py --verbose

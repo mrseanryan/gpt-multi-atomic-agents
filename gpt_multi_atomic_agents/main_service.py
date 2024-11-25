@@ -5,7 +5,7 @@ from atomic_agents.agents.base_agent import (
     BaseAgent,
     BaseAgentConfig,
 )
-
+from cornsnake import util_wait
 from rich.console import Console
 
 from . import util_ai, prompts_router
@@ -98,6 +98,7 @@ def run_chat_loop(
                 recommended_agents = response.recommended_agents
 
                 util_print_agent.print_router_assistant(response, _config=_config)
+                util_wait.wait_seconds(_config.delay_between_calls_in_seconds)
 
                 # Loop thru all the recommended agents, sending each one a rewritten version of the user prompt
                 for recommended_agent in recommended_agents:
@@ -143,6 +144,7 @@ def run_chat_loop(
                         agent_definition.update_blackboard(
                             response=response, blackboard=blackboard
                         )
+                        util_wait.wait_seconds(_config.delay_between_calls_in_seconds)
                     except Exception as e:
                         logger.exception(e)
             except Exception as e:

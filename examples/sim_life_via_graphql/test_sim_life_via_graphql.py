@@ -8,6 +8,9 @@ from . import main
 
 console = Console()
 
+DELAY_SECONDS_BETWEEN_CALLS_TO_AVOID_RATE_LIMIT = 5
+DELAY_SECONDS_BETWEEN_TESTS_TO_AVOID_RATE_LIMIT = 10
+
 
 class TestSimLifeViaGraphQL(unittest.TestCase):
     @parameterized.expand(
@@ -67,8 +70,11 @@ class TestSimLifeViaGraphQL(unittest.TestCase):
 
         # Act
         console.print(f"PROMPT: {user_prompt}")
+        _config = main.get_default_config(
+            delay_between_calls_in_seconds=DELAY_SECONDS_BETWEEN_CALLS_TO_AVOID_RATE_LIMIT
+        )
         result = main.run_chat_loop_via_graphql(
-            user_prompt=user_prompt, user_data=user_data
+            user_prompt=user_prompt, user_data=user_data, _config=_config
         )
         console.print("FINAL OUTPUT (GraphQL mutations):")
         console.print(result)
@@ -87,5 +93,4 @@ class TestSimLifeViaGraphQL(unittest.TestCase):
                     f"Expected {expected_count} {mutation} calls but received {actual_count}"
                 )
         self.assertEqual([], mutation_errors)
-        # wait to avoid triggering rate limits
-        util_wait.wait_seconds(1)
+        util_wait.wait_seconds(DELAY_SECONDS_BETWEEN_TESTS_TO_AVOID_RATE_LIMIT)
