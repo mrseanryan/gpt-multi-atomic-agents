@@ -1,14 +1,10 @@
 # A generic Agent prompt.
-# - more specialized prompts can be set when creating the relevant AgentSpec.
-from . import util_output
-from .config import Config
+# TODO: more specialized prompts can be set when creating the relevant AgentDefinition.
 
 
 GENERIC_AGENT_PROMPT_TEMPLATE = """
 Examine the provided user prompt, the available GraphQL mutation definitions and the previously generated GraphQL mutations. The user's request should be handled by generating GraphQL mutations.
-ONLY generate if the user asked about one of these topics: {TOPICS}.
-
-AVAILABLE_MUTATIONS: ```{AVAILABLE_MUTATIONS}```
+ONLY generate if the user asked about one of the agent topics.
 
 For each available mutation, do the following:
 - check is the mutation relevant to the user's prompt
@@ -40,20 +36,9 @@ Notes:
 - For each mutation call, ensure that all required parameters are provided.
 - For each mutation call, ensure that all interesting information is included.
 - Remove any mutation calls that are not for you to generate - see your 'AVAILABLE_MUTATIONS'.
-- Only generate function calls if really necessary - it is OK to output with no mutations.
+- Only generate mutations if really necessary - check against the input graphql_data. It is OK to output with no mutations.
 """
 
 
-def build_agent_prompt(
-    mutations_allowed_to_generate: list[str], topics: list[str], _config: Config
-) -> str:
-    def _join(strings: list[str]):
-        return ", ".join(strings)
-
-    prompt = GENERIC_AGENT_PROMPT_TEMPLATE.replace("{TOPICS}", _join(topics)).replace(
-        "{AVAILABLE_MUTATIONS}", _join(mutations_allowed_to_generate)
-    )
-
-    util_output.print_debug(f"prompt: {prompt}", config=_config)
-
-    return prompt
+def build_agent_prompt() -> str:
+    return GENERIC_AGENT_PROMPT_TEMPLATE

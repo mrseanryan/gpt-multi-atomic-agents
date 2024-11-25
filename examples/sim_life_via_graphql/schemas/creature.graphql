@@ -6,7 +6,7 @@ type Query {
 
 type Creature {
   id: ID!
-  creature_name: String!
+  creature_name: String! @unique
   allowed_terrain: TerrainType!
   age: Int!
   icon_name: IconType!
@@ -14,7 +14,7 @@ type Creature {
 
 type Vegetation {
   id: ID!
-  vegetation_name: String!
+  vegetation_name: String! @unique
   icon_name: IconType!
   allowed_terrain: TerrainType!
 }

@@ -22,14 +22,15 @@ def build_creature_agent():
     agent_definition = GraphQLAgentDefinition(
         agent_name="Creature Creator",
         description="Creates new creatures given the user prompt. Ensures that ALL creatures mentioned by the user are created.",
-        accepted_graphql_schemas=[creatures_graphql, creature_mutations_graphql],
         input_schema=GraphQLAgentInputSchema,
         initial_input=GraphQLAgentInputSchema(
+            accepted_graphql_schemas=[creatures_graphql, creature_mutations_graphql],
+            graphql_data="",
             mutations_allowed_to_generate=[creature_mutations_graphql],
             previously_generated_mutations=[],
+            topics=["creature"],
         ),
         output_schema=GraphQLAgentOutputSchema,
-        topics=["creature"],
     )
 
     return agent_definition
@@ -42,14 +43,15 @@ def build_vegatation_agent():
     agent_definition = GraphQLAgentDefinition(
         agent_name="Vegetation Creator",
         description="Creates new vegetation matching the user prompt. IMPORTANT: Ensures that ALL vegetation and plants mentioned by the user are created.",
-        accepted_graphql_schemas=[creatures_graphql, vegetation_mutations_graphql],
         input_schema=GraphQLAgentInputSchema,
         initial_input=GraphQLAgentInputSchema(
+            accepted_graphql_schemas=[creatures_graphql, vegetation_mutations_graphql],
+            graphql_data="",
             mutations_allowed_to_generate=[vegetation_mutations_graphql],
             previously_generated_mutations=[],
+            topics=["vegetation"],
         ),
         output_schema=GraphQLAgentOutputSchema,
-        topics=["vegetation"],
     )
 
     return agent_definition
@@ -62,19 +64,20 @@ def build_relationship_agent():
     agent_definition = GraphQLAgentDefinition(
         agent_name="Relationship Creator",
         description="Creates new relationships between creatures given the user prompt",
-        accepted_graphql_schemas=[
-            creatures_graphql,
-            creature_mutations_graphql,
-            vegetation_mutations_graphql,
-            relationship_mutations_graphql,
-        ],
         input_schema=GraphQLAgentInputSchema,
         initial_input=GraphQLAgentInputSchema(
+            accepted_graphql_schemas=[
+                creatures_graphql,
+                creature_mutations_graphql,
+                vegetation_mutations_graphql,
+                relationship_mutations_graphql,
+            ],
+            graphql_data="",
             mutations_allowed_to_generate=[relationship_mutations_graphql],
             previously_generated_mutations=[],
+            topics=["relationship"],
         ),
         output_schema=GraphQLAgentOutputSchema,
-        topics=["relationship"],
     )
 
     return agent_definition

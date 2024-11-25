@@ -34,12 +34,11 @@ class AgentDefinitionBase:
     input_schema: type[BaseIOSchema]
     initial_input: BaseIOSchema
     output_schema: type[BaseIOSchema]
-    topics: list[str]  # The agent ONLY generates if user mentioned one of these topics
     # TODO: could add custom prompt/prompt-extension if needed
 
     @abstractmethod
     def build_input(
-        self, user_input: str, blackboard: Blackboard, config: Config
+        self, rewritten_user_prompt: str, blackboard: Blackboard, config: Config
     ) -> BaseIOSchema:
         raise NotImplementedError
 
@@ -51,6 +50,10 @@ class AgentDefinitionBase:
     def update_blackboard(self, response: BaseIOSchema, blackboard: Blackboard) -> None:
         raise NotImplementedError
 
+    @abstractmethod
+    def get_topics(self) -> list[str]:
+        raise NotImplementedError
+
 
 @dataclass
 class FunctionAgentDefinition(AgentDefinitionBase):
@@ -58,15 +61,13 @@ class FunctionAgentDefinition(AgentDefinitionBase):
     initial_input: FunctionAgentInputSchema
     output_schema: type[FunctionAgentOutputSchema]
     accepted_functions: list[FunctionSpecSchema]
-
-    def get_accepted_function_names(self) -> list[str]:
-        return [f.function_name for f in self.accepted_functions]
+    topics: list[str]  # The agent ONLY generates if user mentioned one of these topics
 
     def build_input(
-        self, user_input: str, blackboard: Blackboard, config: Config
+        self, rewritten_user_prompt: str, blackboard: Blackboard, config: Config
     ) -> BaseIOSchema:
         initial_input = self.initial_input
-        initial_input.user_input = user_input
+        initial_input.user_input = rewritten_user_prompt
 
         initial_input.previously_generated_functions = (
             blackboard.get_generated_functions_matching(
@@ -79,6 +80,12 @@ class FunctionAgentDefinition(AgentDefinitionBase):
         )
 
         return initial_input
+
+    def get_accepted_function_names(self) -> list[str]:
+        return [f.function_name for f in self.accepted_functions]
+
+    def get_topics(self) -> list[str]:
+        return self.topics
 
     def get_system_prompt_builder(self, _config: Config) -> SystemPromptBuilderBase:
         return FunctionSystemPromptBuilder(
@@ -101,16 +108,22 @@ class GraphQLAgentDefinition(AgentDefinitionBase):
     input_schema: type[GraphQLAgentInputSchema]
     initial_input: GraphQLAgentInputSchema
     output_schema: type[GraphQLAgentOutputSchema]
-    accepted_graphql_schemas: list[str]
 
     def build_input(
-        self, user_input: str, blackboard: Blackboard, config: Config
+        self, rewritten_user_prompt: str, blackboard: Blackboard, config: Config
     ) -> BaseIOSchema:
         initial_input = self.initial_input
-        initial_input.user_input = user_input
+
+        initial_input.user_input = rewritten_user_prompt
+        initial_input.graphql_data = blackboard.get_user_data()
 
         initial_input.previously_generated_mutations = (
-            blackboard.get_generated_mutations_matching(self.accepted_graphql_schemas)
+            blackboard.get_generated_mutations_matching(
+                initial_input.accepted_graphql_schemas
+            )
+        )
+        util_output.print_debug(
+            f"[{self.agent_name}] build_input(): {initial_input}", config
         )
         util_output.print_debug(
             f"[{self.agent_name}] Matching previously generated mutations: {initial_input.previously_generated_mutations}",
@@ -120,11 +133,10 @@ class GraphQLAgentDefinition(AgentDefinitionBase):
         return initial_input
 
     def get_system_prompt_builder(self, _config: Config) -> SystemPromptBuilderBase:
-        return GraphQLSystemPromptBuilder(
-            topics=self.topics,
-            _config=_config,
-            mutations_allowed_to_generate=self.initial_input.mutations_allowed_to_generate,
-        )
+        return GraphQLSystemPromptBuilder(_config=_config)
+
+    def get_topics(self) -> list[str]:
+        return self.initial_input.topics
 
     def update_blackboard(self, response: BaseIOSchema, blackboard: Blackboard) -> None:
         if isinstance(response, GraphQLAgentOutputSchema):

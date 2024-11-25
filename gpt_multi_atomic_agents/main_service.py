@@ -45,6 +45,7 @@ def run_chat_loop(
     chat_agent_description: str,
     _config: Config,
     given_user_prompt: str | None = None,
+    given_user_data: str | None = None,
 ) -> list:
     if not agent_definitions:
         raise RuntimeError("Expected at least 1 Agent Definition")
@@ -67,12 +68,17 @@ def run_chat_loop(
             if given_user_prompt
             else console.input(":sunglasses: You: ")
         )
+        # If used as a web service, then would also accept new user_data (which the user has updated either by executing its implementation of Function Calls OR by updating via GraphQL mutations).
+        blackboard.set_user_data(user_data=given_user_data)
         if not user_prompt:
             break
 
         with console.status("[bold green]Processing...") as _status:
             try:
                 console.log("Routing...")
+                # TODO: optimizate router:
+                # - possibly run it on smaller (and faster) LLM
+                # - could allow for Classifier based router, but then cannot rewrite prompts
                 router_agent = prompts_router.create_router_agent(config=_config)
                 response = typing.cast(
                     prompts_router.RouterAgentOutputSchema,
@@ -92,7 +98,7 @@ def run_chat_loop(
                 for recommended_agent in recommended_agents:
                     try:
                         if recommended_agent.agent_name == "chat":
-                            # TODO: add a Chat agent - but not really needed
+                            # TODO: add option to redirect to some Chat agent
                             continue
 
                         console.log(
@@ -141,6 +147,7 @@ def run_chat_loop(
 
         if given_user_prompt:
             break
+    # TODO: to support stateless web service, need to return the whole blackboard, and accept it as optional input
     return (
         blackboard.previously_generated_functions
         if is_function_based

@@ -15,6 +15,8 @@ class Blackboard:
     )
     previously_generated_mutation_calls: list[str] = field(default_factory=list)
 
+    _user_data: str = field(default="")
+
     def add_generated_functions(
         self, generated_function_calls: list[FunctionCallSchema]
     ) -> None:
@@ -43,3 +45,9 @@ class Blackboard:
         return util_graphql.filter_to_matching_mutation_calls(
             self.previously_generated_mutation_calls, accepted_mutation_names
         )
+
+    def get_user_data(self) -> str:
+        return self._user_data
+
+    def set_user_data(self, user_data: str) -> None:
+        self._user_data = user_data

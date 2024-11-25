@@ -2,7 +2,7 @@ from gpt_multi_atomic_agents import config, main_service
 from . import agents
 
 
-def run_chat_loop(test_prompt: str | None = None) -> list:
+def run_chat_loop(user_prompt: str | None = None, user_data: str = "") -> list:
     CHAT_AGENT_DESCRIPTION = (
         "Handles users questions about an ecosystem game like Sim Life"
     )
@@ -25,7 +25,8 @@ def run_chat_loop(test_prompt: str | None = None) -> list:
         agent_definitions=agent_definitions,
         chat_agent_description=CHAT_AGENT_DESCRIPTION,
         _config=_config,
-        given_user_prompt=test_prompt,
+        given_user_prompt=user_prompt,
+        given_user_data=user_data,
     )
 
 

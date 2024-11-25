@@ -9,7 +9,6 @@ from .functions_dto import FunctionSpecSchema
 
 @dataclass
 class SystemPromptBuilderBase(ABC):
-    topics: list[str]
     _config: Config
 
     @abstractmethod
@@ -20,6 +19,7 @@ class SystemPromptBuilderBase(ABC):
 @dataclass
 class FunctionSystemPromptBuilder(SystemPromptBuilderBase):
     allowed_functions_to_generate: list[FunctionSpecSchema]
+    topics: list[str]
 
     def build_system_prompt(self) -> str:
         allowed_functions_to_generate_names = [
@@ -46,8 +46,6 @@ class FunctionSystemPromptBuilder(SystemPromptBuilderBase):
 
 @dataclass
 class GraphQLSystemPromptBuilder(SystemPromptBuilderBase):
-    mutations_allowed_to_generate: list[str]
-
     def build_system_prompt(self) -> str:
         return SystemPromptGenerator(
             background=[
@@ -55,13 +53,10 @@ class GraphQLSystemPromptBuilder(SystemPromptBuilderBase):
             ],
             steps=[
                 # TODO: could break the prompt down into steps
-                prompts_agent_graphql.build_agent_prompt(
-                    self.mutations_allowed_to_generate,
-                    topics=self.topics,
-                    _config=self._config,
-                )
+                prompts_agent_graphql.build_agent_prompt()
             ],
             output_instructions=[
+                # TODO: add also output GraphQL queries
                 "Your output should always be a set of zero or more GraphQL mutation calls, using only the allowed GraphQL mutations definitions."
             ],
         )

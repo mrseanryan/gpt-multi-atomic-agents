@@ -11,12 +11,23 @@ class GraphQLAgentInputSchema(BaseIOSchema):
     """
 
     user_input: str = Field(description="The chat message from the user", default="")
+    accepted_graphql_schemas: list[str] = Field(
+        description="The set of GraphQL schemas which the agent can use to work with client data."
+    )
     mutations_allowed_to_generate: list[str] = Field(
-        description="Definitions of the mutations that this agent can generate"
+        description="Definitions of the GraphQL mutations that this agent can generate"
     )
     previously_generated_mutations: list[str] = Field(
-        description="Previously generated mutations in this chat (some are from other agents)",
+        description="Previously generated GraphQL mutations in this chat (some are from other agents)",
         default_factory=lambda: list,
+    )
+    topics: list[str] = Field(
+        description="This agent ONLY generates if user mentioned one of these topics"
+    )
+    # TODO - add "If data is missing, then you need to generate allowed GraphQL queries."
+    graphql_data: str = Field(
+        description="The input GraphQL data from the client. You need to generate allowed GraphQL mutations that the client will use to update the data.",
+        default="",
     )
 
 
@@ -27,5 +38,6 @@ class GraphQLAgentOutputSchema(BaseIOSchema):
 
     chat_message: str = Field(description="The chat response to the user's message")
     generated_mutations: list[str] = Field(
-        description="The set of new generated mutation calls"
+        description="The set of new generated mutation calls to update the graphql_data. Only generate if neccessary (check if the graphql_data already has the data)."
     )
+    # TODO Add generated_queries - generate queries if need more graphql_data

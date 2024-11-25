@@ -18,12 +18,12 @@ class AgentDescription:
     description: str = Field(
         description="The description of this agent, its purpose and capabilities."
     )
-    topics: str = Field(
+    topics: list[str] = Field(
         description="This agent ONLY generates if user mentioned one of these topics"
     )
 
 
-def _build_chat_agent(description: str) -> AgentDescription:
+def _build_chat_agent_description(description: str) -> AgentDescription:
     return AgentDescription(agent_name="chat", description=description, topics=[])
 
 
@@ -63,9 +63,10 @@ class RouterAgentOutputSchema(BaseIOSchema):
 
 
 def _serialize_agent(agent: AgentDefinitionBase) -> AgentDescription:
-    topics = ", ".join(agent.topics)
     return AgentDescription(
-        agent_name=agent.agent_name, description=agent.description, topics=topics
+        agent_name=agent.agent_name,
+        description=agent.description,
+        topics=agent.get_topics(),
     )
 
 
@@ -115,7 +116,9 @@ def create_router_agent(config: Config) -> BaseAgent:
 def build_input(
     user_prompt: str, agents: list[AgentDefinitionBase], chat_agent_description: str
 ) -> RouterAgentInputSchema:
-    active_agents = agents + [_build_chat_agent(chat_agent_description)]
+    agent_descriptions = _serialize_agents(agents) + [
+        (_build_chat_agent_description(chat_agent_description))
+    ]
     return RouterAgentInputSchema(
-        user_prompt=user_prompt, agent_descriptions=_serialize_agents(active_agents)
+        user_prompt=user_prompt, agent_descriptions=agent_descriptions
     )
