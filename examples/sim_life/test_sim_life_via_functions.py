@@ -17,14 +17,14 @@ class TestSimLife(unittest.TestCase):
             )
         ]
     )
-    def test_generate_creatures(
+    def test_generate_creatures_via_functions(
         self, _test_name_implicitly_used: str, prompt: str
     ) -> None:
         # Arrange
 
         # Act
         console.print(f"PROMPT: {prompt}")
-        result = main.run_chat_loop(prompt)
+        result = main.run_chat_loop_via_function_calls(prompt)
         console.print("FINAL OUTPUT (function calls):")
         console.print(result)
 

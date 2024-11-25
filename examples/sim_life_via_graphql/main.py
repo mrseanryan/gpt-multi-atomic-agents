@@ -1,8 +1,11 @@
 from gpt_multi_atomic_agents import config, main_service
+from gpt_multi_atomic_agents.blackboard import GraphQLBlackboard
 from . import agents
 
 
-def run_chat_loop(user_prompt: str | None = None, user_data: str = "") -> list:
+def run_chat_loop_via_graphql(
+    user_prompt: str | None = None, user_data: str = ""
+) -> list[str]:
     CHAT_AGENT_DESCRIPTION = (
         "Handles users questions about an ecosystem game like Sim Life"
     )
@@ -21,14 +24,17 @@ def run_chat_loop(user_prompt: str | None = None, user_data: str = "") -> list:
         is_debug=False,
     )
 
-    return main_service.run_chat_loop(
+    initial_blackboard = GraphQLBlackboard(previously_generated_mutation_calls=[])
+    initial_blackboard.set_user_data(user_data=user_data)
+    blackboard = main_service.run_chat_loop(
         agent_definitions=agent_definitions,
         chat_agent_description=CHAT_AGENT_DESCRIPTION,
         _config=_config,
         given_user_prompt=user_prompt,
-        given_user_data=user_data,
+        blackboard=initial_blackboard,
     )
+    return blackboard.previously_generated_mutation_calls
 
 
 if __name__ == "__main__":
-    run_chat_loop()
+    run_chat_loop_via_graphql()

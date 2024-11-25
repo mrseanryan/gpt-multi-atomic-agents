@@ -1,5 +1,6 @@
 from abc import abstractmethod
 from dataclasses import dataclass
+import typing
 from atomic_agents.agents.base_agent import (
     BaseIOSchema,
 )
@@ -13,7 +14,7 @@ from .system_prompt_builders import (
 )
 
 from . import util_output
-from .blackboard import Blackboard
+from .blackboard import Blackboard, FunctionCallBlackboard, GraphQLBlackboard
 from .config import Config
 
 from .functions_dto import (
@@ -63,14 +64,22 @@ class FunctionAgentDefinition(AgentDefinitionBase):
     accepted_functions: list[FunctionSpecSchema]
     topics: list[str]  # The agent ONLY generates if user mentioned one of these topics
 
+    def _cast_blackboard(self, blackboard: Blackboard) -> FunctionCallBlackboard:
+        if not isinstance(blackboard, FunctionCallBlackboard):
+            raise RuntimeError("Expected blackboard to be a FunctionCallBlackboard")
+        function_blackboard = typing.cast(FunctionCallBlackboard, blackboard)
+        return function_blackboard
+
     def build_input(
         self, rewritten_user_prompt: str, blackboard: Blackboard, config: Config
     ) -> BaseIOSchema:
+        function_blackboard = self._cast_blackboard(blackboard)
+
         initial_input = self.initial_input
         initial_input.user_input = rewritten_user_prompt
 
         initial_input.previously_generated_functions = (
-            blackboard.get_generated_functions_matching(
+            function_blackboard.get_generated_functions_matching(
                 self.get_accepted_function_names()
             )
         )
@@ -95,12 +104,8 @@ class FunctionAgentDefinition(AgentDefinitionBase):
         )
 
     def update_blackboard(self, response: BaseIOSchema, blackboard: Blackboard) -> None:
-        if isinstance(response, FunctionAgentOutputSchema):
-            blackboard.add_generated_functions(response.generated_function_calls)
-        else:
-            raise RuntimeError(
-                "Unexpected response type - expected a FunctionAgentOutputSchema"
-            )
+        function_blackboard = self._cast_blackboard(blackboard)
+        function_blackboard.add_generated_functions(response.generated_function_calls)
 
 
 @dataclass
@@ -109,16 +114,24 @@ class GraphQLAgentDefinition(AgentDefinitionBase):
     initial_input: GraphQLAgentInputSchema
     output_schema: type[GraphQLAgentOutputSchema]
 
+    def _cast_blackboard(self, blackboard: Blackboard) -> GraphQLBlackboard:
+        if not isinstance(blackboard, GraphQLBlackboard):
+            raise RuntimeError("Expected blackboard to be a GraphQLBlackboard")
+        graphql_blackboard = typing.cast(GraphQLBlackboard, blackboard)
+        return graphql_blackboard
+
     def build_input(
         self, rewritten_user_prompt: str, blackboard: Blackboard, config: Config
     ) -> BaseIOSchema:
+        graphql_blackboard = self._cast_blackboard(blackboard)
+
         initial_input = self.initial_input
 
         initial_input.user_input = rewritten_user_prompt
-        initial_input.graphql_data = blackboard.get_user_data()
+        initial_input.graphql_data = graphql_blackboard.get_user_data()
 
         initial_input.previously_generated_mutations = (
-            blackboard.get_generated_mutations_matching(
+            graphql_blackboard.get_generated_mutations_matching(
                 initial_input.accepted_graphql_schemas
             )
         )
@@ -139,9 +152,5 @@ class GraphQLAgentDefinition(AgentDefinitionBase):
         return self.initial_input.topics
 
     def update_blackboard(self, response: BaseIOSchema, blackboard: Blackboard) -> None:
-        if isinstance(response, GraphQLAgentOutputSchema):
-            blackboard.add_generated_mutations(response.generated_mutations)
-        else:
-            raise RuntimeError(
-                "Unexpected response type - expected a GraphQLAgentOutputSchema"
-            )
+        graphql_blackboard = self._cast_blackboard(blackboard)
+        graphql_blackboard.add_generated_mutations(response.generated_mutations)

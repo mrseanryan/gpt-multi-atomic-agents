@@ -342,9 +342,12 @@ OUTPUT:
 poetry install
 ```
 
-2. Get an Open AI key
+2. Setup your credentials for your preferred AI platform.
 
-3. Set environment variable with your Open AI key:
+For OpenAI:
+
+- You need to get an Open AI key.
+- Set environment variable for your  with your Open AI key:
 
 ```
 export OPENAI_API_KEY="xxx"

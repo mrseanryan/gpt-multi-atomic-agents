@@ -8,14 +8,10 @@ logger = logging.getLogger("blackboard")
 
 
 @dataclass
-class Blackboard:
-    # TODO try split this blackboard, have a base class
+class FunctionCallBlackboard:
     previously_generated_functions: list[FunctionCallSchema] = field(
         default_factory=list
     )
-    previously_generated_mutation_calls: list[str] = field(default_factory=list)
-
-    _user_data: str = field(default="")
 
     def add_generated_functions(
         self, generated_function_calls: list[FunctionCallSchema]
@@ -31,6 +27,13 @@ class Blackboard:
                 self.previously_generated_functions,
             )
         )
+
+
+@dataclass
+class GraphQLBlackboard:
+    previously_generated_mutation_calls: list[str] = field(default_factory=list)
+
+    _user_data: str = field(default="")
 
     def add_generated_mutations(self, generated_mutation_calls: list[str]) -> None:
         self.previously_generated_mutation_calls += generated_mutation_calls
@@ -51,3 +54,6 @@ class Blackboard:
 
     def set_user_data(self, user_data: str) -> None:
         self._user_data = user_data
+
+
+Blackboard = FunctionCallBlackboard | GraphQLBlackboard

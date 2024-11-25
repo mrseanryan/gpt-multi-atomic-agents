@@ -1,3 +1,4 @@
+from cornsnake import util_wait
 from parameterized import parameterized
 import unittest
 
@@ -66,7 +67,9 @@ class TestSimLifeViaGraphQL(unittest.TestCase):
 
         # Act
         console.print(f"PROMPT: {user_prompt}")
-        result = main.run_chat_loop(user_prompt=user_prompt, user_data=user_data)
+        result = main.run_chat_loop_via_graphql(
+            user_prompt=user_prompt, user_data=user_data
+        )
         console.print("FINAL OUTPUT (GraphQL mutations):")
         console.print(result)
 
@@ -84,3 +87,5 @@ class TestSimLifeViaGraphQL(unittest.TestCase):
                     f"Expected {expected_count} {mutation} calls but received {actual_count}"
                 )
         self.assertEqual([], mutation_errors)
+        # wait to avoid triggering rate limits
+        util_wait.wait_seconds(1)

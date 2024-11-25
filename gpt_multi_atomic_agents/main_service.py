@@ -13,7 +13,7 @@ from .agent_definition import (
     AgentDefinitionBase,
     FunctionAgentDefinition,
 )
-from .blackboard import Blackboard
+from .blackboard import Blackboard, FunctionCallBlackboard, GraphQLBlackboard
 from .config import Config
 from .functions_dto import FunctionAgentOutputSchema
 from . import util_print_agent
@@ -45,11 +45,19 @@ def run_chat_loop(
     chat_agent_description: str,
     _config: Config,
     given_user_prompt: str | None = None,
-    given_user_data: str | None = None,
-) -> list:
+    blackboard: Blackboard
+    | None = None,  # If used as a web service, then would also accept previous state + new data (which the user has updated either by executing its implementation of Function Calls OR by updating via GraphQL mutations).
+) -> Blackboard:
     if not agent_definitions:
         raise RuntimeError("Expected at least 1 Agent Definition")
     is_function_based = isinstance(agent_definitions[0], FunctionAgentDefinition)
+    if blackboard:
+        if is_function_based and not (typing.cast(FunctionCallBlackboard, blackboard)):
+            raise RuntimeError("Expected blackboard to be a FunctionCallBlackboard")
+    else:
+        blackboard = (
+            FunctionCallBlackboard() if is_function_based else GraphQLBlackboard()
+        )
 
     initial_message = FunctionAgentOutputSchema(
         chat_message="How can I help you?", generated_function_calls=[]
@@ -61,15 +69,12 @@ def run_chat_loop(
     if given_user_prompt:
         console.print(f":sunglasses: You: {given_user_prompt}")
 
-    blackboard = Blackboard()
     while True:
         user_prompt = (
             given_user_prompt
             if given_user_prompt
             else console.input(":sunglasses: You: ")
         )
-        # If used as a web service, then would also accept new user_data (which the user has updated either by executing its implementation of Function Calls OR by updating via GraphQL mutations).
-        blackboard.set_user_data(user_data=given_user_data)
         if not user_prompt:
             break
 
@@ -147,12 +152,8 @@ def run_chat_loop(
 
         if given_user_prompt:
             break
-    # TODO: to support stateless web service, need to return the whole blackboard, and accept it as optional input
-    return (
-        blackboard.previously_generated_functions
-        if is_function_based
-        else blackboard.previously_generated_mutation_calls
-    )
+    # To support a stateless web service, we return the whole blackboard, and accept it as optional input
+    return blackboard
 
 
 # to debug - see agent.system_prompt_generator.generate_prompt()
