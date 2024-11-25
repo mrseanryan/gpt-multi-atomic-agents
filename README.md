@@ -6,7 +6,7 @@ A simple dynamic multi-agent framework based on [atomic-agents](https://github.c
   - the router rewrites the user prompt, to best suit each agent
 - generate via OpenAI or AWS Bedrock or groq
 
-- note: the `!! framework is at an early stage !!` - breaking changes may occur between versions.
+- note: the `!! framework is at an early stage !!` - breaking changes will be indicated by increasing the *minor* version (major is still at zero).
 
 [url_repo]: https://github.com/mrseanryan/gpt-multi-atomic-agents
 [url_semver_org]: https://semver.org/
