@@ -37,7 +37,7 @@ def run_chat_loop_via_function_calls(
         given_user_prompt=test_prompt,
     )
 
-    return blackboard.previously_generated_functions()
+    return blackboard.previously_generated_functions
 
 
 if __name__ == "__main__":
