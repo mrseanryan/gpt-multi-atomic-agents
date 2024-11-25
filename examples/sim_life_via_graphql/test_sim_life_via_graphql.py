@@ -12,13 +12,31 @@ class TestSimLifeViaGraphQL(unittest.TestCase):
     @parameterized.expand(
         [
             (
-                "test: Add cow, grass, human.",
+                "complex test: Add cow, grass, human, alien.",
                 "Add a cow that eats grass. Add a human - the cow feeds the human. Add alien that eats the human. The human also eats cows.",
                 "",
-                3,
+                {"addCreature(": 3, "addVegetation(": 1, "addCreatureRelationship(": 4},
             ),
             (
-                "test: Add cow, grass - with human already in data.",
+                "test: Add cow - with human already in GraphQL data.",
+                "The cow feeds the human",
+                """
+                {
+                id: "H001",
+                creature_name: "Human",
+                allowed_terrain: TerrainType.LAND,
+                age: 30,
+                icon_name: IconType.HUMAN
+                }
+                """,
+                {
+                    "addCreature(": 1,  # Human already exists
+                    "addVegetation(": 0,
+                    "addCreatureRelationship(": 1,
+                },
+            ),
+            (
+                "complex test: Add cow, grass, alien - with human already in GraphQL data.",
                 "Add a cow that eats grass. The cow feeds the human. Add alien that eats the human. The human also eats cows.",
                 """
                 {
@@ -29,7 +47,11 @@ class TestSimLifeViaGraphQL(unittest.TestCase):
                 icon_name: IconType.HUMAN
                 }
                 """,
-                2,  # Human already exists
+                {
+                    "addCreature(": 2,  # Human already exists
+                    "addVegetation(": 1,
+                    "addCreatureRelationship(": 4,
+                },
             ),
         ]
     )
@@ -38,7 +60,7 @@ class TestSimLifeViaGraphQL(unittest.TestCase):
         _test_name_implicitly_used: str,
         user_prompt: str,
         user_data: str,
-        expected_add_creature_calls: int,
+        expected_mutation_counts: dict[str, int],
     ) -> None:
         # Arrange
 
@@ -52,5 +74,13 @@ class TestSimLifeViaGraphQL(unittest.TestCase):
         self.assertGreater(len(result), 0)
 
         result_joined = ",".join(result)
-        actual_add_creature_calls = result_joined.count('creature_name: "')
-        self.assertEqual(expected_add_creature_calls, actual_add_creature_calls)
+
+        mutation_errors = []
+        for mutation in expected_mutation_counts.keys():
+            actual_count = result_joined.count(mutation)
+            expected_count = expected_mutation_counts[mutation]
+            if actual_count != expected_count:
+                mutation_errors.append(
+                    f"Expected {expected_count} {mutation} calls but received {actual_count}"
+                )
+        self.assertEqual([], mutation_errors)

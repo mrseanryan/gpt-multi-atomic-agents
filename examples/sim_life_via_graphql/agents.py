@@ -21,7 +21,7 @@ creature_mutations_graphql = _read_schema("creature.mutations.graphql")
 def build_creature_agent():
     agent_definition = GraphQLAgentDefinition(
         agent_name="Creature Creator",
-        description="Creates new creatures given the user prompt. Ensures that ALL creatures mentioned by the user are created.",
+        description="Creates new creatures given the user prompt. Ensures that ALL creatures mentioned by the user are created, but ONLY if they are not already in graphql_data.",
         input_schema=GraphQLAgentInputSchema,
         initial_input=GraphQLAgentInputSchema(
             accepted_graphql_schemas=[creatures_graphql, creature_mutations_graphql],
