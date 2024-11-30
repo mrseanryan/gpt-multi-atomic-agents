@@ -36,5 +36,6 @@ class TestSimLife(unittest.TestCase):
         console.print(result)
 
         # Assert
-        self.assertGreater(len(result), 0)
+        self.assertGreater(len(result.previously_generated_functions), 0)
+        self.assertGreater(len(result.previous_messages), 0)
         util_wait.wait_seconds(DELAY_SECONDS_BETWEEN_TESTS_TO_AVOID_RATE_LIMIT)

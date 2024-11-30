@@ -17,11 +17,12 @@ DELAY_SECONDS_BETWEEN_TESTS_TO_AVOID_RATE_LIMIT = 10
 
 class TestSimLifeViaGraphQL(unittest.TestCase):
     def _check_generation_result(
-        self, generated_mutations: list[str], expected_mutation_counts: dict[str, int]
+        self, blackboard: GraphQLBlackboard, expected_mutation_counts: dict[str, int]
     ) -> None:
-        self.assertGreater(len(generated_mutations), 0)
+        self.assertGreater(len(blackboard.previously_generated_mutation_calls), 0)
+        self.assertGreater(len(blackboard.previous_messages), 0)
 
-        result_joined = ",".join(generated_mutations)
+        result_joined = ",".join(blackboard.previously_generated_mutation_calls)
 
         mutation_errors = []
         for mutation in expected_mutation_counts.keys():
@@ -217,7 +218,7 @@ class TestSimLifeViaGraphQL(unittest.TestCase):
 
         # Assert
         self._check_generation_result(
-            generated_mutations=generation_result.previously_generated_mutation_calls,
+            generated_mutations=generation_result,
             expected_mutation_counts=expected_mutation_counts,
         )
         util_wait.wait_seconds(DELAY_SECONDS_BETWEEN_TESTS_TO_AVOID_RATE_LIMIT)

@@ -28,7 +28,7 @@ def run_chat_loop_via_graphql(
     user_prompt: str | None = None,
     user_data: str = "",
     _config: config.Config | None = None,
-) -> list[str]:
+) -> GraphQLBlackboard:
     if not _config:
         _config = get_default_config()
 
@@ -41,7 +41,7 @@ def run_chat_loop_via_graphql(
         given_user_prompt=user_prompt,
         blackboard=initial_blackboard,
     )
-    return blackboard.previously_generated_mutation_calls
+    return blackboard
 
 
 if __name__ == "__main__":

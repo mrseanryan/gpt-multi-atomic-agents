@@ -15,7 +15,7 @@ from .agent_definition import (
     AgentDefinitionBase,
     FunctionAgentDefinition,
 )
-from .blackboard import Blackboard, FunctionCallBlackboard, GraphQLBlackboard
+from .blackboard import Blackboard, FunctionCallBlackboard, GraphQLBlackboard, Message, MessageRole
 from .config import Config
 from .functions_dto import FunctionAgentOutputSchema
 from . import util_print_agent
@@ -63,7 +63,7 @@ def generate(
     agent_definitions: list[AgentDefinitionBase],
     chat_agent_description: str,
     _config: Config,
-    user_prompt: str,  # TODO optionally accept list of messages with role+content (via blackboard?)
+    user_prompt: str,
     blackboard: Blackboard
     | None = None,  # If used as a web service, then would also accept previous state + new data (which the user has updated either by executing its implementation of Function Calls OR by updating via GraphQL mutations).
     execution_plan: main_router.AgentExecutionPlan | None = None,
@@ -81,6 +81,8 @@ def generate(
     else:
         blackboard = _create_blackboard(agent_definitions)
 
+    blackboard.previous_messages.append(Message(role = MessageRole.user, message=user_prompt))
+
     with console.status("[bold green]Processing...") as _status:
         try:
             if not execution_plan:
@@ -90,6 +92,7 @@ def generate(
                     _config=_config,
                     user_prompt=user_prompt,
                 )
+                blackboard.previous_messages.append(Message(role = MessageRole.assistant, message=execution_plan.chat_message))
                 util_wait.wait_seconds(_config.delay_between_calls_in_seconds)
 
             # Loop thru all the recommended agents, sending each one a rewritten version of the user prompt
@@ -153,7 +156,7 @@ def run_chat_loop(
     chat_agent_description: str,
     _config: Config,
     given_user_prompt: str
-    | None = None,  # TODO optionally accept list of messages with role+content (via blackboard?)
+    | None = None,
     blackboard: Blackboard
     | None = None,  # If used as a web service, then would also accept previous state + new data (which the user has updated either by executing its implementation of Function Calls OR by updating via GraphQL mutations).
 ) -> Blackboard:
@@ -167,11 +170,14 @@ def run_chat_loop(
     if not blackboard:
         blackboard = _create_blackboard(agent_definitions)
 
+    initial_assistant_message = "How can I help you?"
     initial_message = FunctionAgentOutputSchema(
-        chat_message="How can I help you?", generated_function_calls=[]
+        chat_message=initial_assistant_message, generated_function_calls=[]
     )
 
     util_print_agent.print_assistant_functions(initial_message)
+
+    blackboard.previous_messages.append(Message(role = MessageRole.assistant, message=initial_assistant_message))
 
     # for more emojis - see "poetry run python -m rich.emoji"
     if given_user_prompt:

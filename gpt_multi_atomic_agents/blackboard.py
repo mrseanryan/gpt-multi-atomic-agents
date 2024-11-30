@@ -1,4 +1,5 @@
 from dataclasses import dataclass, field
+from enum import StrEnum, auto
 import logging
 
 from .functions_dto import FunctionCallSchema
@@ -7,11 +8,22 @@ from . import util_graphql
 logger = logging.getLogger("blackboard")
 
 
+class MessageRole(StrEnum):
+    user = auto()
+    assistant = auto()
+
+@dataclass
+class Message:
+    role: MessageRole
+    message: str
+
+
 @dataclass
 class FunctionCallBlackboard:
     previously_generated_functions: list[FunctionCallSchema] = field(
         default_factory=list
     )
+    previous_messages: list[Message] = field(default_factory=list)
 
     def add_generated_functions(
         self, generated_function_calls: list[FunctionCallSchema]
@@ -28,10 +40,10 @@ class FunctionCallBlackboard:
             )
         )
 
-
 @dataclass
 class GraphQLBlackboard:
     previously_generated_mutation_calls: list[str] = field(default_factory=list)
+    previous_messages: list[Message] = field(default_factory=list)
 
     _user_data: str = field(default="")
 
