@@ -14,6 +14,15 @@ def get_default_config(delay_between_calls_in_seconds: float = 0.0):
     )
     return _config
 
+CHAT_AGENT_DESCRIPTION = (
+    "Handles users questions about an ecosystem game like Sim Life"
+)
+
+agent_definitions = [
+    agents.build_creature_agent(),
+    agents.build_relationship_agent(),
+    agents.build_vegatation_agent(),
+]
 
 def run_chat_loop_via_graphql(
     user_prompt: str | None = None,
@@ -22,16 +31,6 @@ def run_chat_loop_via_graphql(
 ) -> list[str]:
     if not _config:
         _config = get_default_config()
-
-    CHAT_AGENT_DESCRIPTION = (
-        "Handles users questions about an ecosystem game like Sim Life"
-    )
-
-    agent_definitions = [
-        agents.build_creature_agent(),
-        agents.build_relationship_agent(),
-        agents.build_vegatation_agent(),
-    ]
 
     initial_blackboard = GraphQLBlackboard(previously_generated_mutation_calls=[])
     initial_blackboard.set_user_data(user_data=user_data)

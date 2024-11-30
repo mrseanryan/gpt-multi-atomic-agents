@@ -22,7 +22,7 @@ console = Console()
 def print_agent(
     agent: prompts_router.RecommendedAgent,
     _config: config.Config,
-    max_prompt_out_len: int = 100,
+    max_prompt_out_len: int = 200,
     prefix="",
 ) -> None:
     rewritten_user_prompt = (
@@ -42,7 +42,7 @@ def print_router_assistant(
     )
     console.print(Text("  - recommended agents:", style="blue"))
     for agent in message.recommended_agents:
-        print_agent(agent, _config=_config, max_prompt_out_len=50)
+        print_agent(agent, _config=_config)
 
 
 def _print_assistant_base(chat_message: str, output: typing.Any, agent_name="general"):
@@ -74,3 +74,6 @@ def print_assistant_output(
         return _print_assistant_graphql(response, agent_definition.agent_name)
     else:
         raise RuntimeError("Not a recognised AgentDefinitionBase")
+
+def print_user_prompt(user_prompt: str) -> None:
+    console.print(f":sunglasses: You: {user_prompt}")
