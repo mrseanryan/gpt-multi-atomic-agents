@@ -102,7 +102,10 @@ class TestSimLifeViaGraphQL(unittest.TestCase):
         console.print(generation_result)
 
         # Assert
-        self._check_generation_result(generation_result, expected_mutation_counts)
+        self._check_generation_result(
+            blackboard=generation_result,
+            expected_mutation_counts=expected_mutation_counts,
+        )
 
         util_wait.wait_seconds(DELAY_SECONDS_BETWEEN_TESTS_TO_AVOID_RATE_LIMIT)
 
@@ -218,7 +221,7 @@ class TestSimLifeViaGraphQL(unittest.TestCase):
 
         # Assert
         self._check_generation_result(
-            generated_mutations=generation_result,
+            blackboard=generation_result,
             expected_mutation_counts=expected_mutation_counts,
         )
         util_wait.wait_seconds(DELAY_SECONDS_BETWEEN_TESTS_TO_AVOID_RATE_LIMIT)

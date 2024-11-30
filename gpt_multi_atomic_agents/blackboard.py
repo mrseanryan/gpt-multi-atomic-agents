@@ -12,6 +12,7 @@ class MessageRole(StrEnum):
     user = auto()
     assistant = auto()
 
+
 @dataclass
 class Message:
     role: MessageRole
@@ -39,6 +40,7 @@ class FunctionCallBlackboard:
                 self.previously_generated_functions,
             )
         )
+
 
 @dataclass
 class GraphQLBlackboard:
