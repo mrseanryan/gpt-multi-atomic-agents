@@ -46,9 +46,15 @@ The agents communicate indirectly using a blackboard. The language is a composed
 
 ![System overview](https://raw.githubusercontent.com/mrseanryan/gpt-multi-atomic-agents/master/images/diagram-Multi-LLM-based-Agent-collaboration-via-Dynamic-Router-GraphQL-context.jpg)
 
-A router takes the user prompt and selects the best sequence of the most suitable agents, to handle the user prompt.
+A router takes the user prompt and generates an agent execution plan.
+
+The execution plan uses the best sequence of the most suitable agents, to handle the user prompt.
 
 The router rewrites the user prompt to suit each agent, which improves quality and avoids unwanted output.
+
+note: Optionally, the router can be run separately, allowing for human-in-the-loop feedback on the execution plan that the router generated. In this way, the user can collaborate more with the router, before the generative agents are actually executed.
+
+- this allows the user to have more control over the output, and has the added benefit of reducing the *perceived* time taken to generate, since the user has intermediate interaction with the router.
 
 Finally, the output is returned in the form of an ordered list of (Function or GraphQL) calls.
 
@@ -119,13 +125,13 @@ function_add_relationship = FunctionSpecSchema(
 
 #### Agent Definitions [Function Calls Based Approach]
 
-The Creature Creator agent is defined in terms of:
+The Creature Creator agent is defined declaratively in terms of:
 
 - its description (a very short prompt)
 - its input schema (a list of accepted function definitions)
 - its output schema (a list of output function definitions)
 
-Agents can exchange information indirectly, by reusing the same function defintions.
+Agents can collaborate and exchange information indirectly, by reusing the same function defintions via a blackboard.
 
 ```python
 def build_creature_agent():
@@ -156,7 +162,7 @@ Notes about the Creature Creator agent:
 
 This is a demo 'Sim Life' world builder.
 It uses 3 agents (Creature Creature, Vegetation Creator, Relationship Creator) to process user prompts.
-The agents are defined in terms of GraphQL schema, and allowed generated mutations.
+The agents are defined declaratively in terms of GraphQL input schema, and allowed generated mutations.
 The output is a series of GraphQL mutations which can be executed by the client, to build the Sim Life world.
 
 #### Definitions [GraphQL Based Approach]
@@ -221,13 +227,15 @@ input VegetationInput {
 
 #### Agent Definitions [GraphQL Based Approach]
 
-The Creature Creator agent is defined in terms of:
+The Creature Creator agent is defined declaratively in terms of:
 
 - its description (a very short prompt)
 - its input schema (a list of accepted GraphQL schemas)
 - its output schema (a list of output GraphQL mutation calls)
 
-Agents exchange information indirectly via a blackboard, by reusing the same GraphQL schemas and mutation calls.
+An agent is basically a composition of input and output schemas, together with a prompt.
+
+Agents collaborate and exchange information indirectly via a blackboard, by reusing the same GraphQL schemas and mutation calls.
 
 ```python
 creatures_graphql = _read_schema("creature.graphql")
@@ -284,7 +292,7 @@ def run_chat_loop(given_user_prompt: str|None = None) -> list:
 
 > note: if `given_user_prompt` is not set, then `run_chat_loop()` will wait for user input from the keyboard
 
-See the [example source code](https://github.com/mrseanryan/gpt-multi-atomic-agents/tree/master/examples/sim_life) for more details.
+See the [example source code](https://github.com/mrseanryan/gpt-multi-atomic-agents/tree/master/examples) for more details.
 
 ## Example Execution [Function Calls Based Approach]
 
@@ -306,6 +314,10 @@ Because the framework has a dynamic router, it can handle more complex 'composit
 > Add a cow that eats grass. Add a human - the cow feeds the human. Add and alien that eats the human. The human also eats cows.
 
 The router figures out which agents to use, what order to run them in, and what prompt to send to each agent.
+
+Optionally, the router can be re-executed with user feedback on its genereated plan, before actually executing the agents.
+
+The recommended agents are then executed in order, building up their results in the shared blackboard.
 
 Finally, the framework combines the resulting calls together and returns them to the client.
 
@@ -369,4 +381,4 @@ Test script:
 ./test.sh
 ```
 
-See the [example source code](https://github.com/mrseanryan/gpt-multi-atomic-agents/tree/master/examples/sim_life) for more details.
+See the [example source code](https://github.com/mrseanryan/gpt-multi-atomic-agents/tree/master/examples) for more details.
