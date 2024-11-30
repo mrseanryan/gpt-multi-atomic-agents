@@ -22,7 +22,7 @@ logger = logging.getLogger("main_service")
 class AgentExecutionPlan:
     chat_message: str
     recommended_agents: list[prompts_router.RecommendedAgent]
-    # TODO: could group the agents via list of ParallelAgentsGroup
+    # TODO: could group the agents via list of ParallelAgentsGroup - this could also allow client to execute the agents in stages, allowing for HITL
 
 
 def generate_plan(
@@ -30,7 +30,7 @@ def generate_plan(
     chat_agent_description: str,
     _config: Config,
     user_prompt: str
-    | None = None,  # TODO optionally accept list of messages with role+content
+    | None = None,
 ) -> AgentExecutionPlan:
     console.log("Routing...")
     """
