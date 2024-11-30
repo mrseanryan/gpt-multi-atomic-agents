@@ -10,12 +10,14 @@ type Creature {
   allowed_terrain: TerrainType!
   age: Int!
   icon_name: IconType!
+  emoji: String!
 }
 
 type Vegetation {
   id: ID!
   vegetation_name: String! @unique
   icon_name: IconType!
+  emoji: String!
   allowed_terrain: TerrainType!
 }
 
@@ -24,6 +26,7 @@ type Relationship {
   from_name: String!
   to_name: String!
   relationship_kind: RelationshipType!
+  emoji: String!
 }
 
 enum TerrainType {
@@ -44,7 +47,10 @@ enum IconType {
 
 enum RelationshipType {
   EATS
-  BUYS
   FEEDS
+  BUYS
   SELLS
+  FIGHTS
+  HELPS
+  CARRIES
 }

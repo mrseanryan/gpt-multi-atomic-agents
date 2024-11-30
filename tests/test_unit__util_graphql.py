@@ -23,6 +23,7 @@ input CreatureInput {
   allowed_terrain: TerrainType!
   age: Int!
   icon_name: IconType!
+  emoji: String!
 }
 """,
                     """
@@ -34,6 +35,7 @@ input VegetationInput {
   vegetation_name: String!
   icon_name: IconType!
   allowed_terrain: TerrainType!
+  emoji: String!
 }
 """,
                     """
@@ -45,6 +47,7 @@ input RelationshipInput {
   from_name: String!
   to_name: String!
   relationship_kind: RelationshipType!
+  emoji: String!
 }
 """,
                 ],

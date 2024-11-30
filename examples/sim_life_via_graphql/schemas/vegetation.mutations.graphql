@@ -6,4 +6,5 @@ input VegetationInput {
   vegetation_name: String!
   icon_name: IconType!
   allowed_terrain: TerrainType!
+  emoji: String!
 }

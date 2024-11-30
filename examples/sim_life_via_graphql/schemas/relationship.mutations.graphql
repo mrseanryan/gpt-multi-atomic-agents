@@ -6,4 +6,5 @@ input RelationshipInput {
   from_name: String!
   to_name: String!
   relationship_kind: RelationshipType!
+  emoji: String!
 }

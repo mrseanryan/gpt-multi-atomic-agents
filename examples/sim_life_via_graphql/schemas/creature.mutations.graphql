@@ -7,4 +7,5 @@ input CreatureInput {
   allowed_terrain: TerrainType!
   age: Int!
   icon_name: IconType!
+  emoji: String!
 }
