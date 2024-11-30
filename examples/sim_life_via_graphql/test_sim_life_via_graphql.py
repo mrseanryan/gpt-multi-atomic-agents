@@ -16,7 +16,9 @@ DELAY_SECONDS_BETWEEN_TESTS_TO_AVOID_RATE_LIMIT = 10
 
 
 class TestSimLifeViaGraphQL(unittest.TestCase):
-    def _check_generation_result(self, generated_mutations: list[str], expected_mutation_counts: dict[str, int]) -> None:
+    def _check_generation_result(
+        self, generated_mutations: list[str], expected_mutation_counts: dict[str, int]
+    ) -> None:
         self.assertGreater(len(generated_mutations), 0)
 
         result_joined = ",".join(generated_mutations)
@@ -108,9 +110,9 @@ class TestSimLifeViaGraphQL(unittest.TestCase):
             (
                 "complex test: Add cow, grass, alien - with human already in GraphQL data.",
                 "Add a cow that eats grass. The cow feeds the human. Add alien that eats the human. The human also eats cows.",
-                3
+                3,
             ),
-          ]
+        ]
     )
     def test_generate_execution_plan_creatures_via_graphql(
         self,
@@ -130,13 +132,15 @@ class TestSimLifeViaGraphQL(unittest.TestCase):
             agent_definitions=main.agent_definitions,
             chat_agent_description=main.CHAT_AGENT_DESCRIPTION,
             _config=_config,
-            user_prompt=user_prompt
+            user_prompt=user_prompt,
         )
         console.print("FINAL OUTPUT (Execution Plan):")
         console.print(generation_result)
 
         # Assert
-        self.assertEqual(len(generation_result.recommended_agents), expected_agent_count)
+        self.assertEqual(
+            len(generation_result.recommended_agents), expected_agent_count
+        )
 
         util_wait.wait_seconds(DELAY_SECONDS_BETWEEN_TESTS_TO_AVOID_RATE_LIMIT)
 
@@ -161,7 +165,7 @@ class TestSimLifeViaGraphQL(unittest.TestCase):
                     "addCreatureRelationship(": 4,
                 },
             ),
-          ]
+        ]
     )
     def test_generate_execution_plan_then_generate_creatures_via_graphql(
         self,
@@ -183,7 +187,7 @@ class TestSimLifeViaGraphQL(unittest.TestCase):
             agent_definitions=main.agent_definitions,
             chat_agent_description=main.CHAT_AGENT_DESCRIPTION,
             _config=_config,
-            user_prompt=user_prompt
+            user_prompt=user_prompt,
         )
         console.print("GENERATED OUTPUT (Execution Plan):")
         console.print(execution_plan)
@@ -205,12 +209,15 @@ class TestSimLifeViaGraphQL(unittest.TestCase):
             _config=_config,
             user_prompt=user_prompt,
             blackboard=initial_blackboard,
-            execution_plan=execution_plan
+            execution_plan=execution_plan,
         )
 
         console.print("GENERATED OUTPUT (Generation):")
         console.print(generation_result)
 
         # Assert
-        self._check_generation_result(generated_mutations=generation_result.previously_generated_mutation_calls, expected_mutation_counts=expected_mutation_counts)
+        self._check_generation_result(
+            generated_mutations=generation_result.previously_generated_mutation_calls,
+            expected_mutation_counts=expected_mutation_counts,
+        )
         util_wait.wait_seconds(DELAY_SECONDS_BETWEEN_TESTS_TO_AVOID_RATE_LIMIT)

@@ -42,24 +42,30 @@ def _create_agent(agent_definition: AgentDefinitionBase, _config: Config) -> Bas
     return agent
 
 
-def _create_blackboard(agent_definitions: list[AgentDefinitionBase]) -> Blackboard:
-    if not agent_definitions:
-        raise RuntimeError("Expected at least 1 Agent Definition")
+def _check_blackboard(
+    blackboard: Blackboard, agent_definitions: list[AgentDefinitionBase]
+) -> None:
     is_function_based = isinstance(agent_definitions[0], FunctionAgentDefinition)
     if blackboard:
         if is_function_based and not (typing.cast(FunctionCallBlackboard, blackboard)):
             raise RuntimeError("Expected blackboard to be a FunctionCallBlackboard")
-    else:
-        blackboard = (
-            FunctionCallBlackboard() if is_function_based else GraphQLBlackboard()
-        )
+
+
+def _create_blackboard(agent_definitions: list[AgentDefinitionBase]) -> Blackboard:
+    if not agent_definitions:
+        raise RuntimeError("Expected at least 1 Agent Definition")
+    is_function_based = isinstance(agent_definitions[0], FunctionAgentDefinition)
+    blackboard = FunctionCallBlackboard() if is_function_based else GraphQLBlackboard()
+    return blackboard
+
 
 def generate(
     agent_definitions: list[AgentDefinitionBase],
     chat_agent_description: str,
     _config: Config,
     user_prompt: str,  # TODO optionally accept list of messages with role+content
-    blackboard: Blackboard | None = None,  # If used as a web service, then would also accept previous state + new data (which the user has updated either by executing its implementation of Function Calls OR by updating via GraphQL mutations).
+    blackboard: Blackboard
+    | None = None,  # If used as a web service, then would also accept previous state + new data (which the user has updated either by executing its implementation of Function Calls OR by updating via GraphQL mutations).
     execution_plan: main_router.AgentExecutionPlan | None = None,
 ) -> Blackboard:
     """
@@ -70,13 +76,20 @@ def generate(
 
     start = util_time.start_timer()
 
-    if not blackboard:
+    if blackboard:
+        _check_blackboard(blackboard=blackboard, agent_definitions=agent_definitions)
+    else:
         blackboard = _create_blackboard(agent_definitions)
 
     with console.status("[bold green]Processing...") as _status:
         try:
             if not execution_plan:
-                execution_plan = main_router.generate_plan(agent_definitions=agent_definitions, chat_agent_description=chat_agent_description, _config=_config, user_prompt=user_prompt)
+                execution_plan = main_router.generate_plan(
+                    agent_definitions=agent_definitions,
+                    chat_agent_description=chat_agent_description,
+                    _config=_config,
+                    user_prompt=user_prompt,
+                )
                 util_wait.wait_seconds(_config.delay_between_calls_in_seconds)
 
             # Loop thru all the recommended agents, sending each one a rewritten version of the user prompt
@@ -116,14 +129,12 @@ def generate(
                             config=_config,
                         )
                     )
-                    util_print_agent.print_assistant_output(
-                        response, agent_definition
-                    )
+                    util_print_agent.print_assistant_output(response, agent_definition)
 
                     agent_definition.update_blackboard(
                         response=response, blackboard=blackboard
                     )
-                    is_last = (i == len(execution_plan.recommended_agents) - 1)
+                    is_last = i == len(execution_plan.recommended_agents) - 1
                     if not is_last:
                         util_wait.wait_seconds(_config.delay_between_calls_in_seconds)
                 except Exception as e:
@@ -136,12 +147,15 @@ def generate(
         console.log(f"  time taken: {util_time.describe_elapsed_seconds(time_taken)}")
     return blackboard
 
+
 def run_chat_loop(
     agent_definitions: list[AgentDefinitionBase],
     chat_agent_description: str,
     _config: Config,
-    given_user_prompt: str | None = None,  # TODO optionally accept list of messages with role+content
-    blackboard: Blackboard | None = None,  # If used as a web service, then would also accept previous state + new data (which the user has updated either by executing its implementation of Function Calls OR by updating via GraphQL mutations).
+    given_user_prompt: str
+    | None = None,  # TODO optionally accept list of messages with role+content
+    blackboard: Blackboard
+    | None = None,  # If used as a web service, then would also accept previous state + new data (which the user has updated either by executing its implementation of Function Calls OR by updating via GraphQL mutations).
 ) -> Blackboard:
     """
     Use the provided agents to fulfill the user's prompt.
@@ -172,7 +186,13 @@ def run_chat_loop(
         if not user_prompt:
             break
 
-        blackboard = generate(agent_definitions=agent_definitions, chat_agent_description=chat_agent_description, _config=_config, user_prompt=user_prompt, blackboard=blackboard)
+        blackboard = generate(
+            agent_definitions=agent_definitions,
+            chat_agent_description=chat_agent_description,
+            _config=_config,
+            user_prompt=user_prompt,
+            blackboard=blackboard,
+        )
 
         if given_user_prompt:
             break

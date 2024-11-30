@@ -17,18 +17,21 @@ from . import util_print_agent
 console = Console()
 logger = logging.getLogger("main_service")
 
+
 @dataclass
 class AgentExecutionPlan:
     chat_message: str
     recommended_agents: list[prompts_router.RecommendedAgent]
     # TODO: could group the agents via list of ParallelAgentsGroup
 
+
 def generate_plan(
     agent_definitions: list[AgentDefinitionBase],
     chat_agent_description: str,
     _config: Config,
-    user_prompt: str | None = None  # TODO optionally accept list of messages with role+content
-    ) -> AgentExecutionPlan:
+    user_prompt: str
+    | None = None,  # TODO optionally accept list of messages with role+content
+) -> AgentExecutionPlan:
     console.log("Routing...")
     """
     Generate an agent execution plan to fulfill the user prompt, using the provided agents.
@@ -60,5 +63,5 @@ def generate_plan(
 
     return AgentExecutionPlan(
         chat_message=response.chat_message,
-        recommended_agents = response.recommended_agents
+        recommended_agents=response.recommended_agents,
     )

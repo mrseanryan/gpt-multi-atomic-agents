@@ -75,5 +75,6 @@ def print_assistant_output(
     else:
         raise RuntimeError("Not a recognised AgentDefinitionBase")
 
+
 def print_user_prompt(user_prompt: str) -> None:
     console.print(f":sunglasses: You: {user_prompt}")
