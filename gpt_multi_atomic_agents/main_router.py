@@ -29,8 +29,7 @@ def generate_plan(
     agent_definitions: list[AgentDefinitionBase],
     chat_agent_description: str,
     _config: Config,
-    user_prompt: str
-    | None = None,
+    user_prompt: str | None = None,
 ) -> AgentExecutionPlan:
     console.log("Routing...")
     """
