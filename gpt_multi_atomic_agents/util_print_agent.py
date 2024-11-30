@@ -25,11 +25,9 @@ def print_agent(
     max_prompt_out_len: int = 200,
     prefix="",
 ) -> None:
-    rewritten_user_prompt = (
-        agent.rewritten_user_prompt
-        if _config.is_debug
-        else agent.rewritten_user_prompt[:max_prompt_out_len] + "..."
-    )
+    rewritten_user_prompt = agent.rewritten_user_prompt
+    if not _config.is_debug and len(rewritten_user_prompt) > max_prompt_out_len:
+        rewritten_user_prompt = agent.rewritten_user_prompt[:max_prompt_out_len] + "..."
     console.print(Text(f" {prefix} - [{agent.agent_name}]", style="cyan"))
     console.print(Text(f"  <-- '{rewritten_user_prompt}'", style="blue"))
 

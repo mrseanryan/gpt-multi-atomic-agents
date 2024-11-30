@@ -63,7 +63,7 @@ def generate(
     agent_definitions: list[AgentDefinitionBase],
     chat_agent_description: str,
     _config: Config,
-    user_prompt: str,  # TODO optionally accept list of messages with role+content
+    user_prompt: str,  # TODO optionally accept list of messages with role+content (via blackboard?)
     blackboard: Blackboard
     | None = None,  # If used as a web service, then would also accept previous state + new data (which the user has updated either by executing its implementation of Function Calls OR by updating via GraphQL mutations).
     execution_plan: main_router.AgentExecutionPlan | None = None,
@@ -153,7 +153,7 @@ def run_chat_loop(
     chat_agent_description: str,
     _config: Config,
     given_user_prompt: str
-    | None = None,  # TODO optionally accept list of messages with role+content
+    | None = None,  # TODO optionally accept list of messages with role+content (via blackboard?)
     blackboard: Blackboard
     | None = None,  # If used as a web service, then would also accept previous state + new data (which the user has updated either by executing its implementation of Function Calls OR by updating via GraphQL mutations).
 ) -> Blackboard:
