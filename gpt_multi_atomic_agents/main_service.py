@@ -58,7 +58,7 @@ def generate(
     agent_definitions: list[AgentDefinitionBase],
     chat_agent_description: str,
     _config: Config,
-    user_prompt: str,
+    user_prompt: str,  # TODO optionally accept list of messages with role+content
     blackboard: Blackboard | None = None,  # If used as a web service, then would also accept previous state + new data (which the user has updated either by executing its implementation of Function Calls OR by updating via GraphQL mutations).
     execution_plan: main_router.AgentExecutionPlan | None = None,
 ) -> Blackboard:
@@ -140,9 +140,8 @@ def run_chat_loop(
     agent_definitions: list[AgentDefinitionBase],
     chat_agent_description: str,
     _config: Config,
-    given_user_prompt: str | None = None,
+    given_user_prompt: str | None = None,  # TODO optionally accept list of messages with role+content
     blackboard: Blackboard | None = None,  # If used as a web service, then would also accept previous state + new data (which the user has updated either by executing its implementation of Function Calls OR by updating via GraphQL mutations).
-    execution_plan: main_router.AgentExecutionPlan | None = None
 ) -> Blackboard:
     """
     Use the provided agents to fulfill the user's prompt.

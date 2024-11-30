@@ -27,7 +27,8 @@ def generate_plan(
     agent_definitions: list[AgentDefinitionBase],
     chat_agent_description: str,
     _config: Config,
-    user_prompt: str | None = None) -> AgentExecutionPlan:
+    user_prompt: str | None = None  # TODO optionally accept list of messages with role+content
+    ) -> AgentExecutionPlan:
     console.log("Routing...")
     """
     Generate an agent execution plan to fulfill the user prompt, using the provided agents.
