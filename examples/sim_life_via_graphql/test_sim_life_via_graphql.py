@@ -4,7 +4,7 @@ import unittest
 
 from rich.console import Console
 
-from gpt_multi_atomic_agents import main_router, main_service
+from gpt_multi_atomic_agents import main_generator, main_router
 from gpt_multi_atomic_agents.blackboard import GraphQLBlackboard
 
 from . import main
@@ -207,7 +207,7 @@ class TestSimLifeViaGraphQL(unittest.TestCase):
         initial_blackboard.set_user_data(user_data=user_data)
 
         # Act
-        generation_result = main_service.generate(
+        generation_result = main_generator.generate(
             agent_definitions=main.agent_definitions,
             chat_agent_description=main.CHAT_AGENT_DESCRIPTION,
             _config=_config,

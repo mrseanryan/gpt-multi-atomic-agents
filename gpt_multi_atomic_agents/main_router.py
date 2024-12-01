@@ -14,7 +14,7 @@ from . import util_print_agent
 
 
 console = Console()
-logger = logging.getLogger("main_service")
+logger = logging.getLogger("main_router")
 
 
 def generate_plan(

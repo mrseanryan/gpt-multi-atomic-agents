@@ -1,5 +1,5 @@
 import agents
-from gpt_multi_atomic_agents import config, main_service
+from gpt_multi_atomic_agents import config, main_generator
 
 from importlib.metadata import version
 
@@ -26,7 +26,7 @@ def run_chat_loop_via_function_calls(test_prompt: str | None = None) -> list:
         is_debug=False,
     )
 
-    blackboard = main_service.run_chat_loop(
+    blackboard = main_generator.run_chat_loop(
         agent_definitions=agent_definitions,
         chat_agent_description=CHAT_AGENT_DESCRIPTION,
         _config=_config,
