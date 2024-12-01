@@ -1,5 +1,5 @@
 import agents
-from gpt_multi_atomic_agents import config, main_generator
+from gpt_multi_atomic_agents import config, main_generator, blackboard_accessor
 
 from importlib.metadata import version
 
@@ -7,7 +7,9 @@ gmaa_version = version("gpt_multi_atomic_agents")
 print(f"Using gpt_multi_atomic_agents [{gmaa_version}] - 'from X import Y'")
 
 
-def run_chat_loop_via_function_calls(test_prompt: str | None = None) -> list:
+def run_chat_loop_via_function_calls(
+    test_prompt: str | None = None,
+) -> blackboard_accessor.BlackboardAccessor:
     CHAT_AGENT_DESCRIPTION = (
         "Handles users questions about an ecosystem game like Sim Life"
     )
@@ -32,7 +34,8 @@ def run_chat_loop_via_function_calls(test_prompt: str | None = None) -> list:
         _config=_config,
         given_user_prompt=test_prompt,
     )
-    return blackboard.previously_generated_functions
+    print(blackboard)
+    return blackboard
 
 
 if __name__ == "__main__":

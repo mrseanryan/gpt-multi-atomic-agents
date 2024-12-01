@@ -43,7 +43,7 @@ class GraphQLBlackboardAccessor:
 
     def get_new_mutations_and_queries(self) -> MutationsAndQueries:
         """Get the new mutations and queries which the client needs to execute. After executing, the client should call update_with_new_client_data() to pass in the updated and/or missing data."""
-        queries = []  # TODO update when we add query generation
+        queries = []  # TODO update when we add generation of GraphQL queries
         return MutationsAndQueries(
             previously_generated_mutation_calls=self._blackboard._previously_generated_mutation_calls,
             previously_generated_queries=queries,
