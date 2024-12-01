@@ -5,7 +5,7 @@ import logging
 from .functions_dto import FunctionCallSchema
 from . import util_graphql
 
-logger = logging.getLogger("blackboard")
+logger = logging.getLogger(__file__)
 
 
 class MessageRole(StrEnum):

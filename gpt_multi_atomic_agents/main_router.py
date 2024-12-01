@@ -12,9 +12,9 @@ from .agent_definition import (
 from .config import Config
 from . import util_print_agent
 
-
 console = Console()
-logger = logging.getLogger("main_router")
+
+logger = logging.getLogger(__file__)
 
 
 def generate_plan(

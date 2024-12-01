@@ -1,7 +1,7 @@
 import logging
 from cornsnake import util_list, util_string
 
-logger = logging.getLogger("util_graphql")
+logger = logging.getLogger(__file__)
 
 
 def _clean_mutation_name(name):

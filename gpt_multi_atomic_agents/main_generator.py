@@ -30,7 +30,7 @@ from . import util_print_agent
 
 console = Console()
 
-logger = logging.getLogger("main_generator")
+logger = logging.getLogger(__file__)
 
 
 def _create_agent(agent_definition: AgentDefinitionBase, _config: Config) -> BaseAgent:
