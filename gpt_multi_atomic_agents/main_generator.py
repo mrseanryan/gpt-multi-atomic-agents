@@ -24,6 +24,11 @@ from .blackboard import (
     Message,
     MessageRole,
 )
+from .blackboard_accessor import (
+    BlackboardAccessor,
+    FunctionCallBlackboardAccessor,
+    GraphQLBlackboardAccessor,
+)
 from .config import Config
 from .functions_dto import FunctionAgentOutputSchema
 from . import util_print_agent
@@ -59,11 +64,17 @@ def _check_blackboard(
             raise RuntimeError("Expected blackboard to be a FunctionCallBlackboard")
 
 
-def _create_blackboard(agent_definitions: list[AgentDefinitionBase]) -> Blackboard:
+def _create_blackboard_accessor(
+    agent_definitions: list[AgentDefinitionBase],
+) -> BlackboardAccessor:
     if not agent_definitions:
         raise RuntimeError("Expected at least 1 Agent Definition")
     is_function_based = isinstance(agent_definitions[0], FunctionAgentDefinition)
-    blackboard = FunctionCallBlackboard() if is_function_based else GraphQLBlackboard()
+    blackboard = (
+        FunctionCallBlackboardAccessor(_blackboard=FunctionCallBlackboard())
+        if is_function_based
+        else GraphQLBlackboardAccessor(_blackboard=GraphQLBlackboard())
+    )
     return blackboard
 
 
@@ -72,10 +83,10 @@ def generate(
     chat_agent_description: str,
     _config: Config,
     user_prompt: str,
-    blackboard: Blackboard
+    blackboard: BlackboardAccessor
     | None = None,  # If used as a web service, then would also accept previous state + new data (which the user has updated either by executing its implementation of Function Calls OR by updating via GraphQL mutations).
     execution_plan: AgentExecutionPlanSchema | None = None,
-) -> Blackboard:
+) -> BlackboardAccessor:
     """
     Use the provided agents to fulfill the user's prompt.
     - if an execution plan is provided, that is used to decide which agents to execute.
@@ -85,11 +96,13 @@ def generate(
     start = util_time.start_timer()
 
     if blackboard:
-        _check_blackboard(blackboard=blackboard, agent_definitions=agent_definitions)
+        _check_blackboard(
+            blackboard=blackboard._blackboard, agent_definitions=agent_definitions
+        )
     else:
-        blackboard = _create_blackboard(agent_definitions)
+        blackboard = _create_blackboard_accessor(agent_definitions)
 
-    blackboard.previous_messages.append(
+    blackboard._blackboard.add_mesage(
         Message(role=MessageRole.user, message=user_prompt)
     )
 
@@ -102,7 +115,7 @@ def generate(
                     _config=_config,
                     user_prompt=user_prompt,
                 )
-                blackboard.previous_messages.append(
+                blackboard._blackboard.add_mesage(
                     Message(
                         role=MessageRole.assistant, message=execution_plan.chat_message
                     )
@@ -142,14 +155,14 @@ def generate(
                     response = agent.run(
                         agent_definition.build_input(
                             recommended_agent.rewritten_user_prompt,
-                            blackboard=blackboard,
+                            blackboard=blackboard._blackboard,
                             config=_config,
                         )
                     )
                     util_print_agent.print_assistant_output(response, agent_definition)
 
                     agent_definition.update_blackboard(
-                        response=response, blackboard=blackboard
+                        response=response, blackboard=blackboard._blackboard
                     )
                     is_last = i == len(execution_plan.recommended_agents) - 1
                     if not is_last:
@@ -170,9 +183,9 @@ def run_chat_loop(
     chat_agent_description: str,
     _config: Config,
     given_user_prompt: str | None = None,
-    blackboard: Blackboard
+    blackboard: BlackboardAccessor
     | None = None,  # If used as a web service, then would also accept previous state + new data (which the user has updated either by executing its implementation of Function Calls OR by updating via GraphQL mutations).
-) -> Blackboard:
+) -> BlackboardAccessor:
     """
     Use the provided agents to fulfill the user's prompt.
     - if an execution plan is provided, that is used to decide which agents to execute.
@@ -181,7 +194,7 @@ def run_chat_loop(
     """
 
     if not blackboard:
-        blackboard = _create_blackboard(agent_definitions)
+        blackboard = _create_blackboard_accessor(agent_definitions)
 
     initial_assistant_message = "How can I help you?"
     initial_message = FunctionAgentOutputSchema(
@@ -190,7 +203,7 @@ def run_chat_loop(
 
     util_print_agent.print_assistant_functions(initial_message)
 
-    blackboard.previous_messages.append(
+    blackboard._blackboard.add_mesage(
         Message(role=MessageRole.assistant, message=initial_assistant_message)
     )
 

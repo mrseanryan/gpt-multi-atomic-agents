@@ -160,6 +160,6 @@ class GraphQLAgentDefinition(AgentDefinitionBase):
     def update_blackboard(self, response: BaseIOSchema, blackboard: Blackboard) -> None:
         graphql_blackboard = self._cast_blackboard(blackboard)
         graphql_blackboard.add_generated_mutations(response.generated_mutations)
-        graphql_blackboard.previous_messages.append(
+        graphql_blackboard.add_mesage(
             Message(role=MessageRole.assistant, message=response.chat_message)
         )

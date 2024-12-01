@@ -1,5 +1,5 @@
 from gpt_multi_atomic_agents import config, main_generator
-from gpt_multi_atomic_agents.blackboard import GraphQLBlackboard
+from gpt_multi_atomic_agents.blackboard_accessor import GraphQLBlackboardAccessor
 from . import agents
 
 
@@ -28,12 +28,12 @@ def run_chat_loop_via_graphql(
     user_prompt: str | None = None,
     user_data: str = "",
     _config: config.Config | None = None,
-) -> GraphQLBlackboard:
+) -> GraphQLBlackboardAccessor:
     if not _config:
         _config = get_default_config()
 
-    initial_blackboard = GraphQLBlackboard(previously_generated_mutation_calls=[])
-    initial_blackboard.set_user_data(user_data=user_data)
+    initial_blackboard = GraphQLBlackboardAccessor()
+    initial_blackboard.update_with_new_client_data(user_data=user_data)
     blackboard = main_generator.run_chat_loop(
         agent_definitions=agent_definitions,
         chat_agent_description=CHAT_AGENT_DESCRIPTION,

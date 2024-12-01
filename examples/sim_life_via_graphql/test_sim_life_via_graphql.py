@@ -6,6 +6,7 @@ from rich.console import Console
 
 from gpt_multi_atomic_agents import main_generator, main_router
 from gpt_multi_atomic_agents.blackboard import GraphQLBlackboard
+from gpt_multi_atomic_agents.blackboard_accessor import GraphQLBlackboardAccessor
 
 from . import main
 
@@ -17,12 +18,19 @@ DELAY_SECONDS_BETWEEN_TESTS_TO_AVOID_RATE_LIMIT = 10
 
 class TestSimLifeViaGraphQL(unittest.TestCase):
     def _check_generation_result(
-        self, blackboard: GraphQLBlackboard, expected_mutation_counts: dict[str, int]
+        self,
+        blackboard: GraphQLBlackboardAccessor,
+        expected_mutation_counts: dict[str, int],
     ) -> None:
-        self.assertGreater(len(blackboard.previously_generated_mutation_calls), 0)
-        self.assertGreater(len(blackboard.previous_messages), 0)
+        new_mutations_and_queries = blackboard.get_new_mutations_and_queries()
+        self.assertGreater(
+            len(new_mutations_and_queries.previously_generated_mutation_calls), 0
+        )
+        self.assertGreater(len(blackboard.get_new_messages()), 0)
 
-        result_joined = ",".join(blackboard.previously_generated_mutation_calls)
+        result_joined = ",".join(
+            new_mutations_and_queries.previously_generated_mutation_calls
+        )
 
         mutation_errors = []
         for mutation in expected_mutation_counts.keys():
@@ -203,8 +211,8 @@ class TestSimLifeViaGraphQL(unittest.TestCase):
 
         # Test: use the generated execution plan
         # Arrange
-        initial_blackboard = GraphQLBlackboard(previously_generated_mutation_calls=[])
-        initial_blackboard.set_user_data(user_data=user_data)
+        initial_blackboard = GraphQLBlackboardAccessor(GraphQLBlackboard())
+        initial_blackboard.update_with_new_client_data(user_data=user_data)
 
         # Act
         generation_result = main_generator.generate(
@@ -225,3 +233,11 @@ class TestSimLifeViaGraphQL(unittest.TestCase):
             expected_mutation_counts=expected_mutation_counts,
         )
         util_wait.wait_seconds(DELAY_SECONDS_BETWEEN_TESTS_TO_AVOID_RATE_LIMIT)
+
+
+# TODO add test to cover the client-side (BlackboardAccessor)
+#
+# note: normally after generate() the client would:
+# - execute any mutations to update their data
+# - execute any queries to get more data
+# Then cycle around: ask user for prompt, update the blackboard, call generate_plan(), call generate()...

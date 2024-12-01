@@ -1,5 +1,5 @@
 from gpt_multi_atomic_agents import config, main_generator
-from gpt_multi_atomic_agents.blackboard import FunctionCallBlackboard
+from gpt_multi_atomic_agents.blackboard_accessor import FunctionCallBlackboardAccessor
 from . import agents
 
 
@@ -17,7 +17,7 @@ def get_default_config(delay_between_calls_in_seconds: float = 0.0):
 
 def run_chat_loop_via_function_calls(
     test_prompt: str | None = None, _config: config.Config | None = None
-) -> FunctionCallBlackboard:
+) -> FunctionCallBlackboardAccessor:
     CHAT_AGENT_DESCRIPTION = (
         "Handles users questions about an ecosystem game like Sim Life"
     )

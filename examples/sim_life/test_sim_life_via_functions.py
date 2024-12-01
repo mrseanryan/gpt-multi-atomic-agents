@@ -36,6 +36,16 @@ class TestSimLife(unittest.TestCase):
         console.print(result)
 
         # Assert
-        self.assertGreater(len(result.previously_generated_functions), 0)
-        self.assertGreater(len(result.previous_messages), 0)
+        self.assertGreater(len(result.get_new_functions()), 0)
+        self.assertGreater(len(result.get_new_messages()), 0)
         util_wait.wait_seconds(DELAY_SECONDS_BETWEEN_TESTS_TO_AVOID_RATE_LIMIT)
+
+
+# TODO add test via generate_plan() and generate()
+
+# TODO add test to cover the client-side (BlackboardAccessor)
+#
+# note: normally after calling generate() the client would:
+# - execute any functions to update their data
+#   - for some functions this involves getting more data
+# Then cycle around: ask user for prompt, update the blackboard, call generate_plan(), call generate()...
