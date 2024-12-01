@@ -7,6 +7,7 @@ from atomic_agents.agents.base_agent import (
 from atomic_agents.lib.components.system_prompt_generator import SystemPromptGenerator
 from pydantic import Field
 
+
 from . import util_ai
 from .agent_definition import AgentDefinitionBase
 from .config import Config
@@ -27,18 +28,6 @@ def _build_chat_agent_description(description: str) -> AgentDescription:
     return AgentDescription(agent_name="chat", description=description, topics=[])
 
 
-class RouterAgentInputSchema(BaseIOSchema):
-    """
-    This schema represents the input to the Router agent.
-    The schema contains the user's prompt and the list of available agents. Each agent has a special purpose. You need to recommend one or more agents to handle the users prompt.
-    """
-
-    user_prompt: str = Field(description="The chat message from the user", default="")
-    agent_descriptions: list[AgentDescription] = Field(
-        description="The list of available agents, describing their abilities and topics"
-    )
-
-
 class RecommendedAgent(BaseIOSchema):
     """
     This schema represents one agent that you recommend be used to handle the user's prompt.
@@ -51,14 +40,41 @@ class RecommendedAgent(BaseIOSchema):
     )
 
 
+class AgentExecutionPlanSchema(BaseIOSchema):
+    """
+    This schema represents a generated plan to execute agents to fulfill the user's request.
+    """
+
+    chat_message: str = Field(description="The chat response to the user's message")
+    recommended_agents: list[RecommendedAgent] = Field(
+        description="The ordered list of agents that you recommend should be used to handle the user's prompt. Only the most relevant agents should be recommended."
+    )
+    # TODO: could group the agents via list of ParallelAgentsGroup - this could also allow client to execute the agents in stages, allowing for HITL
+
+
+class RouterAgentInputSchema(BaseIOSchema):
+    """
+    This schema represents the input to the Router agent.
+    The schema contains the user's prompt and the list of available agents. Each agent has a special purpose. You need to recommend one or more agents to handle the users prompt.
+    """
+
+    user_prompt: str = Field(description="The chat message from the user", default="")
+    agent_descriptions: list[AgentDescription] = Field(
+        description="The list of available agents, describing their abilities and topics"
+    )
+    previous_plan: AgentExecutionPlanSchema | None = Field(
+        description="The previously executed plan which the user wants you to modify",
+        default=None,
+    )
+
+
 class RouterAgentOutputSchema(BaseIOSchema):
     """
     This schema represents the output of the Router agent.
     """
 
-    chat_message: str = Field(description="The chat response to the user's message")
-    recommended_agents: list[RecommendedAgent] = Field(
-        description="The list of agents that you recommend should be used to handle the user's prompt. Only the most relevant agents should be recommended."
+    execution_plan: AgentExecutionPlanSchema = Field(
+        description="The generated plan to execute the agents"
     )
 
 
@@ -114,11 +130,16 @@ def create_router_agent(config: Config) -> BaseAgent:
 
 
 def build_input(
-    user_prompt: str, agents: list[AgentDefinitionBase], chat_agent_description: str
+    user_prompt: str,
+    agents: list[AgentDefinitionBase],
+    chat_agent_description: str,
+    previous_plan: AgentExecutionPlanSchema | None = None,
 ) -> RouterAgentInputSchema:
     agent_descriptions = _serialize_agents(agents) + [
         (_build_chat_agent_description(chat_agent_description))
     ]
     return RouterAgentInputSchema(
-        user_prompt=user_prompt, agent_descriptions=agent_descriptions
+        user_prompt=user_prompt,
+        agent_descriptions=agent_descriptions,
+        previous_plan=previous_plan,
     )

@@ -36,10 +36,10 @@ def print_router_assistant(
     message: prompts_router.RouterAgentOutputSchema, _config: config.Config
 ) -> None:
     console.print(
-        f":robot: [bold cyan]Assistant [router]: {message.chat_message}[/bold cyan]"
+        f":robot: [bold cyan]Assistant [router]: {message.execution_plan.chat_message}[/bold cyan]"
     )
     console.print(Text("  - recommended agents:", style="blue"))
-    for agent in message.recommended_agents:
+    for agent in message.execution_plan.recommended_agents:
         print_agent(agent, _config=_config)
 
 

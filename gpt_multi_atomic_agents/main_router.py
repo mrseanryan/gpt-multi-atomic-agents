@@ -1,4 +1,3 @@
-from dataclasses import dataclass
 import logging
 import typing
 
@@ -18,19 +17,13 @@ console = Console()
 logger = logging.getLogger("main_service")
 
 
-@dataclass
-class AgentExecutionPlan:
-    chat_message: str
-    recommended_agents: list[prompts_router.RecommendedAgent]
-    # TODO: could group the agents via list of ParallelAgentsGroup - this could also allow client to execute the agents in stages, allowing for HITL
-
-
 def generate_plan(
     agent_definitions: list[AgentDefinitionBase],
     chat_agent_description: str,
     _config: Config,
-    user_prompt: str | None = None,
-) -> AgentExecutionPlan:
+    user_prompt: str,
+    previous_plan: prompts_router.AgentExecutionPlanSchema | None = None,
+) -> prompts_router.AgentExecutionPlanSchema:
     console.log("Routing...")
     """
     Generate an agent execution plan to fulfill the user prompt, using the provided agents.
@@ -52,6 +45,7 @@ def generate_plan(
                 user_prompt=user_prompt,
                 agents=agent_definitions,
                 chat_agent_description=chat_agent_description,
+                previous_plan=previous_plan,
             )
         ),
     )
@@ -60,7 +54,4 @@ def generate_plan(
     time_taken = util_time.end_timer(start=start)
     console.log(f"  time taken: {util_time.describe_elapsed_seconds(time_taken)}")
 
-    return AgentExecutionPlan(
-        chat_message=response.chat_message,
-        recommended_agents=response.recommended_agents,
-    )
+    return response.execution_plan

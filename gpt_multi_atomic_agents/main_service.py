@@ -8,6 +8,8 @@ from atomic_agents.agents.base_agent import (
 from cornsnake import util_time, util_wait
 from rich.console import Console
 
+from .prompts_router import AgentExecutionPlanSchema
+
 from . import main_router
 
 from . import util_ai
@@ -72,7 +74,7 @@ def generate(
     user_prompt: str,
     blackboard: Blackboard
     | None = None,  # If used as a web service, then would also accept previous state + new data (which the user has updated either by executing its implementation of Function Calls OR by updating via GraphQL mutations).
-    execution_plan: main_router.AgentExecutionPlan | None = None,
+    execution_plan: AgentExecutionPlanSchema | None = None,
 ) -> Blackboard:
     """
     Use the provided agents to fulfill the user's prompt.
