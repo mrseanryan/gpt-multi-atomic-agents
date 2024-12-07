@@ -133,16 +133,11 @@ Agents can collaborate and exchange information indirectly, by reusing the same 
 
 ```python
 def build_creature_agent():
-    agent_definition = FunctionAgentDefinition(
+    agent_definition = build_function_agent_definition(
         agent_name="Creature Creator",
         description="Creates new creatures given the user prompt. Ensures that ALL creatures mentioned by the user are created.",
         accepted_functions=[function_add_creature, function_add_relationship],
-        input_schema=FunctionAgentInputSchema,
-        initial_input=FunctionAgentInputSchema(
-            functions_allowed_to_generate=[function_add_creature],
-            previously_generated_functions=[]
-        ),
-        output_schema=FunctionAgentOutputSchema,
+        functions_allowed_to_generate=[function_add_creature],
         topics=["creature"]
     )
 
@@ -240,16 +235,11 @@ creatures_graphql = _read_schema("creature.graphql")
 creature_mutations_graphql = _read_schema("creature.mutations.graphql")
 
 def build_creature_agent():
-    agent_definition = GraphQLAgentDefinition(
+    agent_definition = build_graphql_agent_definition(
         agent_name="Creature Creator",
         description="Creates new creatures given the user prompt. Ensures that ALL creatures mentioned by the user are created.",
         accepted_graphql_schemas=[creatures_graphql, creature_mutations_graphql],
-        input_schema=GraphQLAgentInputSchema,
-        initial_input=GraphQLAgentInputSchema(
-            mutations_allowed_to_generate=[creature_mutations_graphql],
-            previously_generated_mutations=[]
-        ),
-        output_schema=GraphQLAgentOutputSchema,
+        mutations_allowed_to_generate=[creature_mutations_graphql],
         topics=["creature"]
     )
 
@@ -373,10 +363,21 @@ source ~/.zprofile
 
 ## Usage
 
-Test script:
+gpt-multi-atomic-agents can be used in two ways:
+
+- as a framework for your application or service
+- as a REST API, where a client provides the agents and user prompts
+
+REST API (with Swagger examples):
+
+```
+./run-rest-api.sh
+```
+
+Also see the [example source code](https://github.com/mrseanryan/gpt-multi-atomic-agents/tree/master/examples) for more details.
+
+## Tests
 
 ```
 ./test.sh
 ```
-
-See the [example source code](https://github.com/mrseanryan/gpt-multi-atomic-agents/tree/master/examples) for more details.

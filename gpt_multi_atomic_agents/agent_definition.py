@@ -203,3 +203,25 @@ class GraphQLAgentDefinition(AgentDefinitionBase):
         graphql_blackboard.add_mesage(
             Message(role=MessageRole.assistant, message=graphql_response.chat_message)
         )
+
+
+def build_graphql_agent_definition(
+    agent_name: str,
+    description: str,
+    accepted_graphql_schemas: list[str],
+    mutations_allowed_to_generate: list[str],
+    topics: list[str],
+) -> GraphQLAgentDefinition:
+    return GraphQLAgentDefinition(
+        agent_name=agent_name,
+        description=description,
+        input_schema=GraphQLAgentInputSchema,
+        initial_input=GraphQLAgentInputSchema(
+            accepted_graphql_schemas=accepted_graphql_schemas,
+            graphql_data="",
+            mutations_allowed_to_generate=mutations_allowed_to_generate,
+            previously_generated_mutations=[],
+            topics=topics,
+        ),
+        output_schema=GraphQLAgentOutputSchema,
+    )

@@ -81,17 +81,12 @@ def _create_blackboard_accessor(
 def _create_blackboard_accessor_from_blackboard(
     blackboard: Blackboard,
 ) -> BlackboardAccessor:
-    if not blackboard.agent_definitions:
-        raise RuntimeError("Expected at least 1 Agent Definition")
-    is_function_based = isinstance(
-        blackboard.agent_definitions[0], FunctionAgentDefinition
-    )
-    blackboard = (
-        FunctionCallBlackboardAccessor(_blackboard=FunctionCallBlackboard())
-        if is_function_based
-        else GraphQLBlackboardAccessor(_blackboard=GraphQLBlackboard())
-    )
-    return blackboard
+    if isinstance(blackboard, FunctionCallBlackboard):
+        return FunctionCallBlackboardAccessor(_blackboard=FunctionCallBlackboard())
+    elif isinstance(blackboard, GraphQLBlackboard):
+        return GraphQLBlackboardAccessor(_blackboard=GraphQLBlackboard())
+
+    raise RuntimeError("Not a recognised kind of Blackboard")
 
 
 def generate(
