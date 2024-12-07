@@ -51,7 +51,7 @@ The agent language can either be **Function Calling** based, or else **GraphQL**
 
 The framework is generic and allows agents to be defined in terms of a name, description, accepted input calls, and allowed output calls.
 
-The agents communicate indirectly using a blackboard. The language is a composed of (Function or GraphQL mutation) calls: each agent specifies what it understands as input, and what calls it is able to generate. In this way, the agents can understand each other's output.
+The agents communicate indirectly using a blackboard. The language is a composed of (Function or GraphQL mutation) calls: each agent specifies what it understands as input, and what calls it is able to generate. Each agent can be configured to understand a subset of the output of the other agents. In this way, the agents can understand each other's output and collaborate together.
 
 ![System overview](https://raw.githubusercontent.com/mrseanryan/gpt-multi-atomic-agents/master/images/diagram-Multi-LLM-based-Agent-collaboration-via-Dynamic-Router-GraphQL-context.jpg)
 
@@ -156,7 +156,7 @@ def build_creature_agent():
 Notes about the Creature Creator agent:
 - this agent can only generate "AddCreature" function calls.
 - the agent also accepts (understands) previous "AddCreature" calls, so that it knows what has already been created.
-- additionally, this agent understands a subset of function calls from agents: here, it understands the "AddRelationship" function defined by `function_add_relationship`. See the [example source code](https://github.com/mrseanryan/gpt-multi-atomic-agents/tree/master/examples/sim_life) for more details.
+- additionally, this agent understands a subset of function calls from agents: here, it understands the "AddRelationship" function defined by `function_add_relationship`. This allows the agents to collaborate. See the [example source code](https://github.com/mrseanryan/gpt-multi-atomic-agents/tree/master/examples/sim_life) for more details.
 
 ## Examples [GraphQL Based Approach]
 
@@ -259,7 +259,7 @@ Notes about this agent:
 - this agent can only generate mutations that are defined by `creature_mutations_graphql` from the file "creature.mutations.graphql".
 - the agent also accepts (understands) previous mutations calls, so that it knows what has already been created (`creature_mutations_graphql`).
 - additionally, this agent understands the shared GraphQL schema defined by `creatures_graphql` from the file "creature.graphql".
-  - This array of GraphQL files can also be used to allow an Agent to understand the mutations output by other agents.
+  - This array of GraphQL files can also be used to allow an Agent to understand a subset of the mutations output by other agents. This allows the agents to collaborate.
   - See the [example source code](https://github.com/mrseanryan/gpt-multi-atomic-agents/tree/master/examples/sim_life_via_graphql) for more details.
 
 ## Using the Agents in a chat loop
