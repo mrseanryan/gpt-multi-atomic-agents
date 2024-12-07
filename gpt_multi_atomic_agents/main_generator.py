@@ -159,6 +159,7 @@ def generate_with_blackboard(
                         role=MessageRole.assistant, message=execution_plan.chat_message
                     )
                 )
+                util_print_agent.print_assistant_message(execution_plan.chat_message)
                 util_wait.wait_seconds(_config.delay_between_calls_in_seconds)
 
             # Loop thru all the recommended agents, sending each one a rewritten version of the user prompt
@@ -217,8 +218,36 @@ def generate_with_blackboard(
     return blackboard
 
 
-def _is_quit(user_message: str) -> bool:
-    return user_message.lower().strip() in ["bye", "quit", "stop", "exit"]
+def _is_user_input_matching(user_prompt: str, keys: list[str]) -> bool:
+    return user_prompt.lower().strip() in keys
+
+
+def _is_quit(user_prompt: str) -> bool:
+    return _is_user_input_matching(
+        user_prompt=user_prompt, keys=["bye", "quit", "stop", "exit"]
+    )
+
+
+def _is_dump(user_prompt: str) -> bool:
+    return _is_user_input_matching(user_prompt=user_prompt, keys=["dump"])
+
+
+def _dump_blackboard(blackboard: Blackboard) -> None:
+    console.print(blackboard)
+
+
+def _is_help(user_prompt: str) -> bool:
+    return _is_user_input_matching(user_prompt=user_prompt, keys=["help"])
+
+
+def _print_help() -> None:
+    console.print(
+        "Type in a question for the AI. If you are not sure what to type, then ask it a question like 'What can you do?'"
+    )
+    console.print(
+        "To exit, press ENTER or else type one of: bye, exit, quit and press ENTER"
+    )
+    console.print("To see the current blackboard state, type: dump and press ENTER")
 
 
 def run_chat_loop(
@@ -239,8 +268,9 @@ def run_chat_loop(
     if not blackboard:
         blackboard = _create_blackboard_accessor(agent_definitions)
 
-    initial_assistant_message = "How can I help you?"
+    _print_help()
 
+    initial_assistant_message = "How can I help you?"
     util_print_agent.print_assistant_message(message=initial_assistant_message)
 
     blackboard._blackboard.add_mesage(
@@ -257,9 +287,17 @@ def run_chat_loop(
             if given_user_prompt
             else console.input(":sunglasses: You: ")
         )
-        if not user_prompt or _is_quit(user_prompt):
+        if not user_prompt or _is_quit(user_prompt=user_prompt):
             util_print_agent.print_assistant_message("Good bye!")
             break
+
+        if _is_dump(user_prompt=user_prompt):
+            _dump_blackboard(blackboard=blackboard)
+            continue
+
+        if _is_help(user_prompt=user_prompt):
+            _print_help()
+            continue
 
         blackboard = generate(
             agent_definitions=agent_definitions,
