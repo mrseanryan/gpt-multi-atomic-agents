@@ -40,7 +40,7 @@ class FunctionCallSchema(BaseIOSchema):
     """This schema represents a function call that was already generated."""
 
     agent_name: str = Field(
-        description="The name of the agent that generated the function calls"
+        description="The name of the agent that generated the function call"
     )
     function_name: str = Field(description="The name of the function")
     parameters: dict[str, str] = Field(

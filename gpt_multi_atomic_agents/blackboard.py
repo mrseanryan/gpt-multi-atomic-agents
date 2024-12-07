@@ -8,6 +8,7 @@ from .util_pydantic import CustomBaseModel
 
 from .functions_dto import FunctionCallSchema
 from . import util_graphql
+from . import rest_api_examples
 
 logger = logging.getLogger(__file__)
 
@@ -24,19 +25,33 @@ class Message:
 
 
 class FunctionCallBlackboard(CustomBaseModel):
-    # All previously generated functions: either from client (representing its data) or from agents in this generation
     internal_previously_generated_functions: list[FunctionCallSchema] = Field(
-        default_factory=list
+        description="All previously generated functions: either from client (representing its data) or from agents in this generation",
+        examples=[[rest_api_examples.example_create_creature_call__wolf]],
+        default_factory=list,
     )
     # All previous messages in this chat (series of generations)
-    internal_previous_messages: list[Message] = Field(default_factory=list)
+    internal_previous_messages: list[Message] = Field(
+        default_factory=list,
+        examples=[
+            [
+                Message(role=MessageRole.user, message="Add a wolf"),
+                Message(
+                    role=MessageRole.assistant,
+                    message="I have created a wolf. Is there anything else I can help you with?",
+                ),
+            ]
+        ],
+    )
 
     # Messages that were newly-generated during this generation (required for client to know what new messages to display)
-    internal_newly_generated_messages: list[Message] = Field(default_factory=list)
+    internal_newly_generated_messages: list[Message] = Field(
+        default_factory=list, examples=[[]]
+    )
 
     # Functions that were newly-generated during this generation (required for client so they know what functions they need to execute to update their data).
     internal_newly_generated_functions: list[FunctionCallSchema] = Field(
-        default_factory=list
+        default_factory=list, examples=[[]]
     )
 
     def add_generated_functions(

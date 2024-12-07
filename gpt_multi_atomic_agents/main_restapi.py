@@ -2,7 +2,11 @@ from fastapi import FastAPI
 from pydantic import Field
 
 from .blackboard import FunctionCallBlackboard
-from .functions_dto import FunctionSpecSchema, ParameterSpec, ParameterType
+from .rest_api_examples import (
+    FunctionAgentDefinitionMinimal,
+    creature_agent_name,
+    example_creeature_creator_agent,
+)
 
 from .config import load_config
 from .util_pydantic import CustomBaseModel
@@ -14,7 +18,6 @@ from . import main_router
 from . import main_generator
 
 app = FastAPI()
-creature_agent_name = "Creature Creator"
 
 
 class GeneratePlanRequest(CustomBaseModel):
@@ -55,63 +58,10 @@ class GeneratePlanRequest(CustomBaseModel):
     )
 
 
-class FunctionAgentDefinitionMinimal(CustomBaseModel):
-    agent_name: str = Field(
-        description="The name of the agent", examples=[creature_agent_name]
-    )
-    description: str = Field(
-        description="The description of this agent, its purpose and capabilities."
-    )
-    accepted_functions: list[FunctionSpecSchema] = Field(
-        description="The set of 'input' function calls that this agent understands. Each agent should understand its own output, but can also understand a subset of the output of other agents. This allows the agents to collaborate."
-    )
-    functions_allowed_to_generate: list[FunctionSpecSchema] = Field(
-        description="The set of 'output' function calls that this agent generates."
-    )
-    topics: list[str] = Field(
-        description="This agent ONLY generates if user mentioned one of these topics"
-    )
-
-
-# Build examples programatically = less error prone
-creature_icons = ["sheep-icon", "wolf-icon", "grass-icon", "human-icon", "other-icon"]
-terrain_types = ["mountain", "marsh", "prairie", "coast", "water"]
-
-function_create_creature = FunctionSpecSchema(
-    agent_name=creature_agent_name,
-    function_name="AddCreature",
-    description="Adds a new creature to the world (not vegetation)",
-    parameters=[
-        ParameterSpec(name="creature_name", type=ParameterType.string),
-        ParameterSpec(
-            name="allowed_terrain",
-            type=ParameterType.string,
-            allowed_values=terrain_types,
-        ),
-        ParameterSpec(name="age", type=ParameterType.int),
-        ParameterSpec(
-            name="icon_name", type=ParameterType.string, allowed_values=creature_icons
-        ),
-    ],
-)
-
-accepted_functions = [function_create_creature]
-
-
 class FunctionCallGenerateRequest(CustomBaseModel):
     agent_definitions: list[FunctionAgentDefinitionMinimal] = Field(
         description="The defintions of the Agents to execute, in order.",
-        examples=[
-            [
-                {
-                    "agent_name": creature_agent_name,
-                    "description": "Creates new creatures given the user prompt. Ensures that ALL creatures mentioned by the user are created.",
-                    "accepted_functions": accepted_functions,
-                    "functions_allowed_to_generate": accepted_functions,
-                    "topics": ["creature"],
-                }
-            ]
-        ],
+        examples=[[example_creeature_creator_agent]],
     )
     chat_agent_description: str = Field(
         description="Describe the purpose and domain of this chat system.",
