@@ -90,11 +90,11 @@ def _build_system_prompt_generator_custom() -> SystemPromptGenerator:
             # TODO: revise/improve these steps
             "For each agent, consider whether it needs to be run to fulfull the user's prompt",
             "Only select agents that are really relevant to the user's prompt",
-            "If you find no suitable agent, then default to the 'chat' agent",
+            "If you find no suitable agent, then generate a polite message to explain to the user that you cannot handle this request",
             "For each selected agent, rewrite the user's prompt to suit that agent",
         ],
         output_instructions=[
-            "Take the user prompt and match it to a sequence of one or more of the available agents. If no suitable agent is available, use the 'chat' agent."
+            "Take the user prompt and match it to a sequence of one or more of the available agents. If no suitable agent is available, then generate a polite message to explain to the user that you cannot handle this request."
         ],
     )
 
