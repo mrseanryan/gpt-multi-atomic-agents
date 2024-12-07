@@ -66,7 +66,9 @@ class FunctionAgentOutputSchema(BaseIOSchema):
     This schema represents the output of the agent. The chat message should be non-technical - do NOT mention functions.
     """
 
-    chat_message: str = Field(description="The chat response to the user's message - a friendly, non-technical message. Do NOT mention functions.")
+    chat_message: str = Field(
+        description="The chat response to the user's message - a friendly, non-technical message. Do NOT mention functions."
+    )
     generated_function_calls: list[FunctionCallSchema] = Field(
         description="The set of new generated function calls"
     )

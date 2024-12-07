@@ -36,7 +36,9 @@ class GraphQLAgentOutputSchema(BaseIOSchema):
     This schema represents the output of the agent. The chat message should be non-technical - do NOT mention GraphQL.
     """
 
-    chat_message: str = Field(description="The chat response to the user's message - a friendly non-technical message. Do NOT mention GraphQL.")
+    chat_message: str = Field(
+        description="The chat response to the user's message - a friendly non-technical message. Do NOT mention GraphQL."
+    )
     generated_mutations: list[str] = Field(
         description="The set of new generated mutation calls to update the graphql_data. Only generate if neccessary (check if the graphql_data already has the data)."
     )

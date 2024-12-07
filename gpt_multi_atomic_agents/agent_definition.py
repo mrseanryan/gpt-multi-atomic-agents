@@ -119,8 +119,12 @@ class FunctionAgentDefinition(AgentDefinitionBase):
     def update_blackboard(self, response: BaseIOSchema, blackboard: Blackboard) -> None:
         function_response = self._cast_response(response)
         function_blackboard = self._cast_blackboard(blackboard)
-        function_blackboard.add_mesage(Message(role=MessageRole.assistant, message=function_response.chat_message))
-        function_blackboard.add_generated_functions(function_response.generated_function_calls)
+        function_blackboard.add_mesage(
+            Message(role=MessageRole.assistant, message=function_response.chat_message)
+        )
+        function_blackboard.add_generated_functions(
+            function_response.generated_function_calls
+        )
 
 
 def build_function_agent_definition(
@@ -155,6 +159,11 @@ class GraphQLAgentDefinition(AgentDefinitionBase):
         graphql_blackboard = typing.cast(GraphQLBlackboard, blackboard)
         return graphql_blackboard
 
+    def _cast_response(self, response: BaseIOSchema) -> GraphQLAgentOutputSchema:
+        if not isinstance(response, GraphQLAgentOutputSchema):
+            raise RuntimeError("Expected response to be a GraphQLAgentOutputSchema")
+        return typing.cast(GraphQLAgentOutputSchema, response)
+
     def build_input(
         self, rewritten_user_prompt: str, blackboard: Blackboard, config: Config
     ) -> BaseIOSchema:
@@ -188,7 +197,9 @@ class GraphQLAgentDefinition(AgentDefinitionBase):
 
     def update_blackboard(self, response: BaseIOSchema, blackboard: Blackboard) -> None:
         graphql_blackboard = self._cast_blackboard(blackboard)
-        graphql_blackboard.add_generated_mutations(response.generated_mutations)
+        graphql_response = self._cast_response(response)
+
+        graphql_blackboard.add_generated_mutations(graphql_response.generated_mutations)
         graphql_blackboard.add_mesage(
-            Message(role=MessageRole.assistant, message=response.chat_message)
+            Message(role=MessageRole.assistant, message=graphql_response.chat_message)
         )

@@ -46,7 +46,9 @@ class AgentExecutionPlanSchema(BaseIOSchema):
     This schema represents a generated plan to execute agents to fulfill the user's request. The chat message should be non-technical - do NOT mention agents.
     """
 
-    chat_message: str = Field(description="The chat response to the user's message - a friendly non-technical message. Do NOT mention agents.")
+    chat_message: str = Field(
+        description="The chat response to the user's message - a friendly non-technical message. Do NOT mention agents."
+    )
     recommended_agents: list[RecommendedAgent] = Field(
         description="The ordered list of agents that you recommend should be used to handle the user's prompt. Only the most relevant agents should be recommended."
     )
