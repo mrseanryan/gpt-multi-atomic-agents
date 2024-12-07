@@ -8,7 +8,7 @@ def build_creature_agent():
         description="Creates new creatures given the user prompt. Ensures that ALL creatures mentioned by the user are created.",
         accepted_functions=[
             functions.function_create_creature,
-            functions.function_create_relationship
+            functions.function_create_relationship,
         ],
         functions_allowed_to_generate=[functions.function_create_creature],
         topics=["creature"],

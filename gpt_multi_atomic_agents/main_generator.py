@@ -83,13 +83,16 @@ def _create_blackboard_accessor_from_blackboard(
 ) -> BlackboardAccessor:
     if not blackboard.agent_definitions:
         raise RuntimeError("Expected at least 1 Agent Definition")
-    is_function_based = isinstance(blackboard.agent_definitions[0], FunctionAgentDefinition)
+    is_function_based = isinstance(
+        blackboard.agent_definitions[0], FunctionAgentDefinition
+    )
     blackboard = (
         FunctionCallBlackboardAccessor(_blackboard=FunctionCallBlackboard())
         if is_function_based
         else GraphQLBlackboardAccessor(_blackboard=GraphQLBlackboard())
     )
     return blackboard
+
 
 def generate(
     agent_definitions: list[AgentDefinitionBase],
@@ -106,19 +109,20 @@ def generate(
         _config=_config,
         user_prompt=user_prompt,
         blackboard=blackboard._blackboard,
-        execution_plan=execution_plan
+        execution_plan=execution_plan,
     )
     return _create_blackboard_accessor_from_blackboard(blackboard=blackboard)
 
 
 def _create_blackboard(
-    agent_definitions: list[AgentDefinitionBase]
+    agent_definitions: list[AgentDefinitionBase],
 ) -> BlackboardAccessor:
     if not agent_definitions:
         raise RuntimeError("Expected at least 1 Agent Definition")
     is_function_based = isinstance(agent_definitions[0], FunctionAgentDefinition)
     blackboard = FunctionCallBlackboard() if is_function_based else GraphQLBlackboard()
     return blackboard
+
 
 def generate_with_blackboard(
     agent_definitions: list[AgentDefinitionBase],
@@ -138,15 +142,11 @@ def generate_with_blackboard(
     start = util_time.start_timer()
 
     if blackboard:
-        _check_blackboard(
-            blackboard=blackboard, agent_definitions=agent_definitions
-        )
+        _check_blackboard(blackboard=blackboard, agent_definitions=agent_definitions)
     else:
         blackboard = _create_blackboard(agent_definitions)
 
-    blackboard.add_mesage(
-        Message(role=MessageRole.user, message=user_prompt)
-    )
+    blackboard.add_mesage(Message(role=MessageRole.user, message=user_prompt))
 
     with console.status("[bold green]Processing...") as _status:
         try:

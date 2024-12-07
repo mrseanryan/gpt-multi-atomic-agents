@@ -14,7 +14,9 @@ from .config import Config
 
 @dataclass
 class AgentDescription:
-    agent_name: str = Field(description="The name of the agent", examples=["Creature Creator"])
+    agent_name: str = Field(
+        description="The name of the agent", examples=["Creature Creator"]
+    )
     description: str = Field(
         description="The description of this agent, its purpose and capabilities."
     )

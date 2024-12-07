@@ -1,6 +1,6 @@
 import logging
 import os
-from cornsnake import util_toml, util_file, util_dir
+from cornsnake import util_toml
 from dataclasses import dataclass
 from enum import StrEnum, auto
 
@@ -29,6 +29,7 @@ class Config:
     is_debug: bool = False
     delay_between_calls_in_seconds: float = 0.0
 
+
 def _get_path_to_ini(path_to_ini: str) -> str:
     path_to_ini = path_to_ini
     if not os.path.exists(path_to_ini):
@@ -37,8 +38,9 @@ def _get_path_to_ini(path_to_ini: str) -> str:
     logger.info(f"Reading config from '{path_to_ini}'")
     return path_to_ini
 
+
 def load_config(path_to_ini: str) -> Config:
-    path_to_file=_get_path_to_ini(path_to_ini)
+    path_to_file = _get_path_to_ini(path_to_ini)
     config = Config
     util_toml.read_config_ini_file(path_to_file=path_to_file, config_object=config)
     return config

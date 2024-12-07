@@ -1,4 +1,4 @@
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from enum import StrEnum, auto
 import logging
 
@@ -35,7 +35,9 @@ class FunctionCallBlackboard(CustomBaseModel):
     internal_newly_generated_messages: list[Message] = Field(default_factory=list)
 
     # Functions that were newly-generated during this generation (required for client so they know what functions they need to execute to update their data).
-    internal_newly_generated_functions: list[FunctionCallSchema] = Field(default_factory=list)
+    internal_newly_generated_functions: list[FunctionCallSchema] = Field(
+        default_factory=list
+    )
 
     def add_generated_functions(
         self, generated_function_calls: list[FunctionCallSchema]
@@ -71,9 +73,12 @@ class FunctionCallBlackboard(CustomBaseModel):
         """Reset newly generated, in case client did not clear out"""
         self._reset()
 
+
 class GraphQLBlackboard(CustomBaseModel):
     # Previously generated mutation calls, in this generation. Cleared out when new client data is received (so is effectively *newly* generated only).
-    internal_previously_generated_mutation_calls: list[str] = Field(default_factory=list)
+    internal_previously_generated_mutation_calls: list[str] = Field(
+        default_factory=list
+    )
 
     # All previous messages in this chat (series of generations)
     internal_previous_messages: list[Message] = Field(default_factory=list)
@@ -120,5 +125,6 @@ class GraphQLBlackboard(CustomBaseModel):
     def reset_newly_generated(self) -> None:
         """Reset newly generated, in case client did not clear out"""
         self._reset()
+
 
 Blackboard = FunctionCallBlackboard | GraphQLBlackboard

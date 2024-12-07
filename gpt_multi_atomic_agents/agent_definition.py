@@ -1,5 +1,4 @@
 from abc import abstractmethod
-from dataclasses import dataclass, field
 import typing
 from atomic_agents.agents.base_agent import (
     BaseIOSchema,
@@ -37,8 +36,12 @@ class AgentDefinitionBase(CustomBaseModel):
     Defines one function-based agent. NOT for direct use with LLM.
     """
 
-    agent_name: str = Field(description="The name of the agent.", examples=["Creature Creator"])
-    description: str = Field(description="Describes the function of the agent. This acts as a mini prompt for the LLM.")
+    agent_name: str = Field(
+        description="The name of the agent.", examples=["Creature Creator"]
+    )
+    description: str = Field(
+        description="Describes the function of the agent. This acts as a mini prompt for the LLM."
+    )
     input_schema: type[BaseIOSchema]
     initial_input: BaseIOSchema
     output_schema: type[BaseIOSchema]
@@ -113,12 +116,13 @@ class FunctionAgentDefinition(AgentDefinitionBase):
         function_blackboard = self._cast_blackboard(blackboard)
         function_blackboard.add_generated_functions(response.generated_function_calls)
 
+
 def build_function_agent_definition(
     agent_name: str,
     description: str,
     accepted_functions: list[FunctionSpecSchema],
     functions_allowed_to_generate: list[FunctionSpecSchema],
-    topics: list[str]
+    topics: list[str],
 ) -> FunctionAgentDefinition:
     return FunctionAgentDefinition(
         agent_name=agent_name,
@@ -132,6 +136,7 @@ def build_function_agent_definition(
         output_schema=FunctionAgentOutputSchema,
         topics=topics,
     )
+
 
 class GraphQLAgentDefinition(AgentDefinitionBase):
     input_schema: type[GraphQLAgentInputSchema]

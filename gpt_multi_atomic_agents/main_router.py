@@ -17,16 +17,22 @@ console = Console()
 logger = logging.getLogger(__file__)
 
 
-def _convert_agent_to_description(agent: AgentDefinitionBase) -> prompts_router.AgentDescription:
+def _convert_agent_to_description(
+    agent: AgentDefinitionBase,
+) -> prompts_router.AgentDescription:
     return prompts_router.AgentDescription(
         agent_name=agent.agent_name,
         description=agent.description,
         topics=agent.get_topics(),
     )
 
-def _convert_agents_to_descriptions(agents: list[AgentDefinitionBase]) -> list[prompts_router.AgentDescription]:
+
+def _convert_agents_to_descriptions(
+    agents: list[AgentDefinitionBase],
+) -> list[prompts_router.AgentDescription]:
     all_agents = agents
     return [_convert_agent_to_description(a) for a in all_agents]
+
 
 def generate_plan(
     agent_definitions: list[AgentDefinitionBase],
@@ -41,8 +47,9 @@ def generate_plan(
         chat_agent_description=chat_agent_description,
         _config=_config,
         user_prompt=user_prompt,
-        previous_plan=previous_plan
+        previous_plan=previous_plan,
     )
+
 
 def generate_plan_via_descriptions(
     agent_descriptions: list[prompts_router.AgentDescription],
