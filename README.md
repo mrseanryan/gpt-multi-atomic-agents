@@ -13,7 +13,7 @@ A simple dynamic multi-agent framework based on [atomic-agents](https://github.c
       - when the user is happy -> the client can use the `generator` to execute the plan, using the recommended agents
       - the client then receives function calls (or GraphQL mutations) to update the data
 - generate via OpenAI or AWS Bedrock or groq
-- use a library OR run out-of-the-box as a REST API
+- use as a library OR run out-of-the-box as a REST API
 
 - note: the `!! framework is at an early stage !!` - breaking changes will be indicated by increasing the *minor* version (major is still at zero).
 
