@@ -2,9 +2,18 @@
 A simple dynamic multi-agent framework based on [atomic-agents](https://github.com/BrainBlend-AI/atomic-agents) and [Instructor](https://github.com/instructor-ai/instructor). Uses the power of [Pydantic](https://docs.pydantic.dev) for data and schema validation and serialization.
 
 - compose Agents made of a system prompt, with a shared language of either **Function Calls** or else **GraphQL mutations**
-- a router uses an LLM to process complex 'composite' user prompts, and automatically route them to the best sequence of your agents
-  - the router rewrites the user prompt, to best suit each agent
+- convert user input into data modifications (functions or GraphQL mutations)
+- to maximise user engagement, uses a 2-phase process:
+  - Planning Phase:
+    - a router uses an LLM to process complex 'composite' user prompts, and automatically route them to the best sequence of your agents
+      - the router rewrites the user prompt, to best suit each agent
+      - an execution plan is generated
+      - the client can use the `router` to iterate over the execution plan, with user feedback
+  - Generation Phase:
+      - when the user is happy -> the client can use the `generator` to execute the plan, using the recommended agents
+      - the client then receives function calls (or GraphQL mutations) to update the data
 - generate via OpenAI or AWS Bedrock or groq
+- use a library OR run out-of-the-box as a REST API
 
 - note: the `!! framework is at an early stage !!` - breaking changes will be indicated by increasing the *minor* version (major is still at zero).
 
