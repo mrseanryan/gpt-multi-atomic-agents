@@ -17,8 +17,35 @@ console = Console()
 logger = logging.getLogger(__file__)
 
 
+def _convert_agent_to_description(agent: AgentDefinitionBase) -> prompts_router.AgentDescription:
+    return prompts_router.AgentDescription(
+        agent_name=agent.agent_name,
+        description=agent.description,
+        topics=agent.get_topics(),
+    )
+
+def _convert_agents_to_descriptions(agents: list[AgentDefinitionBase]) -> list[prompts_router.AgentDescription]:
+    all_agents = agents
+    return [_convert_agent_to_description(a) for a in all_agents]
+
 def generate_plan(
     agent_definitions: list[AgentDefinitionBase],
+    chat_agent_description: str,
+    _config: Config,
+    user_prompt: str,
+    previous_plan: prompts_router.AgentExecutionPlanSchema | None = None,
+) -> prompts_router.AgentExecutionPlanSchema:
+    agent_descriptions = _convert_agents_to_descriptions(agents=agent_definitions)
+    return generate_plan_via_descriptions(
+        agent_descriptions=agent_descriptions,
+        chat_agent_description=chat_agent_description,
+        _config=_config,
+        user_prompt=user_prompt,
+        previous_plan=previous_plan
+    )
+
+def generate_plan_via_descriptions(
+    agent_descriptions: list[prompts_router.AgentDescription],
     chat_agent_description: str,
     _config: Config,
     user_prompt: str,
@@ -34,6 +61,8 @@ def generate_plan(
 
     start = util_time.start_timer()
 
+    # TODO: make router reject irrelevant user prompts (if no matching agents + it does not fit the chat_agent_description)
+
     # TODO: optimizate router:
     # - possibly run it on smaller (and faster) LLM
     # - could allow for Classifier based router, but then cannot rewrite prompts
@@ -43,7 +72,7 @@ def generate_plan(
         router_agent.run(
             prompts_router.build_input(
                 user_prompt=user_prompt,
-                agents=agent_definitions,
+                agent_descriptions=agent_descriptions,
                 chat_agent_description=chat_agent_description,
                 previous_plan=previous_plan,
             )

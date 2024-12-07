@@ -9,13 +9,12 @@ from pydantic import Field
 
 
 from . import util_ai
-from .agent_definition import AgentDefinitionBase
 from .config import Config
 
 
 @dataclass
 class AgentDescription:
-    agent_name: str = Field(description="The name of the agent")
+    agent_name: str = Field(description="The name of the agent", examples=["Creature Creator"])
     description: str = Field(
         description="The description of this agent, its purpose and capabilities."
     )
@@ -78,19 +77,6 @@ class RouterAgentOutputSchema(BaseIOSchema):
     )
 
 
-def _serialize_agent(agent: AgentDefinitionBase) -> AgentDescription:
-    return AgentDescription(
-        agent_name=agent.agent_name,
-        description=agent.description,
-        topics=agent.get_topics(),
-    )
-
-
-def _serialize_agents(agents: list[AgentDefinitionBase]) -> list[AgentDescription]:
-    all_agents = agents
-    return [_serialize_agent(a) for a in all_agents]
-
-
 def _build_system_prompt_generator_custom() -> SystemPromptGenerator:
     return SystemPromptGenerator(
         background=[
@@ -131,13 +117,12 @@ def create_router_agent(config: Config) -> BaseAgent:
 
 def build_input(
     user_prompt: str,
-    agents: list[AgentDefinitionBase],
+    agent_descriptions: list[AgentDescription],
     chat_agent_description: str,
     previous_plan: AgentExecutionPlanSchema | None = None,
 ) -> RouterAgentInputSchema:
-    agent_descriptions = _serialize_agents(agents) + [
-        (_build_chat_agent_description(chat_agent_description))
-    ]
+    agent_descriptions.append(_build_chat_agent_description(chat_agent_description))
+
     return RouterAgentInputSchema(
         user_prompt=user_prompt,
         agent_descriptions=agent_descriptions,

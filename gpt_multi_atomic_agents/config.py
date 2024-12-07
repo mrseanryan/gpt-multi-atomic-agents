@@ -1,5 +1,10 @@
+import logging
+import os
+from cornsnake import util_toml, util_file, util_dir
 from dataclasses import dataclass
 from enum import StrEnum, auto
+
+logger = logging.getLogger(__file__)
 
 
 class AI_PLATFORM_Enum(StrEnum):
@@ -18,8 +23,22 @@ ANTHROPIC_MAX_TOKENS = 8192
 
 @dataclass
 class Config:
-    ai_platform: AI_PLATFORM_Enum
-    model: str
-    max_tokens: int
+    ai_platform: AI_PLATFORM_Enum = AI_PLATFORM_Enum.bedrock_anthropic
+    model: str = ANTHROPIC_MODEL
+    max_tokens: int = ANTHROPIC_MAX_TOKENS
     is_debug: bool = False
     delay_between_calls_in_seconds: float = 0.0
+
+def _get_path_to_ini(path_to_ini: str) -> str:
+    path_to_ini = path_to_ini
+    if not os.path.exists(path_to_ini):
+        # look in current directory
+        path_to_ini = os.path.join(os.getcwd(), path_to_ini)
+    logger.info(f"Reading config from '{path_to_ini}'")
+    return path_to_ini
+
+def load_config(path_to_ini: str) -> Config:
+    path_to_file=_get_path_to_ini(path_to_ini)
+    config = Config
+    util_toml.read_config_ini_file(path_to_file=path_to_file, config_object=config)
+    return config

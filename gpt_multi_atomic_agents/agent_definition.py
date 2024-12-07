@@ -1,9 +1,10 @@
 from abc import abstractmethod
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 import typing
 from atomic_agents.agents.base_agent import (
     BaseIOSchema,
 )
+from pydantic import Field
 
 from .graphql_dto import GraphQLAgentInputSchema, GraphQLAgentOutputSchema
 
@@ -12,6 +13,7 @@ from .system_prompt_builders import (
     GraphQLSystemPromptBuilder,
     SystemPromptBuilderBase,
 )
+from .util_pydantic import CustomBaseModel
 
 from . import util_output
 from .blackboard import (
@@ -30,14 +32,13 @@ from .functions_dto import (
 )
 
 
-@dataclass
-class AgentDefinitionBase:
+class AgentDefinitionBase(CustomBaseModel):
     """
     Defines one function-based agent. NOT for direct use with LLM.
     """
 
-    agent_name: str
-    description: str
+    agent_name: str = Field(description="The name of the agent.", examples=["Creature Creator"])
+    description: str = Field(description="Describes the function of the agent. This acts as a mini prompt for the LLM.")
     input_schema: type[BaseIOSchema]
     initial_input: BaseIOSchema
     output_schema: type[BaseIOSchema]
@@ -62,7 +63,6 @@ class AgentDefinitionBase:
         raise NotImplementedError
 
 
-@dataclass
 class FunctionAgentDefinition(AgentDefinitionBase):
     input_schema: type[FunctionAgentInputSchema]
     initial_input: FunctionAgentInputSchema
@@ -113,8 +113,26 @@ class FunctionAgentDefinition(AgentDefinitionBase):
         function_blackboard = self._cast_blackboard(blackboard)
         function_blackboard.add_generated_functions(response.generated_function_calls)
 
+def build_function_agent_definition(
+    agent_name: str,
+    description: str,
+    accepted_functions: list[FunctionSpecSchema],
+    functions_allowed_to_generate: list[FunctionSpecSchema],
+    topics: list[str]
+) -> FunctionAgentDefinition:
+    return FunctionAgentDefinition(
+        agent_name=agent_name,
+        description=description,
+        accepted_functions=accepted_functions,
+        input_schema=FunctionAgentInputSchema,
+        initial_input=FunctionAgentInputSchema(
+            functions_allowed_to_generate=functions_allowed_to_generate,
+            previously_generated_functions=[],
+        ),
+        output_schema=FunctionAgentOutputSchema,
+        topics=topics,
+    )
 
-@dataclass
 class GraphQLAgentDefinition(AgentDefinitionBase):
     input_schema: type[GraphQLAgentInputSchema]
     initial_input: GraphQLAgentInputSchema
