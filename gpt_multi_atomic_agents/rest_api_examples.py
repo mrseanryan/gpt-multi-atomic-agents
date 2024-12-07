@@ -33,7 +33,6 @@ creature_icons = ["sheep-icon", "wolf-icon", "grass-icon", "human-icon", "other-
 terrain_types = ["mountain", "marsh", "prairie", "coast", "water"]
 
 function_create_creature = FunctionSpecSchema(
-    agent_name=creature_agent_name,
     function_name="AddCreature",
     description="Adds a new creature to the world (not vegetation)",
     parameters=[

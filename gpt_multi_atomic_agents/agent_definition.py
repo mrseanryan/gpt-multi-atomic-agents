@@ -76,8 +76,12 @@ class FunctionAgentDefinition(AgentDefinitionBase):
     def _cast_blackboard(self, blackboard: Blackboard) -> FunctionCallBlackboard:
         if not isinstance(blackboard, FunctionCallBlackboard):
             raise RuntimeError("Expected blackboard to be a FunctionCallBlackboard")
-        function_blackboard = typing.cast(FunctionCallBlackboard, blackboard)
-        return function_blackboard
+        return typing.cast(FunctionCallBlackboard, blackboard)
+
+    def _cast_response(self, response: BaseIOSchema) -> FunctionAgentOutputSchema:
+        if not isinstance(response, FunctionAgentOutputSchema):
+            raise RuntimeError("Expected response to be a FunctionAgentOutputSchema")
+        return typing.cast(FunctionAgentOutputSchema, response)
 
     def build_input(
         self, rewritten_user_prompt: str, blackboard: Blackboard, config: Config
@@ -113,8 +117,10 @@ class FunctionAgentDefinition(AgentDefinitionBase):
         )
 
     def update_blackboard(self, response: BaseIOSchema, blackboard: Blackboard) -> None:
+        function_response = self._cast_response(response)
         function_blackboard = self._cast_blackboard(blackboard)
-        function_blackboard.add_generated_functions(response.generated_function_calls)
+        function_blackboard.add_mesage(Message(role=MessageRole.assistant, message=function_response.chat_message))
+        function_blackboard.add_generated_functions(function_response.generated_function_calls)
 
 
 def build_function_agent_definition(

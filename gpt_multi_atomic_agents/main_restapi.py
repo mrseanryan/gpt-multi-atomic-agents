@@ -45,7 +45,7 @@ class GeneratePlanRequest(CustomBaseModel):
         description="Optionally also send a previously generated plan, so the AI can generate a new plan taking into account the user's feedback (in user_prompt).",
         examples=[
             {
-                "chat_message": "Certainly! I'll help you add a sheep that eats grass to your ecosystem. I'll use the Creature Creator agent to create this new creature for you.",
+                "chat_message": "Certainly! I'll help you add a sheep that eats grass to your ecosystem.",
                 "recommended_agents": [
                     {
                         "agent_name": creature_agent_name,
@@ -78,7 +78,7 @@ class FunctionCallGenerateRequest(CustomBaseModel):
         description="Optionally also include a previously generated plan, to reduce latency. If no plan is included, then generate will also internally call generate_plan.",
         examples=[
             {
-                "chat_message": "Certainly! I'll help you add a sheep that eats grass to your ecosystem. I'll use the Creature Creator agent to create this new creature for you.",
+                "chat_message": "Certainly! I'll help you add a sheep that eats grass to your ecosystem.",
                 "recommended_agents": [
                     {
                         "agent_name": creature_agent_name,

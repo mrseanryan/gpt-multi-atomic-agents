@@ -12,7 +12,6 @@ creature_icons = ["sheep-icon", "wolf-icon", "grass-icon", "human-icon", "other-
 terrain_types = ["mountain", "marsh", "prairie", "coast", "water"]
 
 function_create_creature = FunctionSpecSchema(
-    agent_name=creature_agent_name,
     function_name="AddCreature",
     description="Adds a new creature to the world (not vegetation)",
     parameters=[
@@ -30,7 +29,6 @@ function_create_creature = FunctionSpecSchema(
 )
 
 function_create_vegetation = FunctionSpecSchema(
-    agent_name=vegetation_agent_name,
     function_name="AddVegetation",
     description="Adds new vegetation to the world",
     parameters=[
@@ -49,7 +47,6 @@ function_create_vegetation = FunctionSpecSchema(
 )
 
 function_create_relationship = FunctionSpecSchema(
-    agent_name=relationship_agent_name,
     function_name="AddCreatureRelationship",
     description="Adds a new relationship between two creatures",
     parameters=[

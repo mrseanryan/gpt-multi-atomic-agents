@@ -74,6 +74,9 @@ class FunctionCallBlackboard(CustomBaseModel):
         self.internal_previous_messages.append(message)
         self.internal_newly_generated_messages.append(message)
 
+    def add_previous_mesage(self, message: Message) -> None:
+        self.internal_previous_messages.append(message)
+
     def _reset(self):
         """Resets newly created functions, to prepare for next generation"""
         self.internal_newly_generated_functions.clear()
@@ -110,6 +113,9 @@ class GraphQLBlackboard(CustomBaseModel):
     def add_mesage(self, message: Message) -> None:
         self.internal_previous_messages.append(message)
         self.internal_newly_generated_messages.append(message)
+
+    def add_previous_mesage(self, message: Message) -> None:
+        self.internal_previous_messages.append(message)
 
     def get_generated_mutations_matching(
         self, accepted_graphql_schemas: list[str]

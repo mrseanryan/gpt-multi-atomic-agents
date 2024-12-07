@@ -26,9 +26,6 @@ class ParameterSpec(BaseIOSchema):
 class FunctionSpecSchema(BaseIOSchema):
     """This schema represents the definition of a function call that can be generated."""
 
-    agent_name: str = Field(
-        description="The name of the agent that generated the function calls"
-    )  # TODO review, this makes the f/w less flexible
     description: str = Field(description="Describes what the function does")
     function_name: str = Field(description="The name of the function")
     parameters: list[ParameterSpec] = Field(
@@ -66,10 +63,10 @@ class FunctionAgentInputSchema(BaseIOSchema):
 
 class FunctionAgentOutputSchema(BaseIOSchema):
     """
-    This schema represents the output of the agent.
+    This schema represents the output of the agent. The chat message should be non-technical - do NOT mention functions.
     """
 
-    chat_message: str = Field(description="The chat response to the user's message")
+    chat_message: str = Field(description="The chat response to the user's message - a friendly, non-technical message. Do NOT mention functions.")
     generated_function_calls: list[FunctionCallSchema] = Field(
         description="The set of new generated function calls"
     )

@@ -146,7 +146,7 @@ def generate_with_blackboard(
     else:
         blackboard = _create_blackboard(agent_definitions)
 
-    blackboard.add_mesage(Message(role=MessageRole.user, message=user_prompt))
+    blackboard.add_previous_mesage(Message(role=MessageRole.user, message=user_prompt))
 
     with console.status("[bold green]Processing...") as _status:
         try:

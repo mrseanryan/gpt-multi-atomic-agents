@@ -88,7 +88,6 @@ The AddCreature function:
 
 ```python
 function_add_creature = FunctionSpecSchema(
-    agent_name=creature_agent_name,
     function_name="AddCreature",
     description="Adds a new creature to the world (not vegetation)",
     parameters=[
@@ -104,7 +103,6 @@ The AddCreatureRelationship function:
 
 ```python
 function_add_relationship = FunctionSpecSchema(
-    agent_name=relationship_agent_name,
     function_name="AddCreatureRelationship",
     description="Adds a new relationship between two creatures",
     parameters=[
