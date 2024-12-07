@@ -82,9 +82,9 @@ def _create_blackboard_accessor_from_blackboard(
     blackboard: Blackboard,
 ) -> BlackboardAccessor:
     if isinstance(blackboard, FunctionCallBlackboard):
-        return FunctionCallBlackboardAccessor(_blackboard=FunctionCallBlackboard())
+        return FunctionCallBlackboardAccessor(_blackboard=blackboard)
     elif isinstance(blackboard, GraphQLBlackboard):
-        return GraphQLBlackboardAccessor(_blackboard=GraphQLBlackboard())
+        return GraphQLBlackboardAccessor(_blackboard=blackboard)
 
     raise RuntimeError("Not a recognised kind of Blackboard")
 
