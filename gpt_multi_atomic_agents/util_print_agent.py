@@ -51,6 +51,13 @@ def _print_assistant_base(chat_message: str, output: typing.Any, agent_name="gen
     console.print(output)
 
 
+def print_assistant_message(message: str):
+    initial_message = FunctionAgentOutputSchema(
+        chat_message=message, generated_function_calls=[]
+    )
+    print_assistant_functions(message=initial_message)
+
+
 def print_assistant_functions(message: FunctionAgentOutputSchema, agent_name="general"):
     return _print_assistant_base(
         message.chat_message, message.generated_function_calls, agent_name=agent_name

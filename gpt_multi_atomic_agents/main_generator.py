@@ -30,7 +30,6 @@ from .blackboard_accessor import (
     GraphQLBlackboardAccessor,
 )
 from .config import Config
-from .functions_dto import FunctionAgentOutputSchema
 from . import util_print_agent
 
 console = Console()
@@ -60,8 +59,11 @@ def _check_blackboard(
 ) -> None:
     is_function_based = isinstance(agent_definitions[0], FunctionAgentDefinition)
     if blackboard:
-        if is_function_based and not (typing.cast(FunctionCallBlackboard, blackboard)):
-            raise RuntimeError("Expected blackboard to be a FunctionCallBlackboard")
+        if is_function_based:
+            if not (typing.cast(FunctionCallBlackboard, blackboard)):
+                raise RuntimeError("Expected blackboard to be a FunctionCallBlackboard")
+        elif not (typing.cast(GraphQLBlackboard, blackboard)):
+            raise RuntimeError("Expected blackboard to be a GraphQLBlackboard")
 
 
 def _create_blackboard_accessor(
@@ -215,6 +217,10 @@ def generate_with_blackboard(
     return blackboard
 
 
+def _is_quit(user_message: str) -> bool:
+    return user_message.lower().strip() in ["bye", "quit", "stop", "exit"]
+
+
 def run_chat_loop(
     agent_definitions: list[AgentDefinitionBase],
     chat_agent_description: str,
@@ -234,11 +240,8 @@ def run_chat_loop(
         blackboard = _create_blackboard_accessor(agent_definitions)
 
     initial_assistant_message = "How can I help you?"
-    initial_message = FunctionAgentOutputSchema(
-        chat_message=initial_assistant_message, generated_function_calls=[]
-    )
 
-    util_print_agent.print_assistant_functions(initial_message)
+    util_print_agent.print_assistant_message(message=initial_assistant_message)
 
     blackboard._blackboard.add_mesage(
         Message(role=MessageRole.assistant, message=initial_assistant_message)
@@ -254,7 +257,8 @@ def run_chat_loop(
             if given_user_prompt
             else console.input(":sunglasses: You: ")
         )
-        if not user_prompt:
+        if not user_prompt or _is_quit(user_prompt):
+            util_print_agent.print_assistant_message("Good bye!")
             break
 
         blackboard = generate(
