@@ -24,6 +24,10 @@ class GraphQLAgentInputSchema(BaseIOSchema):
     topics: list[str] = Field(
         description="This agent ONLY generates if user mentioned one of these topics"
     )
+    agent_parameters: list[str] = Field(
+        description="A list of agent parameters that you can extract from the user's prompt.",
+        default_factory=lambda: list,
+    )
     # TODO - add "If data is missing, then you need to generate allowed GraphQL queries."
     graphql_data: str = Field(
         description="The input GraphQL data from the client. You need to generate allowed GraphQL mutations that the client will use to update the data.",

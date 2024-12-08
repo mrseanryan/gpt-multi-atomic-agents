@@ -65,6 +65,10 @@ class AgentDefinitionBase(CustomBaseModel):
     def get_topics(self) -> list[str]:
         raise NotImplementedError
 
+    @abstractmethod
+    def get_agent_parameters(self) -> list[str]:
+        raise NotImplementedError
+
 
 class FunctionAgentDefinition(AgentDefinitionBase):
     input_schema: type[FunctionAgentInputSchema]
@@ -72,6 +76,9 @@ class FunctionAgentDefinition(AgentDefinitionBase):
     output_schema: type[FunctionAgentOutputSchema]
     accepted_functions: list[FunctionSpecSchema]
     topics: list[str]  # The agent ONLY generates if user mentioned one of these topics
+    agent_parameters: list[
+        str
+    ]  # Optional parameters that router can try to extract from user prompt
 
     def _cast_blackboard(self, blackboard: Blackboard) -> FunctionCallBlackboard:
         if not isinstance(blackboard, FunctionCallBlackboard):
@@ -109,6 +116,9 @@ class FunctionAgentDefinition(AgentDefinitionBase):
     def get_topics(self) -> list[str]:
         return self.topics
 
+    def get_agent_parameters(self) -> list[str]:
+        return self.agent_parameters
+
     def get_system_prompt_builder(self, _config: Config) -> SystemPromptBuilderBase:
         return FunctionSystemPromptBuilder(
             topics=self.topics,
@@ -133,7 +143,10 @@ def build_function_agent_definition(
     accepted_functions: list[FunctionSpecSchema],
     functions_allowed_to_generate: list[FunctionSpecSchema],
     topics: list[str],
+    agent_parameters: list[str] | None = None,
 ) -> FunctionAgentDefinition:
+    if not agent_parameters:
+        agent_parameters = []
     return FunctionAgentDefinition(
         agent_name=agent_name,
         description=description,
@@ -145,6 +158,7 @@ def build_function_agent_definition(
         ),
         output_schema=FunctionAgentOutputSchema,
         topics=topics,
+        agent_parameters=agent_parameters,
     )
 
 
@@ -195,6 +209,9 @@ class GraphQLAgentDefinition(AgentDefinitionBase):
     def get_topics(self) -> list[str]:
         return self.initial_input.topics
 
+    def get_agent_parameters(self) -> list[str]:
+        return self.initial_input.agent_parameters
+
     def update_blackboard(self, response: BaseIOSchema, blackboard: Blackboard) -> None:
         graphql_blackboard = self._cast_blackboard(blackboard)
         graphql_response = self._cast_response(response)
@@ -211,7 +228,10 @@ def build_graphql_agent_definition(
     accepted_graphql_schemas: list[str],
     mutations_allowed_to_generate: list[str],
     topics: list[str],
+    agent_parameters: list[str] | None = None,
 ) -> GraphQLAgentDefinition:
+    if not agent_parameters:
+        agent_parameters = []
     return GraphQLAgentDefinition(
         agent_name=agent_name,
         description=description,
@@ -222,6 +242,7 @@ def build_graphql_agent_definition(
             mutations_allowed_to_generate=mutations_allowed_to_generate,
             previously_generated_mutations=[],
             topics=topics,
+            agent_parameters=agent_parameters,
         ),
         output_schema=GraphQLAgentOutputSchema,
     )

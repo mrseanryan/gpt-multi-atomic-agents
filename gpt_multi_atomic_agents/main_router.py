@@ -24,6 +24,7 @@ def _convert_agent_to_description(
         agent_name=agent.agent_name,
         description=agent.description,
         topics=agent.get_topics(),
+        agent_parameters=agent.get_agent_parameters(),
     )
 
 

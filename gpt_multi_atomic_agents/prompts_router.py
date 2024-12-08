@@ -23,10 +23,21 @@ class AgentDescription:
     topics: list[str] = Field(
         description="This agent ONLY generates if user mentioned one of these topics"
     )
+    agent_parameters: list[str] = Field(
+        description="A list of agent parameters that you can extract from the user's prompt."
+    )  # Agent Parameters can be used by client to know what context to include in generation requests.
 
 
 def _build_chat_agent_description(description: str) -> AgentDescription:
-    return AgentDescription(agent_name="chat", description=description, topics=[])
+    return AgentDescription(
+        agent_name="chat",
+        description=description,
+        topics=[],
+        agent_parameters=["subjects"],
+    )
+
+
+ParamNameToValues = dict[str, list[str]]
 
 
 class RecommendedAgent(BaseIOSchema):
@@ -38,6 +49,9 @@ class RecommendedAgent(BaseIOSchema):
     agent_name: str = Field(description="The name of the agent")
     rewritten_user_prompt: str = Field(
         description="The user's prompt, rewritten to suit this agent"
+    )
+    agent_parameters: ParamNameToValues = Field(
+        description="Agent Parameters that you extracted from the user's prompt"
     )
 
 
