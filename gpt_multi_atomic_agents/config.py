@@ -28,6 +28,7 @@ class Config:
     max_tokens: int = ANTHROPIC_MAX_TOKENS
     is_debug: bool = False
     delay_between_calls_in_seconds: float = 0.0
+    temp_data_dir_path: str = "data-generated"
 
 
 def _get_path_to_ini(path_to_ini: str) -> str:
