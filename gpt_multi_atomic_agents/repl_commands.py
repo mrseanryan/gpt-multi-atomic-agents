@@ -1,11 +1,14 @@
 from abc import ABC, abstractmethod
 import os
-from cornsnake import util_dir, util_file
+from cornsnake import util_dir
 from enum import StrEnum, auto
 from typing import Text
 from rich.console import Console
 
-from .blackboard import Blackboard, FunctionCallBlackboard, GraphQLBlackboard
+from .blackboard import (
+    Blackboard,
+    save_blackboard_to_file,
+)
 from .config import Config
 from .util_print_agent import print_assistant_message_only
 
@@ -106,14 +109,6 @@ class LoadReplCommand(ReplCommandBase):
         return CommandAction.load_blackboard
 
 
-def _get_bb_format(blackboard: Blackboard) -> str:
-    if isinstance(blackboard, FunctionCallBlackboard):
-        return "functioncall"
-    elif isinstance(blackboard, GraphQLBlackboard):
-        return "graphql"
-    raise RuntimeError("Not a recognised kind of Blackboard")
-
-
 class SaveReplCommand(ReplCommandBase):
     def get_name(self):
         return "save"
@@ -122,17 +117,8 @@ class SaveReplCommand(ReplCommandBase):
         return "Save the blackboard to the local data store"
 
     def do(self, blackboard: Blackboard, config: Config) -> CommandAction:
-        json_data = blackboard.model_dump_json()
-
         filename = input("Please enter a filename:")
-
-        bb_format = _get_bb_format(blackboard=blackboard)
-
-        filename = util_file.change_extension(filename, f".{bb_format}.json")
-        filepath = os.path.join(config.temp_data_dir_path, filename)
-
-        console.print(f"Saving blackboard to {filepath}")
-        util_file.write_text_to_file(json_data, filepath)
+        save_blackboard_to_file(blackboard=blackboard, filename=filename, config=config)
 
         return CommandAction.handled_already
 

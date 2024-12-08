@@ -19,6 +19,11 @@ console = Console()
 logger = logging.getLogger(__file__)
 
 
+class BlackboardFormat(StrEnum):
+    function_call = auto()
+    graphql = auto()
+
+
 class MessageRole(StrEnum):
     user = auto()
     assistant = auto()
@@ -31,6 +36,11 @@ class Message:
 
 
 class FunctionCallBlackboard(CustomBaseModel):
+    format: BlackboardFormat = Field(
+        description="The data format of the blackboard",
+        default=BlackboardFormat.function_call,
+    )
+
     internal_previously_generated_functions: list[FunctionCallSchema] = Field(
         description="All previously generated functions: either from client (representing its data) or from agents in this generation",
         examples=[[rest_api_examples.example_create_creature_call__wolf]],
@@ -108,6 +118,11 @@ class FunctionCallBlackboard(CustomBaseModel):
 
 
 class GraphQLBlackboard(CustomBaseModel):
+    format: BlackboardFormat = Field(
+        description="The data format of the blackboard",
+        default=BlackboardFormat.graphql,
+    )
+
     # Previously generated mutation calls, in this generation. Cleared out when new client data is received (so is effectively *newly* generated only).
     internal_previously_generated_mutation_calls: list[str] = Field(
         default_factory=list
@@ -175,6 +190,11 @@ class GraphQLBlackboard(CustomBaseModel):
 Blackboard = FunctionCallBlackboard | GraphQLBlackboard
 
 
+class SerializedBlackboard(CustomBaseModel):
+    blackboard: Blackboard
+    file_schema_version: str = "0.2"
+
+
 def load_blackboard_from_file(
     config: Config, existing_blackboard: Blackboard
 ) -> Blackboard | None:
@@ -192,11 +212,12 @@ def load_blackboard_from_file(
         return existing_blackboard
 
     console.print(f"Loading blackboard from {filepath}")
-    json_data = util_json.read_from_json_file(filepath)
-    if isinstance(existing_blackboard, FunctionCallBlackboard):
-        return TypeAdapter(FunctionCallBlackboard).validate_python(json_data)
-    elif isinstance(existing_blackboard, GraphQLBlackboard):
-        return TypeAdapter(GraphQLBlackboard).validate_python(json_data)
+    try:
+        json_data = util_json.read_from_json_file(filepath)
+        serialized = TypeAdapter(SerializedBlackboard).validate_python(json_data)
+        return serialized.blackboard
+    except Exception as e:
+        logger.exception(e)
 
     console.print(
         Text(
@@ -205,3 +226,15 @@ def load_blackboard_from_file(
         style="red",
     )
     return None
+
+
+def save_blackboard_to_file(blackboard: Blackboard, filename: str, config: Config):
+    filename = util_file.change_extension(filename, f".{blackboard.format.value}.json")
+    filepath = os.path.join(config.temp_data_dir_path, filename)
+
+    console.print(f"Saving blackboard to {filepath}")
+
+    serialized = SerializedBlackboard(format=blackboard.format, blackboard=blackboard)
+    json_data = serialized.model_dump_json()
+
+    util_file.write_text_to_file(json_data, filepath)
