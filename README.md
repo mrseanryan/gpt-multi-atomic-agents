@@ -147,7 +147,7 @@ def build_creature_agent():
         description="Creates new creatures given the user prompt. Ensures that ALL creatures mentioned by the user are created.",
         accepted_functions=[function_add_creature, function_add_relationship],
         functions_allowed_to_generate=[function_add_creature],
-        topics=["creature"]
+        topics=["creature", "summary"]
     )
 
     return agent_definition
@@ -249,7 +249,7 @@ def build_creature_agent():
         description="Creates new creatures given the user prompt. Ensures that ALL creatures mentioned by the user are created.",
         accepted_graphql_schemas=[creatures_graphql, creature_mutations_graphql],
         mutations_allowed_to_generate=[creature_mutations_graphql],
-        topics=["creature"]
+        topics=["creature", "summary"]
     )
 
     return agent_definition

@@ -20,7 +20,7 @@ def build_creature_agent():
             previously_generated_functions=[],
         ),
         output_schema=FunctionAgentOutputSchema,
-        topics=["creature"],
+        topics=["creature", "summary"],
     )
 
     return agent_definition
@@ -40,7 +40,7 @@ def build_vegatation_agent():
             previously_generated_functions=[],
         ),
         output_schema=FunctionAgentOutputSchema,
-        topics=["vegetation"],
+        topics=["vegetation", "summary"],
     )
 
     return agent_definition
@@ -61,7 +61,7 @@ def build_relationship_agent():
             previously_generated_functions=[],
         ),
         output_schema=FunctionAgentOutputSchema,
-        topics=["relationship"],
+        topics=["relationship", "summary"],
     )
 
     return agent_definition

@@ -11,7 +11,7 @@ def build_creature_agent():
             functions.function_create_relationship,
         ],
         functions_allowed_to_generate=[functions.function_create_creature],
-        topics=["creature"],
+        topics=["creature", "summary"],
     )
 
     return agent_definition
@@ -26,7 +26,7 @@ def build_vegatation_agent():
             functions.function_create_relationship,
         ],
         functions_allowed_to_generate=[functions.function_create_vegetation],
-        topics=["vegetation"],
+        topics=["vegetation", "summary"],
     )
 
     return agent_definition
@@ -42,7 +42,7 @@ def build_relationship_agent():
             functions.function_create_relationship,
         ],
         functions_allowed_to_generate=[functions.function_create_relationship],
-        topics=["relationship"],
+        topics=["relationship", "summary"],
     )
 
     return agent_definition

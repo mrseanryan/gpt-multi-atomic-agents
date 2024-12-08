@@ -20,7 +20,7 @@ def build_creature_agent():
         description="Creates new creatures given the user prompt. Ensures that ALL creatures mentioned by the user are created, but ONLY if they are not already in graphql_data.",
         accepted_graphql_schemas=[creatures_graphql, creature_mutations_graphql],
         mutations_allowed_to_generate=[creature_mutations_graphql],
-        topics=["creature"],
+        topics=["creature", "summary"],
     )
 
     return agent_definition
@@ -35,7 +35,7 @@ def build_vegatation_agent():
         description="Creates new vegetation matching the user prompt. IMPORTANT: Ensures that ALL vegetation and plants mentioned by the user are created.",
         accepted_graphql_schemas=[creatures_graphql, vegetation_mutations_graphql],
         mutations_allowed_to_generate=[vegetation_mutations_graphql],
-        topics=["vegetation"],
+        topics=["vegetation", "summary"],
     )
 
     return agent_definition
@@ -55,7 +55,7 @@ def build_relationship_agent():
             relationship_mutations_graphql,
         ],
         mutations_allowed_to_generate=[relationship_mutations_graphql],
-        topics=["relationship"],
+        topics=["relationship", "summary"],
     )
 
     return agent_definition

@@ -54,7 +54,7 @@ example_creeature_creator_agent = FunctionAgentDefinitionMinimal(
     description="Creates new creatures given the user prompt. Ensures that ALL creatures mentioned by the user are created.",
     accepted_functions=[function_create_creature],
     functions_allowed_to_generate=[function_create_creature],
-    topics=["creature"],
+    topics=["creature", "summary"],
 )
 
 example_create_creature_call__wolf = FunctionCallSchema(
