@@ -30,6 +30,7 @@ from .blackboard_accessor import (
     GraphQLBlackboardAccessor,
 )
 from .config import Config
+from .repl_commands import CommandAction, check_user_prompt, print_help
 from . import util_print_agent
 
 console = Console()
@@ -218,38 +219,6 @@ def generate_with_blackboard(
     return blackboard
 
 
-def _is_user_input_matching(user_prompt: str, keys: list[str]) -> bool:
-    return user_prompt.lower().strip() in keys
-
-
-def _is_quit(user_prompt: str) -> bool:
-    return _is_user_input_matching(
-        user_prompt=user_prompt, keys=["bye", "quit", "stop", "exit"]
-    )
-
-
-def _is_dump(user_prompt: str) -> bool:
-    return _is_user_input_matching(user_prompt=user_prompt, keys=["dump"])
-
-
-def _dump_blackboard(blackboard: Blackboard) -> None:
-    console.print(blackboard)
-
-
-def _is_help(user_prompt: str) -> bool:
-    return _is_user_input_matching(user_prompt=user_prompt, keys=["help"])
-
-
-def _print_help() -> None:
-    console.print(
-        "Type in a question for the AI. If you are not sure what to type, then ask it a question like 'What can you do?'"
-    )
-    console.print(
-        "To exit, press ENTER or else type one of: bye, exit, quit and press ENTER"
-    )
-    console.print("To see the current blackboard state, type: dump and press ENTER")
-
-
 def run_chat_loop(
     agent_definitions: list[AgentDefinitionBase],
     chat_agent_description: str,
@@ -268,10 +237,10 @@ def run_chat_loop(
     if not blackboard:
         blackboard = _create_blackboard_accessor(agent_definitions)
 
-    _print_help()
+    print_help()
 
     initial_assistant_message = "How can I help you?"
-    util_print_agent.print_assistant_message(message=initial_assistant_message)
+    util_print_agent.print_assistant_message_only(chat_message=initial_assistant_message)
 
     blackboard._blackboard.add_mesage(
         Message(role=MessageRole.assistant, message=initial_assistant_message)
@@ -287,17 +256,17 @@ def run_chat_loop(
             if given_user_prompt
             else console.input(":sunglasses: You: ")
         )
-        if not user_prompt or _is_quit(user_prompt=user_prompt):
-            util_print_agent.print_assistant_message("Good bye!")
-            break
-
-        if _is_dump(user_prompt=user_prompt):
-            _dump_blackboard(blackboard=blackboard)
-            continue
-
-        if _is_help(user_prompt=user_prompt):
-            _print_help()
-            continue
+        action = check_user_prompt(user_prompt=user_prompt, blackboard=blackboard)
+        match action:
+            case CommandAction.quit:
+                util_print_agent.print_assistant_message_only(chat_message="Good bye!")
+                break
+            case CommandAction.handled_already:
+                continue
+            case CommandAction.no_action:
+                pass
+            case _:
+                raise RuntimeError(f"Not a recognised CommandAction: {action}")
 
         blackboard = generate(
             agent_definitions=agent_definitions,

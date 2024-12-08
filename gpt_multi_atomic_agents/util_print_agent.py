@@ -42,11 +42,13 @@ def print_router_assistant(
     for agent in message.execution_plan.recommended_agents:
         print_agent(agent, _config=_config)
 
-
-def _print_assistant_base(chat_message: str, output: typing.Any, agent_name="general"):
+def print_assistant_message_only(chat_message: str, agent_name="general"):
     console.print(
         f":robot: [bold green]Assistant [{agent_name}]: {chat_message}[/bold green]"
     )
+
+def _print_assistant_base(chat_message: str, output: typing.Any, agent_name="general"):
+    print_assistant_message_only(chat_message=chat_message, agent_name=agent_name)
     console.print(Text("  New calls:", style="yellow"))
     console.print(output)
 
