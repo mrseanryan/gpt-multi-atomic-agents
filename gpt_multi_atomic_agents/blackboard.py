@@ -77,19 +77,28 @@ class FunctionCallBlackboard(CustomBaseModel):
     def add_previous_mesage(self, message: Message) -> None:
         self.internal_previous_messages.append(message)
 
+    def reset_all(self) -> None:
+        """
+        Completely clears out the blackboard, starting over.
+        """
+        self.internal_previously_generated_functions.clear()
+        self.internal_previous_messages.clear()
+        self.internal_newly_generated_messages.clear()
+        self.internal_newly_generated_functions.clear()
+
     def _reset(self):
         """Resets newly created functions, to prepare for next generation"""
         self.internal_newly_generated_functions.clear()
         self.internal_newly_generated_messages.clear()
 
+    def reset_newly_generated(self) -> None:
+        """Reset newly generated, in case client did not clear out"""
+        self._reset()
+
     def set_user_data(self, user_data: list[FunctionCallSchema]) -> None:
         """Receives the new version of user data, by setting the function-calls list, so is ready for next generation."""
         self._reset()
         self.internal_previously_generated_functions = user_data
-
-    def reset_newly_generated(self) -> None:
-        """Reset newly generated, in case client did not clear out"""
-        self._reset()
 
 
 class GraphQLBlackboard(CustomBaseModel):
@@ -135,6 +144,15 @@ class GraphQLBlackboard(CustomBaseModel):
     def set_user_data(self, user_data: str) -> None:
         self._reset()
         self.internal_user_data = user_data
+
+    def reset_all(self) -> None:
+        """
+        Completely clears out the blackboard, starting over.
+        """
+        self.internal_previously_generated_mutation_calls.clear()
+        self.internal_previous_messages.clear()
+        self.internal_newly_generated_messages.clear()
+        self.internal_user_data = ""
 
     def _reset(self) -> None:
         """

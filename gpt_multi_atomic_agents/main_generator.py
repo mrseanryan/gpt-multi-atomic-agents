@@ -240,7 +240,9 @@ def run_chat_loop(
     print_help()
 
     initial_assistant_message = "How can I help you?"
-    util_print_agent.print_assistant_message_only(chat_message=initial_assistant_message)
+    util_print_agent.print_assistant_message_only(
+        chat_message=initial_assistant_message
+    )
 
     blackboard._blackboard.add_mesage(
         Message(role=MessageRole.assistant, message=initial_assistant_message)
@@ -256,7 +258,9 @@ def run_chat_loop(
             if given_user_prompt
             else console.input(":sunglasses: You: ")
         )
-        action = check_user_prompt(user_prompt=user_prompt, blackboard=blackboard)
+        action = check_user_prompt(
+            user_prompt=user_prompt, blackboard=blackboard._blackboard
+        )
         match action:
             case CommandAction.quit:
                 util_print_agent.print_assistant_message_only(chat_message="Good bye!")
