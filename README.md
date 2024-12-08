@@ -403,6 +403,10 @@ The available REST methods:
 
 ### 3. Usage as a command line chat tool
 
+Chat to generate mutations (Function Calls or GraphQL) with the configured Agents. The Blackboard can be saved out for later chatting, or it can be consumed by other tools, for example to execute against application data.
+
+The example command line chats are setup with the same Sim Life style example agents.
+
 Via function calling:
 
 ```
@@ -415,7 +419,6 @@ Via GraphQL:
 ```
 ./run-example.graphql.sh
 ```
-
 
 ```
 🤖 Assistant : Welcome to multi-agent chat
