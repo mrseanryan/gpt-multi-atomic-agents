@@ -1,15 +1,21 @@
 from dataclasses import dataclass
 from enum import StrEnum, auto
 import logging
+from cornsnake import util_file, util_json
+import os
 
-from pydantic import Field
+from pydantic import TypeAdapter, Field
+from rich.console import Console
+from rich.text import Text
 
 from .util_pydantic import CustomBaseModel
 
 from .functions_dto import FunctionCallSchema
+from .config import Config
 from . import util_graphql
 from . import rest_api_examples
 
+console = Console()
 logger = logging.getLogger(__file__)
 
 
@@ -167,3 +173,35 @@ class GraphQLBlackboard(CustomBaseModel):
 
 
 Blackboard = FunctionCallBlackboard | GraphQLBlackboard
+
+
+def load_blackboard_from_file(
+    config: Config, existing_blackboard: Blackboard
+) -> Blackboard | None:
+    filename = input("Please enter a filename:")
+    filename = util_file.change_extension(filename, ".json")
+    filepath = os.path.join(config.temp_data_dir_path, filename)
+
+    if not os.path.exists(filepath):
+        console.print(
+            Text(
+                "That file does not exist. Please use the list command to view the current files."
+            ),
+            style="red",
+        )
+        return existing_blackboard
+
+    console.print(f"Loading blackboard from {filepath}")
+    json_data = util_json.read_from_json_file(filepath)
+    if isinstance(existing_blackboard, FunctionCallBlackboard):
+        return TypeAdapter(FunctionCallBlackboard).validate_python(json_data)
+    elif isinstance(existing_blackboard, GraphQLBlackboard):
+        return TypeAdapter(GraphQLBlackboard).validate_python(json_data)
+
+    console.print(
+        Text(
+            "Could not load that blackboard (the file could be old or a different format: FunctionCalling vs GraphQL)"
+        ),
+        style="red",
+    )
+    return None

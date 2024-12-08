@@ -1,15 +1,12 @@
 import logging
-import os
 import typing
 
 from atomic_agents.agents.base_agent import (
     BaseAgent,
     BaseAgentConfig,
 )
-from cornsnake import util_file, util_json, util_time, util_wait
-from pydantic import TypeAdapter
+from cornsnake import util_time, util_wait
 from rich.console import Console
-from rich.text import Text
 
 from .prompts_router import AgentExecutionPlanSchema
 
@@ -26,6 +23,7 @@ from .blackboard import (
     GraphQLBlackboard,
     Message,
     MessageRole,
+    load_blackboard_from_file,
 )
 from .blackboard_accessor import (
     BlackboardAccessor,
@@ -222,38 +220,6 @@ def generate_with_blackboard(
     return blackboard
 
 
-def _load_blackboard_from_file(
-    config: Config, existing_blackboard: Blackboard
-) -> Blackboard | None:
-    filename = input("Please enter a filename:")
-    filename = util_file.change_extension(filename, ".json")
-    filepath = os.path.join(config.temp_data_dir_path, filename)
-
-    if not os.path.exists(filepath):
-        console.print(
-            Text(
-                "That file does not exist. Please use the list command to view the current files."
-            ),
-            style="red",
-        )
-        return existing_blackboard
-
-    console.print(f"Loading blackboard from {filepath}")
-    json_data = util_json.read_from_json_file(filepath)
-    if isinstance(existing_blackboard, FunctionCallBlackboard):
-        return TypeAdapter(FunctionCallBlackboard).validate_python(json_data)
-    elif isinstance(existing_blackboard, GraphQLBlackboard):
-        return TypeAdapter(GraphQLBlackboard).validate_python(json_data)
-
-    console.print(
-        Text(
-            "Could not load that blackboard (the file could be old or a different format: FunctionCalling vs GraphQL)"
-        ),
-        style="red",
-    )
-    return None
-
-
 def run_chat_loop(
     agent_definitions: list[AgentDefinitionBase],
     chat_agent_description: str,
@@ -303,7 +269,7 @@ def run_chat_loop(
             case CommandAction.handled_already:
                 continue
             case CommandAction.load_blackboard:
-                new_blackboard = _load_blackboard_from_file(
+                new_blackboard = load_blackboard_from_file(
                     config=_config, existing_blackboard=blackboard._blackboard
                 )
                 if new_blackboard:
