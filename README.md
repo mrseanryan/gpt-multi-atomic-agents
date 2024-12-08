@@ -13,7 +13,10 @@ A simple dynamic multi-agent framework based on [atomic-agents](https://github.c
       - when the user is happy -> the client can use the `generator` to execute the plan, using the recommended agents
       - the client then receives function calls (or GraphQL mutations) to update the data
 - generate via OpenAI or AWS Bedrock or groq
-- use as a library OR run out-of-the-box as a REST API
+- usage:
+  1. as a library
+  2. OR run out-of-the-box as a REST API, accepting Agents from the client
+  3. OR as a command line chat-loop
 
 - note: the `!! framework is at an early stage !!` - breaking changes will be indicated by increasing the *minor* version (major is still at zero).
 
@@ -372,18 +375,61 @@ source ~/.zprofile
 
 ## Usage
 
-gpt-multi-atomic-agents can be used in two ways:
+gpt-multi-atomic-agents can be used in three ways:
 
-- as a framework for your application or service
-- as a REST API, where a client provides the agents and user prompts
+1 - as a framework for your application or service
+2 - as a REST API, where a client provides the agents and user prompts
+3 - as a command line tool to chat and generate functions to modify your data
 
-REST API (with Swagger examples):
+### 1. Usage as a framework (library)
+
+See the [example source code](https://github.com/mrseanryan/gpt-multi-atomic-agents/tree/master/examples) for more details.
+
+### 2. Usage as REST API (with Swagger examples):
 
 ```
 ./run-rest-api.sh
 ```
 
-Also see the [example source code](https://github.com/mrseanryan/gpt-multi-atomic-agents/tree/master/examples) for more details.
+The REST API URL and Swagger URLs are printed to the console
+
+The available REST methods:
+
+- generate_plan: Optionally call this before generate_function_calls, in order to generate an Execution Plan separately, and get user feedback. This can help reduce *perceived* latency for the user.
+
+- generate_function_calls: Generates Function Calls to fulfill the user's prompt, given the available Agents in the user's request. If an Execution Plan is included in the request, then that is used to decide which Agents to execute. Otherwise an Execution Plan will be internally generated.
+
+- [Not yet implemented] generate_graphql
+
+### 3. Usage as a command line chat tool
+
+Via function calling:
+
+```
+./run-example.sh
+```
+
+Via GraphQL:
+
+
+```
+./run-example.graphql.sh
+```
+
+
+```
+🤖 Assistant : Welcome to multi-agent chat
+Type in a question for the AI. If you are not sure what to type, then ask it a question like 'What can you do?'
+To exit, use the quit command
+Available commands:
+  clear - Clear the blackboard, starting over. (alias: reset)
+  dump - Dump the current blackboard state to the console (alias: show)
+  help - Display help text
+  list - List the local data files from previous blackboards
+  load - Load a blackboard from the local data store
+  save - Save the blackboard to the local data store
+  quit - Exit the chat loop (alias: bye, exit, stop)
+```
 
 ## Tests
 
