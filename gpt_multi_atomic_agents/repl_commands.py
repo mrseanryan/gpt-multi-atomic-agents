@@ -3,9 +3,7 @@ from enum import StrEnum, auto
 from typing import Text
 from rich.console import Console
 
-from .blackboard import (
-    Blackboard
-)
+from .blackboard import Blackboard
 from .blackboard_serde import list_blackboard_files, save_blackboard_to_file
 from .config import Config
 from .util_print_agent import print_assistant_message_only
