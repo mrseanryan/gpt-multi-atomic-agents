@@ -16,6 +16,7 @@ A simple dynamic multi-agent framework based on [atomic-agents](https://github.c
 - usage:
   1. as a library
   2. OR run out-of-the-box as a REST API, accepting Agents from the client
+    - there is a simple TypeScript framework, for writing Agent-based TypeScript clients of the REST API
   3. OR as a command line chat-loop
 
 - note: the `!! framework is at an early stage !!` - breaking changes will be indicated by increasing the *minor* version (major is still at zero).
@@ -400,6 +401,12 @@ The available REST methods:
 - generate_function_calls: Generates Function Calls to fulfill the user's prompt, given the available Agents in the user's request. If an Execution Plan is included in the request, then that is used to decide which Agents to execute. Otherwise an Execution Plan will be internally generated.
 
 - [Not yet implemented] generate_graphql
+
+#### TypeScript REST API Client
+
+There is a simple TypeScript framework, for writing Agent-based TypeScript clients of the REST API.
+
+For an example with simple Agents, see [TypeScript Example Agents](https://github.com/mrseanryan/gpt-multi-atomic-agents/tree/master/clients/gpt-maa-ts/src/test_gpt_maa_client.ts).
 
 ### 3. Usage as a command line chat tool
 
