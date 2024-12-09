@@ -23,14 +23,16 @@ logger = logging.getLogger(__file__)
 
 app = FastAPI()
 
+
 def _load_config_from_ini() -> Config:
     return load_config(path_to_ini="config.ini")
 
+
 class AsyncIteratorWrapper:
     """The following is a utility class that transforms a
-        regular iterable to an asynchronous one.
+    regular iterable to an asynchronous one.
 
-        link: https://www.python.org/dev/peps/pep-0492/#example-2
+    link: https://www.python.org/dev/peps/pep-0492/#example-2
     """
 
     def __init__(self, obj):
@@ -45,6 +47,7 @@ class AsyncIteratorWrapper:
         except StopIteration:
             raise StopAsyncIteration
         return value
+
 
 @app.middleware("http")
 async def add_request_response_logging(request: Request, call_next):
@@ -66,6 +69,7 @@ async def add_request_response_logging(request: Request, call_next):
 
     response.headers["X-Process-Time"] = str(process_time)
     return response
+
 
 class GeneratePlanRequest(CustomBaseModel):
     agent_descriptions: list[prompts_router.AgentDescription] = Field(
