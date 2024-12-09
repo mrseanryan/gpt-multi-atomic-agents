@@ -1,4 +1,6 @@
-from fastapi import FastAPI
+import logging
+import time
+from fastapi import FastAPI, Request
 from pydantic import Field
 
 from .blackboard import FunctionCallBlackboard
@@ -8,7 +10,7 @@ from .rest_api_examples import (
     example_creeature_creator_agent,
 )
 
-from .config import load_config
+from .config import load_config, Config
 from .util_pydantic import CustomBaseModel
 
 from . import prompts_router
@@ -17,8 +19,53 @@ from .agent_definition import FunctionAgentDefinition, build_function_agent_defi
 from . import main_router
 from . import main_generator
 
+logger = logging.getLogger(__file__)
+
 app = FastAPI()
 
+def _load_config_from_ini() -> Config:
+    return load_config(path_to_ini="config.ini")
+
+class AsyncIteratorWrapper:
+    """The following is a utility class that transforms a
+        regular iterable to an asynchronous one.
+
+        link: https://www.python.org/dev/peps/pep-0492/#example-2
+    """
+
+    def __init__(self, obj):
+        self._it = iter(obj)
+
+    def __aiter__(self):
+        return self
+
+    async def __anext__(self):
+        try:
+            value = next(self._it)
+        except StopIteration:
+            raise StopAsyncIteration
+        return value
+
+@app.middleware("http")
+async def add_request_response_logging(request: Request, call_next):
+    start_time = time.perf_counter()
+
+    config = _load_config_from_ini()
+    if config.is_debug:
+        print("REQUEST HEADERS", request.headers)
+        request_body = await request.body()
+        print("REQUEST BODY", request_body)
+
+    response = await call_next(request)
+    process_time = time.perf_counter() - start_time
+
+    if config.is_debug:
+        resp_body = [section async for section in response.__dict__["body_iterator"]]
+        response.__setattr__("body_iterator", AsyncIteratorWrapper(resp_body))
+        print("RESPONSE BODY", str(resp_body))
+
+    response.headers["X-Process-Time"] = str(process_time)
+    return response
 
 class GeneratePlanRequest(CustomBaseModel):
     agent_descriptions: list[prompts_router.AgentDescription] = Field(
@@ -101,7 +148,7 @@ async def generate_plan(
     return main_router.generate_plan_via_descriptions(
         agent_descriptions=request.agent_descriptions,
         chat_agent_description=request.chat_agent_description,
-        _config=load_config(path_to_ini="config.ini"),
+        _config=_load_config_from_ini(),
         user_prompt=request.user_prompt,
         previous_plan=request.previous_plan,
     )
@@ -127,12 +174,13 @@ def generate_function_calls(
         _build_agent_definition_from_minimal(a) for a in request.agent_definitions
     ]
 
-    request.blackboard.reset_newly_generated()  # in case client did not clear out
+    if request.blackboard:
+        request.blackboard.reset_newly_generated()  # in case client did not clear out
 
     return main_generator.generate_with_blackboard(
         agent_definitions=agent_definitions,
         chat_agent_description=request.chat_agent_description,
-        _config=load_config(path_to_ini="config.ini"),
+        _config=_load_config_from_ini(),
         user_prompt=request.user_prompt,
         blackboard=request.blackboard,
         execution_plan=request.execution_plan,
