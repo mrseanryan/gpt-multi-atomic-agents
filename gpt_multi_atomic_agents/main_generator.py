@@ -8,6 +8,8 @@ from atomic_agents.agents.base_agent import (
 from cornsnake import util_time, util_wait
 from rich.console import Console
 
+from .blackboard_serde import load_blackboard_from_file
+
 from .prompts_router import AgentExecutionPlanSchema
 
 from . import main_router
@@ -23,7 +25,6 @@ from .blackboard import (
     GraphQLBlackboard,
     Message,
     MessageRole,
-    load_blackboard_from_file,
 )
 from .blackboard_accessor import (
     BlackboardAccessor,

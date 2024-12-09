@@ -1,14 +1,12 @@
 from abc import ABC, abstractmethod
-import os
-from cornsnake import util_dir
 from enum import StrEnum, auto
 from typing import Text
 from rich.console import Console
 
 from .blackboard import (
-    Blackboard,
-    save_blackboard_to_file,
+    Blackboard
 )
+from .blackboard_serde import list_blackboard_files, save_blackboard_to_file
 from .config import Config
 from .util_print_agent import print_assistant_message_only
 
@@ -90,11 +88,7 @@ class ListReplCommand(ReplCommandBase):
         return "List the local data files from previous blackboards"
 
     def do(self, blackboard: Blackboard, config: Config) -> CommandAction:
-        files = util_dir.find_files_by_extension(
-            dir_path=config.temp_data_dir_path, extension=".json"
-        )
-        files = [os.path.basename(f) for f in files]
-        console.print(f"Blackboard data files: {files}")
+        list_blackboard_files(blackboard=blackboard, config=config)
         return CommandAction.handled_already
 
 
