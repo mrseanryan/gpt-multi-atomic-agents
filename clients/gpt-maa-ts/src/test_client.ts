@@ -1,7 +1,7 @@
 import { AnonymousAuthenticationProvider } from "@microsoft/kiota-abstractions";
 import { FetchRequestAdapter } from "@microsoft/kiota-http-fetchlibrary";
-import { createPostsClient } from "../client/postsClient.js";
-import { Post } from "../client/models/index.js";
+import { createPostsClient } from "../test_client/postsClient.js";
+import { Post } from "../test_client/models/index.js";
 
 // API requires no authentication, so use the anonymous
 // authentication provider
