@@ -74,11 +74,10 @@ class FunctionAgentDefinition(AgentDefinitionBase):
     input_schema: type[FunctionAgentInputSchema]
     initial_input: FunctionAgentInputSchema
     output_schema: type[FunctionAgentOutputSchema]
-    accepted_functions: list[FunctionSpecSchema]
-    topics: list[str]  # The agent ONLY generates if user mentioned one of these topics
-    agent_parameters: list[
-        str
-    ]  # Optional parameters that router can try to extract from user prompt
+
+    accepted_functions: list[FunctionSpecSchema] = Field(
+        description="The set of Function Calls which this agent can understand as input."
+    )
 
     def _cast_blackboard(self, blackboard: Blackboard) -> FunctionCallBlackboard:
         if not isinstance(blackboard, FunctionCallBlackboard):
@@ -114,14 +113,14 @@ class FunctionAgentDefinition(AgentDefinitionBase):
         return [f.function_name for f in self.accepted_functions]
 
     def get_topics(self) -> list[str]:
-        return self.topics
+        return self.initial_input.topics
 
     def get_agent_parameters(self) -> list[str]:
-        return self.agent_parameters
+        return self.initial_input.agent_parameters
 
     def get_system_prompt_builder(self, _config: Config) -> SystemPromptBuilderBase:
         return FunctionSystemPromptBuilder(
-            topics=self.topics,
+            topics=self.get_topics(),
             _config=_config,
             allowed_functions_to_generate=self.initial_input.functions_allowed_to_generate,
         )
@@ -155,10 +154,10 @@ def build_function_agent_definition(
         initial_input=FunctionAgentInputSchema(
             functions_allowed_to_generate=functions_allowed_to_generate,
             previously_generated_functions=[],
+            topics=topics,
+            agent_parameters=agent_parameters,
         ),
         output_schema=FunctionAgentOutputSchema,
-        topics=topics,
-        agent_parameters=agent_parameters,
     )
 
 
@@ -166,6 +165,10 @@ class GraphQLAgentDefinition(AgentDefinitionBase):
     input_schema: type[GraphQLAgentInputSchema]
     initial_input: GraphQLAgentInputSchema
     output_schema: type[GraphQLAgentOutputSchema]
+
+    accepted_graphql_schemas: list[str] = Field(
+        description="The set of GraphQL schemas which the agent can use to work with client data."
+    )
 
     def _cast_blackboard(self, blackboard: Blackboard) -> GraphQLBlackboard:
         if not isinstance(blackboard, GraphQLBlackboard):
@@ -190,7 +193,7 @@ class GraphQLAgentDefinition(AgentDefinitionBase):
 
         initial_input.previously_generated_mutations = (
             graphql_blackboard.get_generated_mutations_matching(
-                initial_input.accepted_graphql_schemas
+                self.accepted_graphql_schemas
             )
         )
         util_output.print_debug(
@@ -235,9 +238,9 @@ def build_graphql_agent_definition(
     return GraphQLAgentDefinition(
         agent_name=agent_name,
         description=description,
+        accepted_graphql_schemas=accepted_graphql_schemas,
         input_schema=GraphQLAgentInputSchema,
         initial_input=GraphQLAgentInputSchema(
-            accepted_graphql_schemas=accepted_graphql_schemas,
             graphql_data="",
             mutations_allowed_to_generate=mutations_allowed_to_generate,
             previously_generated_mutations=[],

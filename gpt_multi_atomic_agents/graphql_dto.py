@@ -11,9 +11,7 @@ class GraphQLAgentInputSchema(BaseIOSchema):
     """
 
     user_input: str = Field(description="The chat message from the user", default="")
-    accepted_graphql_schemas: list[str] = Field(
-        description="The set of GraphQL schemas which the agent can use to work with client data."
-    )
+
     mutations_allowed_to_generate: list[str] = Field(
         description="Definitions of the GraphQL mutations that this agent can generate"
     )
@@ -25,7 +23,7 @@ class GraphQLAgentInputSchema(BaseIOSchema):
         description="This agent ONLY generates if user mentioned one of these topics"
     )
     agent_parameters: list[str] = Field(
-        description="A list of agent parameters that you can extract from the user's prompt.",
+        description="A list of agent parameters there were extracted from the user's prompt.",
         default_factory=lambda: list,
     )
     # TODO - add "If data is missing, then you need to generate allowed GraphQL queries."

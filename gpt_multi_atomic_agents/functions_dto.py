@@ -60,6 +60,14 @@ class FunctionAgentInputSchema(BaseIOSchema):
         default_factory=lambda: list,
     )
 
+    topics: list[str] = Field(
+        description="This agent ONLY generates if user mentioned one of these topics"
+    )
+    agent_parameters: list[str] = Field(
+        description="A list of agent parameters there were extracted from the user's prompt.",
+        default_factory=lambda: list,
+    )  # Optional parameters that router extracted from user prompt. Client can use to know what context to include.
+
 
 class FunctionAgentOutputSchema(BaseIOSchema):
     """
