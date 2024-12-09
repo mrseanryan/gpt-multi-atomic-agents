@@ -6,6 +6,7 @@
 import { FunctionAgentDefinitionMinimal, FunctionSpecSchema, ParameterSpec } from "../gpt_maa_client/models/index.js"
 import { handleUserPrompt } from "./function_call_generator.js"
 
+// =================================================
 // Define the Functions
 const areaParameter: ParameterSpec = {
     name: "area",
@@ -52,7 +53,8 @@ const wasteDisposerOutputFunctions: FunctionSpecSchema[] = [
     }
 ]
 
-// Declare the Agents
+// =================================================
+// Declare the Agents in terms of the shared Functions
 const lawnMowerAgent: FunctionAgentDefinitionMinimal = {
     agentName: "Lawn Mower",
     description: "Knows how to mow lawns",
@@ -82,6 +84,7 @@ const agentDefinitions: FunctionAgentDefinitionMinimal[] = [
     lawnMowerAgent, furnitureMoverAgent, wasteDisposerAgent
 ]
 
+// =================================================
 // Chat with the Agents
 const chatAgentDescription = "Handles questions about household chores such as garden, garden furniture and waste maintenance.";
 
