@@ -1,0 +1,802 @@
+{
+    "openapi": "3.1.0",
+    "info": {
+        "title": "FastAPI",
+        "version": "0.1.0"
+    },
+    "paths": {
+        "/generate_plan": {
+            "post": {
+                "summary": "Generate Plan",
+                "operationId": "generate_plan_generate_plan_post",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/GeneratePlanRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/AgentExecutionPlanSchema"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/generate_function_calls": {
+            "post": {
+                "summary": "Generate Function Calls",
+                "operationId": "generate_function_calls_generate_function_calls_post",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/FunctionCallGenerateRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/FunctionCallBlackboard-Output"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "AgentDescription": {
+                "properties": {
+                    "agent_name": {
+                        "type": "string",
+                        "title": "Agent Name",
+                        "description": "The name of the agent",
+                        "examples": [
+                            "Creature Creator"
+                        ]
+                    },
+                    "description": {
+                        "type": "string",
+                        "title": "Description",
+                        "description": "The description of this agent, its purpose and capabilities."
+                    },
+                    "topics": {
+                        "items": {
+                            "type": "string"
+                        },
+                        "type": "array",
+                        "title": "Topics",
+                        "description": "This agent ONLY generates if user mentioned one of these topics"
+                    },
+                    "agent_parameters": {
+                        "items": {
+                            "type": "string"
+                        },
+                        "type": "array",
+                        "title": "Agent Parameters",
+                        "description": "A list of agent parameters that you can extract from the user's prompt."
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "agent_name",
+                    "description",
+                    "topics",
+                    "agent_parameters"
+                ],
+                "title": "AgentDescription"
+            },
+            "AgentExecutionPlanSchema": {
+                "properties": {
+                    "chat_message": {
+                        "type": "string",
+                        "title": "Chat Message",
+                        "description": "The chat response to the user's message - a friendly non-technical message. Do NOT mention agents."
+                    },
+                    "recommended_agents": {
+                        "items": {
+                            "$ref": "#/components/schemas/RecommendedAgent"
+                        },
+                        "type": "array",
+                        "title": "Recommended Agents",
+                        "description": "The ordered list of agents that you recommend should be used to handle the user's prompt. Only the most relevant agents should be recommended."
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "chat_message",
+                    "recommended_agents"
+                ],
+                "title": "AgentExecutionPlanSchema",
+                "description": "This schema represents a generated plan to execute agents to fulfill the user's request. The chat message should be non-technical - do NOT mention agents."
+            },
+            "BlackboardFormat": {
+                "type": "string",
+                "enum": [
+                    "function_call",
+                    "graphql"
+                ],
+                "title": "BlackboardFormat"
+            },
+            "FunctionAgentDefinitionMinimal": {
+                "properties": {
+                    "agent_name": {
+                        "type": "string",
+                        "title": "Agent Name",
+                        "description": "The name of the agent",
+                        "examples": [
+                            "Creature Creator"
+                        ]
+                    },
+                    "description": {
+                        "type": "string",
+                        "title": "Description",
+                        "description": "The description of this agent, its purpose and capabilities."
+                    },
+                    "accepted_functions": {
+                        "items": {
+                            "$ref": "#/components/schemas/FunctionSpecSchema"
+                        },
+                        "type": "array",
+                        "title": "Accepted Functions",
+                        "description": "The set of 'input' function calls that this agent understands. Each agent should understand its own output, but can also understand a subset of the output of other agents. This allows the agents to collaborate."
+                    },
+                    "functions_allowed_to_generate": {
+                        "items": {
+                            "$ref": "#/components/schemas/FunctionSpecSchema"
+                        },
+                        "type": "array",
+                        "title": "Functions Allowed To Generate",
+                        "description": "The set of 'output' function calls that this agent generates."
+                    },
+                    "topics": {
+                        "items": {
+                            "type": "string"
+                        },
+                        "type": "array",
+                        "title": "Topics",
+                        "description": "This agent ONLY generates if user mentioned one of these topics"
+                    }
+                },
+                "additionalProperties": false,
+                "type": "object",
+                "required": [
+                    "agent_name",
+                    "description",
+                    "accepted_functions",
+                    "functions_allowed_to_generate",
+                    "topics"
+                ],
+                "title": "FunctionAgentDefinitionMinimal"
+            },
+            "FunctionCallBlackboard-Input": {
+                "properties": {
+                    "format": {
+                        "$ref": "#/components/schemas/BlackboardFormat",
+                        "description": "The data format of the blackboard",
+                        "default": "function_call"
+                    },
+                    "internal_previously_generated_functions": {
+                        "items": {
+                            "$ref": "#/components/schemas/FunctionCallSchema"
+                        },
+                        "type": "array",
+                        "title": "Internal Previously Generated Functions",
+                        "description": "All previously generated functions: either from client (representing its data) or from agents in this generation",
+                        "examples": [
+                            [
+                                {
+                                    "agent_name": "Creature Creator",
+                                    "function_name": "AddCreature",
+                                    "parameters": {
+                                        "age": "5",
+                                        "allowed_terrain": "mountain",
+                                        "creature_name": "wolf",
+                                        "icon_name": "wolf-icon"
+                                    }
+                                }
+                            ]
+                        ]
+                    },
+                    "internal_previous_messages": {
+                        "items": {
+                            "$ref": "#/components/schemas/Message"
+                        },
+                        "type": "array",
+                        "title": "Internal Previous Messages",
+                        "examples": [
+                            [
+                                {
+                                    "message": "Add a wolf",
+                                    "role": "user"
+                                },
+                                {
+                                    "message": "I have created a wolf. Is there anything else I can help you with?",
+                                    "role": "assistant"
+                                }
+                            ]
+                        ]
+                    },
+                    "internal_newly_generated_messages": {
+                        "items": {
+                            "$ref": "#/components/schemas/Message"
+                        },
+                        "type": "array",
+                        "title": "Internal Newly Generated Messages",
+                        "examples": [
+                            []
+                        ]
+                    },
+                    "internal_newly_generated_functions": {
+                        "items": {
+                            "$ref": "#/components/schemas/FunctionCallSchema"
+                        },
+                        "type": "array",
+                        "title": "Internal Newly Generated Functions",
+                        "examples": [
+                            []
+                        ]
+                    }
+                },
+                "additionalProperties": false,
+                "type": "object",
+                "title": "FunctionCallBlackboard"
+            },
+            "FunctionCallBlackboard-Output": {
+                "properties": {
+                    "format": {
+                        "$ref": "#/components/schemas/BlackboardFormat",
+                        "description": "The data format of the blackboard",
+                        "default": "function_call"
+                    },
+                    "internal_previously_generated_functions": {
+                        "items": {
+                            "$ref": "#/components/schemas/FunctionCallSchema"
+                        },
+                        "type": "array",
+                        "title": "Internal Previously Generated Functions",
+                        "description": "All previously generated functions: either from client (representing its data) or from agents in this generation",
+                        "examples": [
+                            [
+                                {
+                                    "agent_name": "Creature Creator",
+                                    "function_name": "AddCreature",
+                                    "parameters": {
+                                        "age": "5",
+                                        "allowed_terrain": "mountain",
+                                        "creature_name": "wolf",
+                                        "icon_name": "wolf-icon"
+                                    }
+                                }
+                            ]
+                        ]
+                    },
+                    "internal_previous_messages": {
+                        "items": {
+                            "$ref": "#/components/schemas/Message"
+                        },
+                        "type": "array",
+                        "title": "Internal Previous Messages",
+                        "examples": [
+                            [
+                                {
+                                    "message": "Add a wolf",
+                                    "role": "user"
+                                },
+                                {
+                                    "message": "I have created a wolf. Is there anything else I can help you with?",
+                                    "role": "assistant"
+                                }
+                            ]
+                        ]
+                    },
+                    "internal_newly_generated_messages": {
+                        "items": {
+                            "$ref": "#/components/schemas/Message"
+                        },
+                        "type": "array",
+                        "title": "Internal Newly Generated Messages",
+                        "examples": [
+                            []
+                        ]
+                    },
+                    "internal_newly_generated_functions": {
+                        "items": {
+                            "$ref": "#/components/schemas/FunctionCallSchema"
+                        },
+                        "type": "array",
+                        "title": "Internal Newly Generated Functions",
+                        "examples": [
+                            []
+                        ]
+                    }
+                },
+                "additionalProperties": false,
+                "type": "object",
+                "title": "FunctionCallBlackboard"
+            },
+            "FunctionCallGenerateRequest": {
+                "properties": {
+                    "agent_definitions": {
+                        "items": {
+                            "$ref": "#/components/schemas/FunctionAgentDefinitionMinimal"
+                        },
+                        "type": "array",
+                        "title": "Agent Definitions",
+                        "description": "The defintions of the Agents to execute, in order.",
+                        "examples": [
+                            [
+                                {
+                                    "accepted_functions": [
+                                        {
+                                            "description": "Adds a new creature to the world (not vegetation)",
+                                            "function_name": "AddCreature",
+                                            "parameters": [
+                                                {
+                                                    "allowed_values": [],
+                                                    "name": "creature_name",
+                                                    "type": "string"
+                                                },
+                                                {
+                                                    "allowed_values": [
+                                                        "mountain",
+                                                        "marsh",
+                                                        "prairie",
+                                                        "coast",
+                                                        "water"
+                                                    ],
+                                                    "name": "allowed_terrain",
+                                                    "type": "string"
+                                                },
+                                                {
+                                                    "allowed_values": [],
+                                                    "name": "age",
+                                                    "type": "int"
+                                                },
+                                                {
+                                                    "allowed_values": [
+                                                        "sheep-icon",
+                                                        "wolf-icon",
+                                                        "grass-icon",
+                                                        "human-icon",
+                                                        "other-icon"
+                                                    ],
+                                                    "name": "icon_name",
+                                                    "type": "string"
+                                                }
+                                            ]
+                                        }
+                                    ],
+                                    "agent_name": "Creature Creator",
+                                    "description": "Creates new creatures given the user prompt. Ensures that ALL creatures mentioned by the user are created.",
+                                    "functions_allowed_to_generate": [
+                                        {
+                                            "description": "Adds a new creature to the world (not vegetation)",
+                                            "function_name": "AddCreature",
+                                            "parameters": [
+                                                {
+                                                    "allowed_values": [],
+                                                    "name": "creature_name",
+                                                    "type": "string"
+                                                },
+                                                {
+                                                    "allowed_values": [
+                                                        "mountain",
+                                                        "marsh",
+                                                        "prairie",
+                                                        "coast",
+                                                        "water"
+                                                    ],
+                                                    "name": "allowed_terrain",
+                                                    "type": "string"
+                                                },
+                                                {
+                                                    "allowed_values": [],
+                                                    "name": "age",
+                                                    "type": "int"
+                                                },
+                                                {
+                                                    "allowed_values": [
+                                                        "sheep-icon",
+                                                        "wolf-icon",
+                                                        "grass-icon",
+                                                        "human-icon",
+                                                        "other-icon"
+                                                    ],
+                                                    "name": "icon_name",
+                                                    "type": "string"
+                                                }
+                                            ]
+                                        }
+                                    ],
+                                    "topics": [
+                                        "creature",
+                                        "summary"
+                                    ]
+                                }
+                            ]
+                        ]
+                    },
+                    "chat_agent_description": {
+                        "type": "string",
+                        "title": "Chat Agent Description",
+                        "description": "Describe the purpose and domain of this chat system.",
+                        "examples": [
+                            "Handles users questions about an ecosystem game like Sim Life"
+                        ]
+                    },
+                    "user_prompt": {
+                        "type": "string",
+                        "title": "User Prompt",
+                        "description": "The input from the user",
+                        "examples": [
+                            "Add a sheep that eats grass"
+                        ]
+                    },
+                    "blackboard": {
+                        "anyOf": [
+                            {
+                                "$ref": "#/components/schemas/FunctionCallBlackboard-Input"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "description": "Optionally include the previous Blackboard state, to have a conversation (avoids stateless server). This contains previous state and new data (which the user has updated either by executing its implementation of Function Calls)."
+                    },
+                    "execution_plan": {
+                        "anyOf": [
+                            {
+                                "$ref": "#/components/schemas/AgentExecutionPlanSchema"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "description": "Optionally also include a previously generated plan, to reduce latency. If no plan is included, then generate will also internally call generate_plan.",
+                        "examples": [
+                            {
+                                "chat_message": "Certainly! I'll help you add a sheep that eats grass to your ecosystem.",
+                                "recommended_agents": [
+                                    {
+                                        "agent_name": "Creature Creator",
+                                        "agent_parameters": {
+                                            "creature_name": [
+                                                "sheep"
+                                            ]
+                                        },
+                                        "rewritten_user_prompt": "Create a new creature: sheep. The sheep should have the ability to eat grass."
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                },
+                "additionalProperties": false,
+                "type": "object",
+                "required": [
+                    "agent_definitions",
+                    "chat_agent_description",
+                    "user_prompt"
+                ],
+                "title": "FunctionCallGenerateRequest"
+            },
+            "FunctionCallSchema": {
+                "properties": {
+                    "agent_name": {
+                        "type": "string",
+                        "title": "Agent Name",
+                        "description": "The name of the agent that generated the function call"
+                    },
+                    "function_name": {
+                        "type": "string",
+                        "title": "Function Name",
+                        "description": "The name of the function"
+                    },
+                    "parameters": {
+                        "additionalProperties": {
+                            "type": "string"
+                        },
+                        "type": "object",
+                        "title": "Parameters",
+                        "description": "The named parameters and their values"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "agent_name",
+                    "function_name",
+                    "parameters"
+                ],
+                "title": "FunctionCallSchema",
+                "description": "This schema represents a function call that was already generated."
+            },
+            "FunctionSpecSchema": {
+                "properties": {
+                    "description": {
+                        "type": "string",
+                        "title": "Description",
+                        "description": "Describes what the function does"
+                    },
+                    "function_name": {
+                        "type": "string",
+                        "title": "Function Name",
+                        "description": "The name of the function"
+                    },
+                    "parameters": {
+                        "items": {
+                            "$ref": "#/components/schemas/ParameterSpec"
+                        },
+                        "type": "array",
+                        "title": "Parameters",
+                        "description": "Named parameters of the function"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "description",
+                    "function_name",
+                    "parameters"
+                ],
+                "title": "FunctionSpecSchema",
+                "description": "This schema represents the definition of a function call that can be generated."
+            },
+            "GeneratePlanRequest": {
+                "properties": {
+                    "agent_descriptions": {
+                        "items": {
+                            "$ref": "#/components/schemas/AgentDescription"
+                        },
+                        "type": "array",
+                        "title": "Agent Descriptions",
+                        "description": "The descriptions of the available Agents. The response will contain the most suitable agents to execute in order.",
+                        "examples": [
+                            [
+                                {
+                                    "agent_name": "Creature Creator",
+                                    "agent_parameters": [
+                                        "creature_name"
+                                    ],
+                                    "description": "Creates new creatures given the user prompt. Ensures that ALL creatures mentioned by the user are created.",
+                                    "topics": [
+                                        "creature"
+                                    ]
+                                }
+                            ]
+                        ]
+                    },
+                    "chat_agent_description": {
+                        "type": "string",
+                        "title": "Chat Agent Description",
+                        "description": "Describes the 'fallback' chat agent: if no suitable agents are recommended, this chat agent will be recommended, if the user's prompt is supported. The description should include the purpose and domain of this chat system.",
+                        "examples": [
+                            "Handles users questions about an ecosystem game like Sim Life"
+                        ]
+                    },
+                    "user_prompt": {
+                        "type": "string",
+                        "title": "User Prompt",
+                        "description": "The input from the user",
+                        "examples": [
+                            "Add a goat instead of a sheep"
+                        ]
+                    },
+                    "previous_plan": {
+                        "anyOf": [
+                            {
+                                "$ref": "#/components/schemas/AgentExecutionPlanSchema"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "description": "Optionally also send a previously generated plan, so the AI can generate a new plan taking into account the user's feedback (in user_prompt).",
+                        "examples": [
+                            {
+                                "chat_message": "Certainly! I'll help you add a sheep that eats grass to your ecosystem.",
+                                "recommended_agents": [
+                                    {
+                                        "agent_name": "Creature Creator",
+                                        "agent_parameters": {
+                                            "creature_name": [
+                                                "sheep"
+                                            ]
+                                        },
+                                        "rewritten_user_prompt": "Create a new creature: sheep. The sheep should have the ability to eat grass."
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                },
+                "additionalProperties": false,
+                "type": "object",
+                "required": [
+                    "agent_descriptions",
+                    "chat_agent_description",
+                    "user_prompt"
+                ],
+                "title": "GeneratePlanRequest"
+            },
+            "HTTPValidationError": {
+                "properties": {
+                    "detail": {
+                        "items": {
+                            "$ref": "#/components/schemas/ValidationError"
+                        },
+                        "type": "array",
+                        "title": "Detail"
+                    }
+                },
+                "type": "object",
+                "title": "HTTPValidationError"
+            },
+            "Message": {
+                "properties": {
+                    "role": {
+                        "$ref": "#/components/schemas/MessageRole"
+                    },
+                    "message": {
+                        "type": "string",
+                        "title": "Message"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "role",
+                    "message"
+                ],
+                "title": "Message"
+            },
+            "MessageRole": {
+                "type": "string",
+                "enum": [
+                    "user",
+                    "assistant"
+                ],
+                "title": "MessageRole"
+            },
+            "ParameterSpec": {
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "title": "Name"
+                    },
+                    "type": {
+                        "$ref": "#/components/schemas/ParameterType"
+                    },
+                    "allowed_values": {
+                        "items": {
+                            "type": "string"
+                        },
+                        "type": "array",
+                        "title": "Allowed Values"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "name",
+                    "type"
+                ],
+                "title": "ParameterSpec",
+                "description": "Defines one parameter of a function, including its name, type and allowed values. If allowed values are empty, then values must match the 'type'."
+            },
+            "ParameterType": {
+                "type": "string",
+                "enum": [
+                    "int",
+                    "float",
+                    "string",
+                    "datetime"
+                ],
+                "title": "ParameterType",
+                "description": "Defines the type of a parameter."
+            },
+            "RecommendedAgent": {
+                "properties": {
+                    "agent_name": {
+                        "type": "string",
+                        "title": "Agent Name",
+                        "description": "The name of the agent"
+                    },
+                    "rewritten_user_prompt": {
+                        "type": "string",
+                        "title": "Rewritten User Prompt",
+                        "description": "The user's prompt, rewritten to suit this agent"
+                    },
+                    "agent_parameters": {
+                        "additionalProperties": {
+                            "items": {
+                                "type": "string"
+                            },
+                            "type": "array"
+                        },
+                        "type": "object",
+                        "title": "Agent Parameters",
+                        "description": "Agent Parameters that you extracted from the user's prompt"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "agent_name",
+                    "rewritten_user_prompt",
+                    "agent_parameters"
+                ],
+                "title": "RecommendedAgent",
+                "description": "This schema represents one agent that you recommend be used to handle the user's prompt.\nThe recommendation includes the name of the agent, and a version of the user's prompt that has been rewritten to suit that agent."
+            },
+            "ValidationError": {
+                "properties": {
+                    "loc": {
+                        "items": {
+                            "anyOf": [
+                                {
+                                    "type": "string"
+                                },
+                                {
+                                    "type": "integer"
+                                }
+                            ]
+                        },
+                        "type": "array",
+                        "title": "Location"
+                    },
+                    "msg": {
+                        "type": "string",
+                        "title": "Message"
+                    },
+                    "type": {
+                        "type": "string",
+                        "title": "Error Type"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "loc",
+                    "msg",
+                    "type"
+                ],
+                "title": "ValidationError"
+            }
+        }
+    }
+}
