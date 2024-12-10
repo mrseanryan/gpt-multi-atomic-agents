@@ -4,7 +4,7 @@
 // - Because the service uses a Blackboard, the agents are then able to collaborate together, since they understand a subset of one another's output.
 
 import { FunctionAgentDefinitionMinimal, FunctionSpecSchema, ParameterSpec } from "../gpt_maa_client/models/index.js"
-import { handleUserPrompt } from "./function_call_generator.js"
+import { handleUserPrompt } from "./index.js"
 
 // =================================================
 // Define the Functions
