@@ -148,7 +148,7 @@ To update the client, if the REST API has changed:
 
 3. Run kyoto to generate the TypeScript client
 ```
-./build.sh
+./ update-from-openapi.sh
 ```
 4. Run the test - update code as needed:
 
