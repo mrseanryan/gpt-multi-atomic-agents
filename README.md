@@ -16,7 +16,7 @@ A simple dynamic multi-agent framework based on [atomic-agents](https://github.c
 - usage:
   1. as a library
   2. OR run out-of-the-box as a REST API, accepting Agents from the client
-    - there is a simple TypeScript framework, for writing Agent-based TypeScript clients of the REST API
+    - there is a simple [TypeScript framework](https://github.com/mrseanryan/gpt-multi-atomic-agents/tree/master/clients/gpt-maa-ts), for writing Agent-based TypeScript clients of the REST API
   3. OR as a command line chat-loop
 
 - note: the `!! framework is at an early stage !!` - breaking changes will be indicated by increasing the *minor* version (major is still at zero).
@@ -406,7 +406,7 @@ The available REST methods:
 
 There is a simple TypeScript framework, for writing Agent-based TypeScript clients of the REST API.
 
-For an example with simple Agents, see [TypeScript Example Agents](https://github.com/mrseanryan/gpt-multi-atomic-agents/tree/master/clients/gpt-maa-ts/src/test_gpt_maa_client.ts).
+For an example with simple Agents, see the [TypeScript Framework README](https://github.com/mrseanryan/gpt-multi-atomic-agents/tree/master/clients/gpt-maa-ts) and the [TypeScript Example Agents](https://github.com/mrseanryan/gpt-multi-atomic-agents/tree/master/clients/gpt-maa-ts/src/test_gpt_maa_client.ts).
 
 ### 3. Usage as a command line chat tool
 
