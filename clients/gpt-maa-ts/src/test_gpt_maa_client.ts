@@ -68,13 +68,13 @@ class LawnHandler extends HandlerBase
     }
 
     private handleMowLawn(functionCall: FunctionCallSchema): void {
-        console.log("<mowing the lawn>")  // TODO need to fix OpenAPI spec of parameters!
-        console.log(`  params: ${functionCall.parameters!.additionalData}`)
+        console.log("<mowing the lawn>")
+        console.log(`  params:`, functionCall.parameters)
     }
 
     private handleProduceCutGrass(functionCall: FunctionCallSchema): void {
-        console.log("<producing cut grass>")  // TODO need to fix OpenAPI spec of parameters!
-        console.log(`  params: ${functionCall.parameters!.additionalData}`)
+        console.log("<producing cut grass>")
+        console.log(`  params:`, functionCall.parameters)
     }
 
     protected nameImplementation(): string
@@ -132,6 +132,9 @@ const bbAccessor = await handleUserPrompt("Mow the lawn, dealing with any lawn f
 if (!bbAccessor) {
     throw new Error("No blackboard accessor was returned!")
 }
+
+// =================================================
+// Display the messages from the Agents
 const messages = bbAccessor.get_new_messages();
 console.log(messages);
 

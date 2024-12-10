@@ -9,7 +9,109 @@ This provides a clean approach to LLM based Agent calling, so the client can foc
 - submit data in the form of Function Calls
 - process the generated mutations, updating the application data
 
-For an example with simple Agents, see [TypeScript Example Agents](https://github.com/mrseanryan/gpt-multi-atomic-agents/tree/master/clients/gpt-maa-ts/src/test_gpt_maa_client.ts).
+## Example
+
+Agents are declared in terms of input and output functions.
+
+First, we define the functions:
+
+```TypeScript
+const areaParameter: ParameterSpec = {
+    name: "area",
+    type: "string",
+    allowedValues: ["front", "back"],
+}
+
+const mowLawnFunction: FunctionSpecSchema = {
+    functionName: "MowLawn",
+    description: "Mow the lawn and tidy it up",
+    parameters: [areaParameter]
+}
+const produceCutGrassFunction: FunctionSpecSchema = {
+    functionName: "ProduceCutGrass",
+    description: "Produce cut grass waster",
+    parameters: [areaParameter]
+}
+```
+
+We also need to provide Handlers, to be able to execute the generated function calls. This is the main point of integration:
+
+```TypeScript
+const functionRegistry = new FunctionRegistry();
+
+class LawnHandler extends HandlerBase
+{
+    constructor(registry: FunctionRegistry) {
+        super(registry);
+        this.registerFunction(mowLawnFunction.functionName!, this.handleMowLawn)
+        this.registerFunction(produceCutGrassFunction.functionName!, this.handleProduceCutGrass)
+    }
+
+    private handleMowLawn(functionCall: FunctionCallSchema): void {
+        console.log("<mowing the lawn>")
+        console.log(`  params:`, functionCall.parameters)
+    }
+
+    private handleProduceCutGrass(functionCall: FunctionCallSchema): void {
+        console.log("<producing cut grass>")
+        console.log(`  params:`, functionCall.parameters)
+    }
+
+    protected nameImplementation(): string
+    {
+        return "Lawn Handler";
+    }
+}
+
+// Create the handlers (they register themselves)
+const defaultHandler = new DefaultHandler(functionRegistry, (functionCall: FunctionCallSchema) => {
+    console.log(`[default handler] for function call: ${functionCall.functionName}(${functionCall.parameters!.additionalData})`)
+})
+const lawnHandler = new LawnHandler(functionRegistry);
+```
+
+Next, we can define the Agents in terms of the Functions (as inputs and outputs):
+
+```TypeScript
+const lawnMowerAgent: FunctionAgentDefinitionMinimal = {
+    agentName: "Lawn Mower",
+    description: "Knows how to mow lawns",
+    acceptedFunctions: mowerOutputFunctions,
+    functionsAllowedToGenerate: mowerOutputFunctions,
+    topics: ["garden", "lawn", "grass"],
+}
+```
+
+Now, we can use the agents to generate function calls, and execute them:
+
+```TypeScript
+const agentDefinitions: FunctionAgentDefinitionMinimal[] = [
+    lawnMowerAgent
+]
+
+// =================================================
+// Chat with the Agents
+const chatAgentDescription = "Handles questions about household chores such as garden, garden furniture and waste maintenance.";
+
+const bbAccessor = await handleUserPrompt("Mow the lawn, dealing with any lawn furniture and waste. After mowing make sure waste is disposed of.", agentDefinitions, chatAgentDescription)
+
+// =================================================
+// Display the messages from the Agents
+console.log(bbAccessor.get_new_messages());
+
+// =================================================
+// Execute the Function Calls using our Handlers
+bbAccessor.get_new_functions()
+const onExecuteStart = () => {
+    console.log("(execution started)")
+}
+const onExecuteEnd = () => {
+    console.log("(execution ended)")
+}
+execute(bbAccessor.get_new_functions(), functionRegistry, onExecuteStart, onExecuteEnd);
+```
+
+For more details, see [TypeScript Example Agents](https://github.com/mrseanryan/gpt-multi-atomic-agents/tree/master/clients/gpt-maa-ts/src/test_gpt_maa_client.ts).
 
 # Setup
 
