@@ -9,7 +9,7 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "gpt-maa-ts": "^0.0.3"
+    "gpt-maa-ts": "^0.0.4"
   },
   "private": true
 }
