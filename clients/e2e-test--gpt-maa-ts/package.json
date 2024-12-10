@@ -1,0 +1,15 @@
+{
+  "name": "e2e-test--gpt-maa-ts",
+  "version": "0.0.1",
+  "description": "test for consuming the gpt-maa-ts package",
+  "main": "index.js",
+  "scripts": {
+    "test": "test"
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "gpt-maa-ts": "^0.0.3"
+  },
+  "private": true
+}
