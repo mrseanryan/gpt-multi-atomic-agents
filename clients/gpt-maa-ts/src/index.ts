@@ -11,6 +11,7 @@ import { generate_plan } from "./function_call_planner.js";
 import { createClient } from "./kioto_client.js";
 
 export { generate_mutations, generate_plan };
+export * from "./function_call_executor.js";
 
 export const handleUserPrompt = async (userPrompt: string, agentDefinitions: FunctionAgentDefinitionMinimal[], chatAgentDescription: string, baseurl: string|null= null): Promise<FunctionCallBlackboardAccessor|null> => {
     const client: PostsClient = createClient(baseurl)

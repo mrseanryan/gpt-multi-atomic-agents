@@ -3,7 +3,8 @@
 // - Agents can be configured to understand a subset of each others output
 // - Because the service uses a Blackboard, the agents are then able to collaborate together, since they understand a subset of one another's output.
 
-import { FunctionAgentDefinitionMinimal, FunctionSpecSchema, ParameterSpec } from "../gpt_maa_client/models/index.js"
+import { FunctionAgentDefinitionMinimal, FunctionCallSchema, FunctionSpecSchema, ParameterSpec } from "../gpt_maa_client/models/index.js"
+import { DefaultHandler, execute, FunctionRegistry, HandlerBase } from "./function_call_executor.js"
 import { handleUserPrompt } from "./index.js"
 
 // =================================================
@@ -54,6 +55,43 @@ const wasteDisposerOutputFunctions: FunctionSpecSchema[] = [
 ]
 
 // =================================================
+// Define our Handlers so we can execute any generated Function Calls
+
+const functionRegistry = new FunctionRegistry();
+
+class LawnHandler extends HandlerBase
+{
+    constructor(registry: FunctionRegistry) {
+        super(registry);
+        this.registerFunction(mowLawnFunction.functionName!, this.handleMowLawn)
+        this.registerFunction(produceCutGrassFunction.functionName!, this.handleProduceCutGrass)
+    }
+
+    private handleMowLawn(functionCall: FunctionCallSchema): void {
+        console.log("<mowing the lawn>")  // TODO need to fix OpenAPI spec of parameters!
+        console.log(`  params: ${functionCall.parameters!.additionalData}`)
+    }
+
+    private handleProduceCutGrass(functionCall: FunctionCallSchema): void {
+        console.log("<producing cut grass>")  // TODO need to fix OpenAPI spec of parameters!
+        console.log(`  params: ${functionCall.parameters!.additionalData}`)
+    }
+
+    protected nameImplementation(): string
+    {
+        return "Lawn Handler";
+    }
+}
+
+// Create the handlers (they register themselves)
+const defaultHandler = new DefaultHandler(functionRegistry, (functionCall: FunctionCallSchema) => {
+    console.log(`[default handler] for function call: ${functionCall.functionName}(${functionCall.parameters!.additionalData})`)
+})
+const lawnHandler = new LawnHandler(functionRegistry);
+
+// TODO add WasteHandler, FurnitureHandler
+
+// =================================================
 // Declare the Agents in terms of the shared Functions
 const lawnMowerAgent: FunctionAgentDefinitionMinimal = {
     agentName: "Lawn Mower",
@@ -89,4 +127,21 @@ const agentDefinitions: FunctionAgentDefinitionMinimal[] = [
 const chatAgentDescription = "Handles questions about household chores such as garden, garden furniture and waste maintenance.";
 
 await handleUserPrompt("What can you do?", agentDefinitions, chatAgentDescription)
-await handleUserPrompt("Mow the lawn, dealing with any lawn furniture and waste. After mowing make sure waste is disposed of.", agentDefinitions, chatAgentDescription)
+const bbAccessor = await handleUserPrompt("Mow the lawn, dealing with any lawn furniture and waste. After mowing make sure waste is disposed of.", agentDefinitions, chatAgentDescription)
+
+if (!bbAccessor) {
+    throw new Error("No blackboard accessor was returned!")
+}
+const messages = bbAccessor.get_new_messages();
+console.log(messages);
+
+// =================================================
+// Execute the Function Calls using our Handlers
+bbAccessor.get_new_functions()
+const onExecuteStart = () => {
+    console.log("(execution started)")
+}
+const onExecuteEnd = () => {
+    console.log("(execution ended)")
+}
+execute(bbAccessor.get_new_functions(), functionRegistry, onExecuteStart, onExecuteEnd);
