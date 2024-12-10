@@ -5,13 +5,14 @@
 
 import { FunctionAgentDefinitionMinimal, FunctionCallBlackboardOutput } from "../gpt_maa_client/models/index.js";
 import { PostsClient } from "../gpt_maa_client/postsClient.js";
+import { FunctionCallBlackboardAccessor } from "./function_call_blackboard_accessor.js";
 import { generate_mutations } from "./function_call_generator.js";
 import { generate_plan } from "./function_call_planner.js";
 import { createClient } from "./kioto_client.js";
 
 export { generate_mutations, generate_plan };
 
-export const handleUserPrompt = async (userPrompt: string, agentDefinitions: FunctionAgentDefinitionMinimal[], chatAgentDescription: string, baseurl: string|null= null): Promise<FunctionCallBlackboardOutput|undefined> => {
+export const handleUserPrompt = async (userPrompt: string, agentDefinitions: FunctionAgentDefinitionMinimal[], chatAgentDescription: string, baseurl: string|null= null): Promise<FunctionCallBlackboardAccessor|null> => {
     const client: PostsClient = createClient(baseurl)
 
     console.log(`USER: ${userPrompt}`)
@@ -19,8 +20,7 @@ export const handleUserPrompt = async (userPrompt: string, agentDefinitions: Fun
     const executionPlan = await generate_plan(client, userPrompt, agentDefinitions, chatAgentDescription)
 
     console.log(`Executing the plan`)
-    const blackboard = await generate_mutations(client, userPrompt, agentDefinitions, chatAgentDescription, executionPlan)
+    const blackboardAccessor = await generate_mutations(client, userPrompt, agentDefinitions, chatAgentDescription, executionPlan)
 
-    // TODO Return a FunctionCallBlackboardAccessor like the Python one
-    return blackboard;
+    return blackboardAccessor;
 }
