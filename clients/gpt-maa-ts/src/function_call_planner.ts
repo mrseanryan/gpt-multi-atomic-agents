@@ -1,7 +1,7 @@
 import { PostsClient } from "../gpt_maa_client/postsClient.js";
 
 import {AgentDescription, AgentExecutionPlanSchema, FunctionAgentDefinitionMinimal, FunctionCallBlackboardOutput, FunctionCallGenerateRequest, GeneratePlanRequest} from "../gpt_maa_client/models/index.js"
-import { dumpJson } from "./kioto_client.js";
+import { dumpJson } from "./kiota_client.js";
 
 const convertAgentDefinitionToDescription = (agentDefinition: FunctionAgentDefinitionMinimal): AgentDescription => {
     return {

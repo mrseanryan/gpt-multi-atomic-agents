@@ -8,7 +8,7 @@ import { PostsClient } from "../gpt_maa_client/postsClient.js";
 import { FunctionCallBlackboardAccessor } from "./function_call_blackboard_accessor.js";
 import { generate_mutations } from "./function_call_generator.js";
 import { generate_plan } from "./function_call_planner.js";
-import { createClient } from "./kioto_client.js";
+import { createClient } from "./kiota_client.js";
 
 export { generate_mutations, generate_plan };
 export * from "./function_call_executor.js";

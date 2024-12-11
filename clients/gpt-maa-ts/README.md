@@ -15,7 +15,7 @@ This provides a clean approach to LLM based Agent calling, so the client can foc
 
 Agents are declared in terms of input and output functions.
 
-First, we define the functions:
+First, we define the functions which the Lawn Mower agent will use:
 
 ```TypeScript
 const areaParameter: ParameterSpec = {
@@ -36,7 +36,57 @@ const produceCutGrassFunction: FunctionSpecSchema = {
 }
 ```
 
-We also need to provide Handlers, to be able to execute the generated function calls. This is the main point of integration:
+Next, we can define the Lawn Mower Agent in terms of Functions (as inputs and outputs):
+
+```TypeScript
+const lawnMowerAgent: FunctionAgentDefinitionMinimal = {
+    agentName: "Lawn Mower",
+    description: "Knows how to mow lawns",
+    acceptedFunctions: [mowLawnFunction, produceCutGrassFunction],
+    functionsAllowedToGenerate: [mowLawnFunction, produceCutGrassFunction],
+    topics: ["garden", "lawn", "grass"],
+}
+```
+
+Next we define Functions that are specific to the Waste Disposer agent:
+
+```TypeScript
+const wasteDisposerOutputFunctions: FunctionSpecSchema[] = [
+    {
+        functionName: "CollectWaste",
+        description: "Collect waste from an area",
+        parameters: [areaParameter]
+    },
+    {
+        functionName: "TakeWasteToCollectionSite",
+        description: "Take previously collected waste from an area, to a collection site",
+        parameters: [areaParameter, {
+            name: "site_name",
+            type: "string"
+        }]
+    }
+]
+```
+
+Now that we have the waster disposer functions, and the waste output function of the Lawn Mower, we can define the Waste Disposer agent.
+
+Notice that the Waste Disposer agent takes the `produceCutGrassFunction` function as in an input. This allows the Waste Disposer agent to see and understand that part of the output from the Lawn Mower agent.
+
+> **_NOTE:_** By sharing a subset of Function Calls, agents are able to understand each other's output, and collaborate indirectly via the REST API (internall, the REST API uses a Blackboard).
+
+```TypeScript
+const wasteDisposerAgent: FunctionAgentDefinitionMinimal = {
+    agentName: "Waste Disposer",
+    description: "Knows how to collect and dispose of waste",
+    acceptedFunctions: [...wasteDisposerOutputFunctions, produceCutGrassFunction], // The waste disposer can observe when the lawn-mower has generated waste
+    functionsAllowedToGenerate: wasteDisposerOutputFunctions,
+    topics: ["waste", "dispose"],
+}
+```
+
+Finally, we also need to provide Handlers, to be able to execute the generated function calls.
+
+> **_NOTE:_** Handlers are the main point of integration with the greater application.
 
 ```TypeScript
 const functionRegistry = new FunctionRegistry();

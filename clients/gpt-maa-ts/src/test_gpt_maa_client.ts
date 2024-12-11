@@ -127,24 +127,24 @@ const agentDefinitions: FunctionAgentDefinitionMinimal[] = [
 const chatAgentDescription = "Handles questions about household chores such as garden, garden furniture and waste maintenance.";
 
 await handleUserPrompt("What can you do?", agentDefinitions, chatAgentDescription)
-const bbAccessor = await handleUserPrompt("Mow the lawn, dealing with any lawn furniture and waste. After mowing make sure waste is disposed of.", agentDefinitions, chatAgentDescription)
+const blackboardAccessor = await handleUserPrompt("Mow the lawn, dealing with any lawn furniture and waste. After mowing make sure waste is disposed of.", agentDefinitions, chatAgentDescription)
 
-if (!bbAccessor) {
+if (!blackboardAccessor) {
     throw new Error("No blackboard accessor was returned!")
 }
 
 // =================================================
 // Display the messages from the Agents
-const messages = bbAccessor.get_new_messages();
+const messages = blackboardAccessor.get_new_messages();
 console.log(messages);
 
 // =================================================
 // Execute the Function Calls using our Handlers
-bbAccessor.get_new_functions()
+blackboardAccessor.get_new_functions()
 const onExecuteStart = () => {
     console.log("(execution started)")
 }
 const onExecuteEnd = () => {
     console.log("(execution ended)")
 }
-execute(bbAccessor.get_new_functions(), functionRegistry, onExecuteStart, onExecuteEnd);
+execute(blackboardAccessor.get_new_functions(), functionRegistry, onExecuteStart, onExecuteEnd);
