@@ -85,7 +85,7 @@ class LawnHandler extends HandlerBase
 
 // Create the handlers (they register themselves)
 const defaultHandler = new DefaultHandler(functionRegistry, (functionCall: FunctionCallSchema) => {
-    console.log(`[default handler] for function call: ${functionCall.functionName}(${functionCall.parameters!.additionalData})`)
+    console.log(`[default handler] for function call: ${functionCall.functionName}`, functionCall.parameters)
 })
 const lawnHandler = new LawnHandler(functionRegistry);
 
