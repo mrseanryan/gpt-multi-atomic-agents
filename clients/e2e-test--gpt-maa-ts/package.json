@@ -6,10 +6,16 @@
   "scripts": {
     "test": "test"
   },
+  "type": "module",
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "gpt-maa-ts": "^0.0.4"
+    "gpt-maa-ts": "^0.0.6"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.1",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2"
   },
   "private": true
 }
