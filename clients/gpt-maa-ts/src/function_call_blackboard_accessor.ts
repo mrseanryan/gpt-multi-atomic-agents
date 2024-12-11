@@ -43,4 +43,9 @@ export class FunctionCallBlackboardAccessor
         this._reset()
         this.blackboard.internalPreviouslyGeneratedFunctions = user_data;
     }
+
+    public get_internal_blackboard(): FunctionCallBlackboardOutput
+    {
+        return this.blackboard;
+    }
 }
