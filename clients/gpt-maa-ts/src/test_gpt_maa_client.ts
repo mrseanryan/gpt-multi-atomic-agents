@@ -59,22 +59,23 @@ const wasteDisposerOutputFunctions: FunctionSpecSchema[] = [
 
 const functionRegistry = new FunctionRegistry();
 
+
+const handleMowLawn = (functionCall: FunctionCallSchema): void => {
+    console.log("<mowing the lawn>")
+    console.log(`  params:`, functionCall.parameters)
+}
+
+const handleProduceCutGrass = (functionCall: FunctionCallSchema): void => {
+    console.log("<producing cut grass>")
+    console.log(`  params:`, functionCall.parameters)
+}
+
 class LawnHandler extends HandlerBase
 {
     constructor(registry: FunctionRegistry) {
         super(registry);
-        this.registerFunction(mowLawnFunction.functionName!, this.handleMowLawn)
-        this.registerFunction(produceCutGrassFunction.functionName!, this.handleProduceCutGrass)
-    }
-
-    private handleMowLawn(functionCall: FunctionCallSchema): void {
-        console.log("<mowing the lawn>")
-        console.log(`  params:`, functionCall.parameters)
-    }
-
-    private handleProduceCutGrass(functionCall: FunctionCallSchema): void {
-        console.log("<producing cut grass>")
-        console.log(`  params:`, functionCall.parameters)
+        this.registerFunction(mowLawnFunction.functionName!, fc => handleMowLawn(fc))
+        this.registerFunction(produceCutGrassFunction.functionName!, fc => handleProduceCutGrass(fc))
     }
 
     protected nameImplementation(): string
