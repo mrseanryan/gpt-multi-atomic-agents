@@ -143,4 +143,4 @@ const onExecuteStart = () => {
 const onExecuteEnd = () => {
     console.log("(execution ended)")
 }
-execute(blackboardAccessor.get_new_functions(), functionRegistry, onExecuteStart, onExecuteEnd);
+await execute(blackboardAccessor.get_new_functions(), functionRegistry, onExecuteStart, onExecuteEnd);

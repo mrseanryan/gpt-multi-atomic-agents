@@ -141,10 +141,10 @@ console.log(messages);
 // =================================================
 // Execute the Function Calls using our Handlers
 blackboardAccessor.get_new_functions()
-const onExecuteStart = () => {
+const onExecuteStart = async () => {
     console.log("(execution started)")
 }
-const onExecuteEnd = () => {
+const onExecuteEnd = async () => {
     console.log("(execution ended)")
 }
-execute(blackboardAccessor.get_new_functions(), functionRegistry, onExecuteStart, onExecuteEnd);
+await execute(blackboardAccessor.get_new_functions(), functionRegistry, onExecuteStart, onExecuteEnd);

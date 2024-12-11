@@ -1,6 +1,6 @@
 {
   "name": "gpt-maa-ts",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "A TypeScript client for submitting AgentDefinitions and user prompt to a gpt-multi-atomic-agents REST API, to generate supported mutations.",
   "scripts": {
     "test": "test",
@@ -34,7 +34,6 @@
     "openai-api",
     "large-language-models",
     "llm",
-    "large-language-model",
     "genai",
     "genai-chatbot",
     "function-calling"

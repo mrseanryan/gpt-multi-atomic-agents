@@ -95,8 +95,8 @@ export interface ExecutionError
     error: string;
 }
 
-export const execute = (functionCalls: FunctionCallSchema[], registry: FunctionRegistry, onExecuteStart: () => void, onExecuteEnd: (errors: ExecutionError[]) => void): void => {
-    onExecuteStart();
+export const execute = async (functionCalls: FunctionCallSchema[], registry: FunctionRegistry, onExecuteStart: () => Promise<void>, onExecuteEnd: (errors: ExecutionError[]) => Promise<void>): Promise<void> => {
+    await onExecuteStart();
 
     const errors: ExecutionError[] = [];
 
@@ -120,5 +120,5 @@ export const execute = (functionCalls: FunctionCallSchema[], registry: FunctionR
         }
     });
 
-    onExecuteEnd(errors);
+    await onExecuteEnd(errors);
 };
