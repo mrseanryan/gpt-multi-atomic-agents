@@ -1,7 +1,5 @@
 // TS e2e example, consuming the TS framework and using 3 'Sim Life' Agents to generate Function Calls. A basic Handler is used during Execution, to output a DOT file.
 
-// import * as gpt_maa_ts from "gpt-maa-ts";
-
 import { FunctionAgentDefinitionMinimal, FunctionCallSchema, FunctionSpecSchema, handleUserPrompt, ParameterSpec } from "gpt-maa-ts"
 import { DefaultHandler, execute, FunctionRegistry, HandlerBase } from "gpt-maa-ts"
 
