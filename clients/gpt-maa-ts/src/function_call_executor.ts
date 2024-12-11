@@ -51,6 +51,11 @@ export abstract class HandlerBase implements IFunctionCallHandler
         this.registry = registry;
     }
 
+    /**
+     * Register a handler to handler the given Function Call.
+     *
+     * warning: do NOT use 'this' in your function (consider 'self').
+     */
     protected registerFunction(functionName: string, handler: Callback): void
     {
         this.registry.registerHandler(functionName, this);
