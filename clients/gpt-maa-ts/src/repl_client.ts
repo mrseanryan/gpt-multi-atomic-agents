@@ -1,7 +1,6 @@
 import {
   AgentExecutionPlanSchema,
   FunctionAgentDefinitionMinimal,
-  FunctionCallSchema,
 } from "../gpt_maa_client/models/index.js";
 import { FunctionCallBlackboardAccessor } from "./function_call_blackboard_accessor.js";
 import { execute, ExecutionError } from "./function_call_executor.js";
@@ -33,10 +32,9 @@ export const chatWithAgentsRepl = async (
 
   while (true) {
     const userPrompt = previousPrompt ?? (await readInputFromUser(""));
-    if (!userPrompt)
-        continue;
+    if (!userPrompt) continue;
 
-    // TODO: check for other commands, not just quitting
+    // TODO: check for other commands, not just quitting - see repl_commands.py
     // Type in a question for the AI. If you are not sure what to type, then ask it a question like 'What can you do?'
     // To exit, use the quit command
     // Available commands:
@@ -48,8 +46,8 @@ export const chatWithAgentsRepl = async (
     //   quit - Exit the chat loop (alias: bye, exit, stop)
     //
     //   NEW to TS only:
-    //   load-agent - Lists the available agent definition files, so you can load one.        
-    if(isQuit(userPrompt)) {
+    //   load-agent - Lists the available agent definition files, so you can load one.
+    if (isQuit(userPrompt)) {
       printAssistant("Goodbye!\n");
       return null;
     }
