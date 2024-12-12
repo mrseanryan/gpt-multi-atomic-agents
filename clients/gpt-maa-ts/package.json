@@ -9,16 +9,15 @@
   "main": "./dist/index.cjs",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.cts",
-
   "exports": {
-      "require": {
-          "types": "./dist/index.d.cts",
-          "default": "./dist/index.cjs"
-      },
-      "import": {
-          "types": "./dist/index.d.mts",
-          "default": "./dist/index.mjs"
-      }
+    "require": {
+      "types": "./dist/index.d.cts",
+      "default": "./dist/index.cjs"
+    },
+    "import": {
+      "types": "./dist/index.d.mts",
+      "default": "./dist/index.mjs"
+    }
   },
   "repository": {
     "type": "git",
@@ -50,6 +49,8 @@
     "typescript": "^5.7.2"
   },
   "dependencies": {
-    "@microsoft/kiota-bundle": "^1.0.0-preview.77"
+    "@microsoft/kiota-bundle": "^1.0.0-preview.77",
+    "@types/terminal-kit": "^2.5.6",
+    "terminal-kit": "^3.1.1"
   }
 }

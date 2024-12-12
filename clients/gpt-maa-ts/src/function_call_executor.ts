@@ -1,6 +1,7 @@
 
 import { FunctionCallSchema } from "../gpt_maa_client/models/index.js";
 import { IDictionary } from "./utils.js";
+import { print } from "./utils_print.js";
 
 export interface IFunctionCallHandler
 {
@@ -114,7 +115,7 @@ export const execute = async (functionCalls: FunctionCallSchema[], registry: Fun
             }
 
             const handler = registry.getHandler(call.functionName!);
-            console.log(`Executing handler ${handler.name()} for function call ${call.functionName} from agent ${call.agentName}`)
+            print(`Executing handler ${handler.name()} for function call ${call.functionName} from agent ${call.agentName}`)
             handler.Handle(call);
         }
         catch(e: any) {

@@ -2,8 +2,8 @@ import { PostsClient } from "../gpt_maa_client/postsClient.js";
 
 import {AgentExecutionPlanSchema, FunctionAgentDefinitionMinimal, FunctionCallBlackboardOutput, FunctionCallGenerateRequest, FunctionCallSchema} from "../gpt_maa_client/models/index.js"
 
-import { dumpJson } from "./kiota_client.js"
 import { FunctionCallBlackboardAccessor } from "./function_call_blackboard_accessor.js";
+import { dumpJson, print, printDetail } from "./utils_print.js";
 
 export const generate_mutations_from_function_calls = async (client: PostsClient, userPrompt: string, agentDefinitions: FunctionAgentDefinitionMinimal[], chatAgentDescription: string, existing_plan: AgentExecutionPlanSchema | undefined = undefined, user_data: FunctionCallSchema[]|null = null): Promise<FunctionCallBlackboardAccessor|null> => {
     const blackboard = new FunctionCallBlackboardAccessor(
@@ -22,9 +22,9 @@ export const generate_mutations_from_function_calls = async (client: PostsClient
 }
 
 export const generate_mutations = async (client: PostsClient, userPrompt: string, agentDefinitions: FunctionAgentDefinitionMinimal[], chatAgentDescription: string, existing_plan: AgentExecutionPlanSchema | undefined = undefined, blackboardAccessor: FunctionCallBlackboardAccessor|null = null): Promise<FunctionCallBlackboardAccessor|null> => {
-    console.log(`USER: ${userPrompt}`)
+    printDetail(`USER: ${userPrompt}`)
 
-    console.log(`Executing the plan`)
+    printDetail(`Generating from the Execution Plan...`)
     const function_call_generate_request: FunctionCallGenerateRequest = {
         agentDefinitions: agentDefinitions,
         blackboard: blackboardAccessor?.get_internal_blackboard(),

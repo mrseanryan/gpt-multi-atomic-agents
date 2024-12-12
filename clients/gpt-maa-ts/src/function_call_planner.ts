@@ -1,7 +1,7 @@
 import { PostsClient } from "../gpt_maa_client/postsClient.js";
 
 import {AgentDescription, AgentExecutionPlanSchema, FunctionAgentDefinitionMinimal, FunctionCallBlackboardOutput, FunctionCallGenerateRequest, GeneratePlanRequest} from "../gpt_maa_client/models/index.js"
-import { dumpJson } from "./kiota_client.js";
+import { dumpJson, printAssistant, printDetail } from "./utils_print.js";
 
 const convertAgentDefinitionToDescription = (agentDefinition: FunctionAgentDefinitionMinimal): AgentDescription => {
     let agentParameterNames: string[] = [];
@@ -19,17 +19,16 @@ const convertAgentDefinitionToDescription = (agentDefinition: FunctionAgentDefin
     }
 }
 
-export const generate_plan = async (client: PostsClient, userPrompt: string, agentDefinitions: FunctionAgentDefinitionMinimal[], chatAgentDescription: string): Promise<AgentExecutionPlanSchema | undefined> => {
-    console.log(`USER: ${userPrompt}`)
+export const generate_plan = async (client: PostsClient, userPrompt: string, agentDefinitions: FunctionAgentDefinitionMinimal[], chatAgentDescription: string, previousPlan: AgentExecutionPlanSchema|undefined): Promise<AgentExecutionPlanSchema | undefined> => {
     const agentDescriptions: AgentDescription[] = agentDefinitions.map(convertAgentDefinitionToDescription);
 
     const generate_plan_request: GeneratePlanRequest = {
         agentDescriptions: agentDescriptions,
         chatAgentDescription: chatAgentDescription,
-        previousPlan: null,
+        previousPlan: previousPlan,
         userPrompt: userPrompt
     }
-    console.log(`Generating a plan for user prompt '${userPrompt}'`)
+    printDetail(`Generating a plan for user prompt '${userPrompt}'`)
     const executionPlan = await client.generate_plan.post(generate_plan_request)
     dumpJson(executionPlan)
 

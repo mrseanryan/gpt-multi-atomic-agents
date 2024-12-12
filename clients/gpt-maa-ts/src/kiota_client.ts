@@ -1,6 +1,7 @@
 import { AnonymousAuthenticationProvider } from "@microsoft/kiota-abstractions";
 import { FetchRequestAdapter, HeadersInspectionHandler, KiotaClientFactory, ParametersNameDecodingHandler, RedirectHandler, RetryHandler, UserAgentHandler } from "@microsoft/kiota-http-fetchlibrary";
 import { createPostsClient, PostsClient } from "../gpt_maa_client/postsClient.js";
+import { printDetail } from "./utils_print.js";
 
 // Create the API client
 export const createClient = (baseurl: string|null = null): PostsClient => {
@@ -18,8 +19,4 @@ export const createClient = (baseurl: string|null = null): PostsClient => {
         adapter.baseUrl = baseurl;
 
     return createPostsClient(adapter);
-}
-
-export const dumpJson = (json: any) => {
-    console.log(JSON.stringify(json))
 }
