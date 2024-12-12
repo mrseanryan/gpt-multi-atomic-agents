@@ -17,6 +17,18 @@ export const chatWithAgentsRepl = async (agentDefinitions: FunctionAgentDefiniti
     while(true) {
         const userPrompt = previousPrompt ?? await readInputFromUser("");
         // TODO: check for other commands, not just quitting
+        // Type in a question for the AI. If you are not sure what to type, then ask it a question like 'What can you do?'
+        // To exit, use the quit command
+        // Available commands:
+        //   clear - Clear the blackboard, starting over. (alias: reset)
+        //   dump - Dump the current blackboard state to the console (alias: show)
+        //   help - Display help text
+        //   load - Load a blackboard from the local data store (also list the files)
+        //   save - Save the blackboard to the local data store
+        //   quit - Exit the chat loop (alias: bye, exit, stop)
+        //
+        //   NEW to TS only:
+        //   load-agent - Lists the available agent definition files, so you can load one.
         if (!userPrompt || isQuit(userPrompt)) {
             printAssistant("Goodbye!\n")
             return null;

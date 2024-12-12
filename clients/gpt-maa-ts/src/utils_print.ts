@@ -42,7 +42,7 @@ export const dumpJson = (json: any) => {
 export const isQuit = (userInput: string | null): boolean => {
   if (!userInput) return true;
 
-  return ["bye", "quit", "exit"].includes(userInput.trim().toLowerCase());
+  return ["quit", "bye", "exit", "stop"].includes(userInput.trim().toLowerCase());
 };
 
 export const askUserIfOk = async (
