@@ -80,7 +80,7 @@ class GeneratePlanRequest(CustomBaseModel):
                     "agent_name": creature_agent_name,
                     "description": "Creates new creatures given the user prompt. Ensures that ALL creatures mentioned by the user are created.",
                     "topics": ["creature"],
-                    "agent_parameters": ["creature_name"],
+                    "agent_parameter_names": ["creature_name"],
                 }
             ]
         ],

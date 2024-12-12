@@ -5,6 +5,7 @@ from .functions_dto import (
     FunctionSpecSchema,
     ParameterSpec,
     ParameterType,
+    ParamNameToValues,
 )
 
 creature_agent_name = "Creature Creator"
@@ -26,6 +27,10 @@ class FunctionAgentDefinitionMinimal(CustomBaseModel):
     topics: list[str] = Field(
         description="This agent ONLY generates if user mentioned one of these topics"
     )
+    agent_parameters: ParamNameToValues = Field(
+        description="A list of agent parameters to extract from the user prompt",
+        default_factory=dict,  # TODO should this be 'lambda: dict' ? but rest-api does not like it.
+    )  # To help with context retrieval by client after it receives the ExecutionPlan OR could help Agent to know what is user talking about
 
 
 # Build examples programatically = less error prone

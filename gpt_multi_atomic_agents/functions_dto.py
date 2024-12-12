@@ -4,6 +4,8 @@ from atomic_agents.agents.base_agent import (
 )
 from pydantic import Field
 
+ParamNameToValues = dict[str, list[str]]
+
 
 class ParameterType(StrEnum):
     """Defines the type of a parameter."""
@@ -63,9 +65,9 @@ class FunctionAgentInputSchema(BaseIOSchema):
     topics: list[str] = Field(
         description="This agent ONLY generates if user mentioned one of these topics"
     )
-    agent_parameters: list[str] = Field(
-        description="A list of agent parameters there were extracted from the user's prompt.",
-        default_factory=lambda: list,
+    agent_parameters: ParamNameToValues = Field(
+        description="A dictionary of agent parameters there were extracted from the user's prompt.",
+        default_factory=lambda: dict,
     )  # Optional parameters that router extracted from user prompt. Client can use to know what context to include.
 
 

@@ -5,7 +5,11 @@ from atomic_agents.agents.base_agent import (
 )
 from pydantic import Field
 
-from .graphql_dto import GraphQLAgentInputSchema, GraphQLAgentOutputSchema
+from .graphql_dto import (
+    GraphQLAgentInputSchema,
+    GraphQLAgentOutputSchema,
+    ParamNameToValues,
+)
 
 from .system_prompt_builders import (
     FunctionSystemPromptBuilder,
@@ -66,7 +70,7 @@ class AgentDefinitionBase(CustomBaseModel):
         raise NotImplementedError
 
     @abstractmethod
-    def get_agent_parameters(self) -> list[str]:
+    def get_agent_parameters(self) -> ParamNameToValues:
         raise NotImplementedError
 
 
@@ -115,7 +119,7 @@ class FunctionAgentDefinition(AgentDefinitionBase):
     def get_topics(self) -> list[str]:
         return self.initial_input.topics
 
-    def get_agent_parameters(self) -> list[str]:
+    def get_agent_parameters(self) -> ParamNameToValues:
         return self.initial_input.agent_parameters
 
     def get_system_prompt_builder(self, _config: Config) -> SystemPromptBuilderBase:
@@ -142,10 +146,10 @@ def build_function_agent_definition(
     accepted_functions: list[FunctionSpecSchema],
     functions_allowed_to_generate: list[FunctionSpecSchema],
     topics: list[str],
-    agent_parameters: list[str] | None = None,
+    agent_parameters: ParamNameToValues | None = None,
 ) -> FunctionAgentDefinition:
     if not agent_parameters:
-        agent_parameters = []
+        agent_parameters = {}
     return FunctionAgentDefinition(
         agent_name=agent_name,
         description=description,
@@ -212,7 +216,7 @@ class GraphQLAgentDefinition(AgentDefinitionBase):
     def get_topics(self) -> list[str]:
         return self.initial_input.topics
 
-    def get_agent_parameters(self) -> list[str]:
+    def get_agent_parameters(self) -> ParamNameToValues:
         return self.initial_input.agent_parameters
 
     def update_blackboard(self, response: BaseIOSchema, blackboard: Blackboard) -> None:
@@ -231,10 +235,10 @@ def build_graphql_agent_definition(
     accepted_graphql_schemas: list[str],
     mutations_allowed_to_generate: list[str],
     topics: list[str],
-    agent_parameters: list[str] | None = None,
+    agent_parameters: ParamNameToValues | None = None,
 ) -> GraphQLAgentDefinition:
     if not agent_parameters:
-        agent_parameters = []
+        agent_parameters = {}
     return GraphQLAgentDefinition(
         agent_name=agent_name,
         description=description,

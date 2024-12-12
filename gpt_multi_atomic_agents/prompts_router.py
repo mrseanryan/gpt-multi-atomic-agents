@@ -23,7 +23,7 @@ class AgentDescription:
     topics: list[str] = Field(
         description="This agent ONLY generates if user mentioned one of these topics"
     )
-    agent_parameters: list[str] = Field(
+    agent_parameter_names: list[str] = Field(
         description="A list of agent parameters that you can extract from the user's prompt."
     )  # Agent Parameters can be used by client to know what context to include in generation requests.
 
@@ -33,7 +33,7 @@ def _build_chat_agent_description(description: str) -> AgentDescription:
         agent_name="chat",
         description=description,
         topics=[],
-        agent_parameters=["subjects"],
+        agent_parameter_names=["subjects"],
     )
 
 

@@ -3,6 +3,8 @@ from atomic_agents.agents.base_agent import (
 )
 from pydantic import Field
 
+ParamNameToValues = dict[str, list[str]]
+
 
 class GraphQLAgentInputSchema(BaseIOSchema):
     """
@@ -22,9 +24,9 @@ class GraphQLAgentInputSchema(BaseIOSchema):
     topics: list[str] = Field(
         description="This agent ONLY generates if user mentioned one of these topics"
     )
-    agent_parameters: list[str] = Field(
-        description="A list of agent parameters there were extracted from the user's prompt.",
-        default_factory=lambda: list,
+    agent_parameters: ParamNameToValues = Field(
+        description="A dictionary of agent parameters there were extracted from the user's prompt.",
+        default_factory=lambda: dict,
     )
     # TODO - add "If data is missing, then you need to generate allowed GraphQL queries."
     graphql_data: str = Field(
