@@ -4,11 +4,18 @@ import {AgentDescription, AgentExecutionPlanSchema, FunctionAgentDefinitionMinim
 import { dumpJson } from "./kiota_client.js";
 
 const convertAgentDefinitionToDescription = (agentDefinition: FunctionAgentDefinitionMinimal): AgentDescription => {
+    let agentParameterNames: string[] = [];
+
+    if (agentDefinition.agentParameters)
+    {
+        agentParameterNames = Object.keys(agentDefinition.agentParameters)
+    }
+
     return {
         agentName: agentDefinition.agentName,
         description: agentDefinition.description,
         topics: agentDefinition.topics,
-        agentParameters: []  // TODO: ?? FunctionAgentDefinitionMinimal could have agentParameters: list[str]
+        agentParameterNames: agentParameterNames
     }
 }
 

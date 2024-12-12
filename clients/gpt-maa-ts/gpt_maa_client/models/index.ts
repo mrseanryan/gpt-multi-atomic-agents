@@ -16,7 +16,7 @@ export interface AgentDescription extends AdditionalDataHolder, Parsable {
     /**
      * A list of agent parameters that you can extract from the user's prompt.
      */
-    agentParameters?: string[] | null;
+    agentParameterNames?: string[] | null;
     /**
      * The description of this agent, its purpose and capabilities.
      */
@@ -61,6 +61,15 @@ export function createAgentDescriptionFromDiscriminatorValue(parseNode: ParseNod
 // @ts-ignore
 export function createAgentExecutionPlanSchemaFromDiscriminatorValue(parseNode: ParseNode | undefined) : ((instance?: Parsable) => Record<string, (node: ParseNode) => void>) {
     return deserializeIntoAgentExecutionPlanSchema;
+}
+/**
+ * Creates a new instance of the appropriate class based on discriminator value
+ * @param parseNode The parse node to use to read the discriminator value and create the object
+ * @returns {FunctionAgentDefinitionMinimal_agent_parameters}
+ */
+// @ts-ignore
+export function createFunctionAgentDefinitionMinimal_agent_parametersFromDiscriminatorValue(parseNode: ParseNode | undefined) : ((instance?: Parsable) => Record<string, (node: ParseNode) => void>) {
+    return deserializeIntoFunctionAgentDefinitionMinimal_agent_parameters;
 }
 /**
  * Creates a new instance of the appropriate class based on discriminator value
@@ -196,7 +205,7 @@ export function createValidationErrorFromDiscriminatorValue(parseNode: ParseNode
 export function deserializeIntoAgentDescription(agentDescription: Partial<AgentDescription> | undefined = {}) : Record<string, (node: ParseNode) => void> {
     return {
         "agent_name": n => { agentDescription.agentName = n.getStringValue(); },
-        "agent_parameters": n => { agentDescription.agentParameters = n.getCollectionOfPrimitiveValues<string>(); },
+        "agent_parameter_names": n => { agentDescription.agentParameterNames = n.getCollectionOfPrimitiveValues<string>(); },
         "description": n => { agentDescription.description = n.getStringValue(); },
         "topics": n => { agentDescription.topics = n.getCollectionOfPrimitiveValues<string>(); },
     }
@@ -221,9 +230,19 @@ export function deserializeIntoFunctionAgentDefinitionMinimal(functionAgentDefin
     return {
         "accepted_functions": n => { functionAgentDefinitionMinimal.acceptedFunctions = n.getCollectionOfObjectValues<FunctionSpecSchema>(createFunctionSpecSchemaFromDiscriminatorValue); },
         "agent_name": n => { functionAgentDefinitionMinimal.agentName = n.getStringValue(); },
+        "agent_parameters": n => { functionAgentDefinitionMinimal.agentParameters = n.getObjectValue<FunctionAgentDefinitionMinimal_agent_parameters>(createFunctionAgentDefinitionMinimal_agent_parametersFromDiscriminatorValue); },
         "description": n => { functionAgentDefinitionMinimal.description = n.getStringValue(); },
         "functions_allowed_to_generate": n => { functionAgentDefinitionMinimal.functionsAllowedToGenerate = n.getCollectionOfObjectValues<FunctionSpecSchema>(createFunctionSpecSchemaFromDiscriminatorValue); },
         "topics": n => { functionAgentDefinitionMinimal.topics = n.getCollectionOfPrimitiveValues<string>(); },
+    }
+}
+/**
+ * The deserialization information for the current model
+ * @returns {Record<string, (node: ParseNode) => void>}
+ */
+// @ts-ignore
+export function deserializeIntoFunctionAgentDefinitionMinimal_agent_parameters(functionAgentDefinitionMinimal_agent_parameters: Partial<FunctionAgentDefinitionMinimal_agent_parameters> | undefined = {}) : Record<string, (node: ParseNode) => void> {
+    return {
     }
 }
 /**
@@ -390,6 +409,10 @@ export interface FunctionAgentDefinitionMinimal extends Parsable {
      */
     agentName?: string | null;
     /**
+     * A list of agent parameters to extract from the user prompt
+     */
+    agentParameters?: FunctionAgentDefinitionMinimal_agent_parameters | null;
+    /**
      * The description of this agent, its purpose and capabilities.
      */
     description?: string | null;
@@ -401,6 +424,15 @@ export interface FunctionAgentDefinitionMinimal extends Parsable {
      * This agent ONLY generates if user mentioned one of these topics
      */
     topics?: string[] | null;
+}
+/**
+ * A list of agent parameters to extract from the user prompt
+ */
+export interface FunctionAgentDefinitionMinimal_agent_parameters extends AdditionalDataHolder, Parsable {
+    /**
+     * Stores additional data not described in the OpenAPI description found when deserializing. Can be used for serialization as well.
+     */
+    additionalData?: Record<string, unknown>;
 }
 export interface FunctionCallBlackboardInput extends Parsable {
     /**
@@ -622,7 +654,7 @@ export interface RecommendedAgent_agent_parameters extends AdditionalDataHolder,
 export function serializeAgentDescription(writer: SerializationWriter, agentDescription: Partial<AgentDescription> | undefined | null = {}) : void {
     if (agentDescription) {
         writer.writeStringValue("agent_name", agentDescription.agentName);
-        writer.writeCollectionOfPrimitiveValues<string>("agent_parameters", agentDescription.agentParameters);
+        writer.writeCollectionOfPrimitiveValues<string>("agent_parameter_names", agentDescription.agentParameterNames);
         writer.writeStringValue("description", agentDescription.description);
         writer.writeCollectionOfPrimitiveValues<string>("topics", agentDescription.topics);
         writer.writeAdditionalData(agentDescription.additionalData);
@@ -649,9 +681,20 @@ export function serializeFunctionAgentDefinitionMinimal(writer: SerializationWri
     if (functionAgentDefinitionMinimal) {
         writer.writeCollectionOfObjectValues<FunctionSpecSchema>("accepted_functions", functionAgentDefinitionMinimal.acceptedFunctions, serializeFunctionSpecSchema);
         writer.writeStringValue("agent_name", functionAgentDefinitionMinimal.agentName);
+        writer.writeObjectValue<FunctionAgentDefinitionMinimal_agent_parameters>("agent_parameters", functionAgentDefinitionMinimal.agentParameters, serializeFunctionAgentDefinitionMinimal_agent_parameters);
         writer.writeStringValue("description", functionAgentDefinitionMinimal.description);
         writer.writeCollectionOfObjectValues<FunctionSpecSchema>("functions_allowed_to_generate", functionAgentDefinitionMinimal.functionsAllowedToGenerate, serializeFunctionSpecSchema);
         writer.writeCollectionOfPrimitiveValues<string>("topics", functionAgentDefinitionMinimal.topics);
+    }
+}
+/**
+ * Serializes information the current object
+ * @param writer Serialization writer to use to serialize this model
+ */
+// @ts-ignore
+export function serializeFunctionAgentDefinitionMinimal_agent_parameters(writer: SerializationWriter, functionAgentDefinitionMinimal_agent_parameters: Partial<FunctionAgentDefinitionMinimal_agent_parameters> | undefined | null = {}) : void {
+    if (functionAgentDefinitionMinimal_agent_parameters) {
+        writer.writeAdditionalData(functionAgentDefinitionMinimal_agent_parameters.additionalData);
     }
 }
 /**
