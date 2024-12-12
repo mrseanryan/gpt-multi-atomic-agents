@@ -21,6 +21,7 @@ export * from "./function_call_serde.js"
 export * from "../gpt_maa_client/models/index.js";
 export * from "./function_call_executor.js";
 export * from "./repl_client.js";
+export * from "./utils_print.js";
 
 export const handleUserPrompt = async (userPrompt: string, agentDefinitions: FunctionAgentDefinitionMinimal[], chatAgentDescription: string, baseurl: string|null= null): Promise<FunctionCallBlackboardAccessor|null> => {
     const client: PostsClient = createClient(baseurl)
