@@ -3,7 +3,7 @@ import { FunctionCallBlackboardAccessor } from "./function_call_blackboard_acces
 import { execute } from "./function_call_executor.js"
 import { createClient, generate_mutations, generate_plan } from "./index.js"
 import { functionRegistry } from "./resources_test_domain.js"
-import { askUserIfOk, dumpJson, printAssistant, printDetail, printMessages, readInputFromUser } from "./utils_print.js";
+import { askUserIfOk, dumpJson, isQuit, printAssistant, printDetail, printMessages, readInputFromUser } from "./utils_print.js";
 import { PostsClient } from "../gpt_maa_client/postsClient.js";
 
 export const chatWithAgentsRepl = async (agentDefinitions: FunctionAgentDefinitionMinimal[], chatAgentDescription: string, baseurl: string): Promise<FunctionCallBlackboardAccessor|null> => {
@@ -12,12 +12,16 @@ export const chatWithAgentsRepl = async (agentDefinitions: FunctionAgentDefiniti
 
     let executionPlan: AgentExecutionPlanSchema|undefined = undefined
 
+    let previousPrompt: string|null = null
+
     while(true) {
-        const userPrompt = await readInputFromUser("");
-        if (!userPrompt) {
+        const userPrompt = previousPrompt ?? await readInputFromUser("");
+        // TODO: check for other commands, not just quitting
+        if (!userPrompt || isQuit(userPrompt)) {
             printAssistant("Goodbye!\n")
             return null;
         }
+        previousPrompt = null
 
         executionPlan = await generate_plan(client, userPrompt, agentDefinitions, chatAgentDescription, executionPlan)
     
@@ -30,8 +34,8 @@ export const chatWithAgentsRepl = async (agentDefinitions: FunctionAgentDefiniti
             yes: "Go ahead",
             no: "I'd like to change something"
         })
-        if (!doContinue) {
-            printAssistant("Okay, what would you like to change?")
+        if (!doContinue.yes) {
+            previousPrompt = doContinue.message
             continue
         }
 
@@ -49,8 +53,8 @@ export const chatWithAgentsRepl = async (agentDefinitions: FunctionAgentDefiniti
             yes: "Go ahead",
             no: "I'd like to change something"
         })
-        if (!doCreateApp) {
-            printAssistant("Okay, what would you like to change?")
+        if (!doCreateApp.yes) {
+            previousPrompt = doContinue.message
             continue
         }
 
@@ -65,6 +69,8 @@ export const chatWithAgentsRepl = async (agentDefinitions: FunctionAgentDefiniti
             console.log("(execution ended)")
         }
         await execute(blackboardAccessor.get_new_functions(), functionRegistry, onExecuteStart, onExecuteEnd);
+
+        printAssistant("Is there anything else I can help with?")
     }
 }
 

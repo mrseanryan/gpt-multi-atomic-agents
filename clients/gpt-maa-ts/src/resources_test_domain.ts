@@ -1,7 +1,7 @@
 // Resource: an example of a 'household chores bots' domain.
 import { FunctionAgentDefinitionMinimal, FunctionCallSchema, FunctionSpecSchema, ParameterSpec } from "../gpt_maa_client/models/index.js"
 import { DefaultHandler, execute, FunctionRegistry, HandlerBase } from "./function_call_executor.js"
-import { print, printDetail } from "./utils_print.js"
+import { dumpJson, print, printDetail } from "./utils_print.js"
 
 // =================================================
 // Define the Functions
@@ -58,12 +58,14 @@ export const functionRegistry = new FunctionRegistry();
 
 const handleMowLawn = (functionCall: FunctionCallSchema): void => {
     print("<mowing the lawn>")
-    printDetail(`  params:`, functionCall.parameters)
+    printDetail(`  params:`)
+    dumpJson(functionCall.parameters)
 }
 
 const handleProduceCutGrass = (functionCall: FunctionCallSchema): void => {
     print("<producing cut grass>")
-    printDetail(`  params:`, functionCall.parameters)
+    printDetail(`  params:`)
+    dumpJson(functionCall.parameters)
 }
 
 class LawnHandler extends HandlerBase
