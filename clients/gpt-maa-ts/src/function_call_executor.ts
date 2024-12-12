@@ -44,10 +44,11 @@ declare type Callback = (functionCall: FunctionCallSchema) => void;
 
 export abstract class HandlerBase implements IFunctionCallHandler
 {
-    protected registry: FunctionRegistry;
-    protected functionCallNameToCallback: IDictionary<Callback> = {};
+    protected readonly registry: FunctionRegistry;
+    protected readonly functionCallNameToCallback: IDictionary<Callback> = {};
 
-    constructor(registry: FunctionRegistry) {
+    protected constructor(registry: FunctionRegistry)
+    {
         this.registry = registry;
     }
 

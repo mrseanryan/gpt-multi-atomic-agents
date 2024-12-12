@@ -55,7 +55,6 @@ const wasteDisposerOutputFunctions: FunctionSpecSchema[] = [
 
 const functionRegistry = new FunctionRegistry();
 
-
 const handleMowLawn = (functionCall: FunctionCallSchema): void => {
     console.log("<mowing the lawn>")
     console.log(`  params:`, functionCall.parameters)
@@ -81,10 +80,10 @@ class LawnHandler extends HandlerBase
 }
 
 // Create the handlers (they register themselves)
-const defaultHandler = new DefaultHandler(functionRegistry, (functionCall: FunctionCallSchema) => {
+new DefaultHandler(functionRegistry, (functionCall: FunctionCallSchema) => {
     console.log(`[default handler] for function call: ${functionCall.functionName}`, functionCall.parameters)
 })
-const lawnHandler = new LawnHandler(functionRegistry);
+new LawnHandler(functionRegistry);
 
 // TODO add WasteHandler, FurnitureHandler
 
