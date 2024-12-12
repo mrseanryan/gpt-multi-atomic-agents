@@ -19,7 +19,7 @@ const convertAgentDefinitionToDescription = (agentDefinition: FunctionAgentDefin
     }
 }
 
-export const generate_plan = async (client: PostsClient, userPrompt: string, agentDefinitions: FunctionAgentDefinitionMinimal[], chatAgentDescription: string, previousPlan: AgentExecutionPlanSchema|undefined): Promise<AgentExecutionPlanSchema | undefined> => {
+export const generate_plan = async (client: PostsClient, userPrompt: string, agentDefinitions: FunctionAgentDefinitionMinimal[], chatAgentDescription: string, previousPlan: AgentExecutionPlanSchema|undefined = undefined): Promise<AgentExecutionPlanSchema | undefined> => {
     const agentDescriptions: AgentDescription[] = agentDefinitions.map(convertAgentDefinitionToDescription);
 
     const generate_plan_request: GeneratePlanRequest = {

@@ -9,11 +9,10 @@ import { FunctionCallBlackboardAccessor } from "./function_call_blackboard_acces
 import { generate_mutations } from "./function_call_generator.js";
 import { generate_plan } from "./function_call_planner.js";
 import { createClient } from "./kiota_client.js";
-import { printAssistant, printDetail, printUser } from "./utils_print.js";
+import { printAssistant, printDetail } from "./utils_print.js";
 
 // Exports for consumers of this package
 export { generate_mutations, generate_plan, createClient };
-// export { PostsClient } from "../gpt_maa_client/postsClient.js";
 export * from "./function_call_blackboard_accessor.js"
 export * from "./function_call_executor.js"
 export * from "./function_call_generator.js"
@@ -21,6 +20,7 @@ export * from "./function_call_planner.js"
 export * from "./function_call_serde.js"
 export * from "../gpt_maa_client/models/index.js";
 export * from "./function_call_executor.js";
+export * from "./repl_client.js";
 
 export const handleUserPrompt = async (userPrompt: string, agentDefinitions: FunctionAgentDefinitionMinimal[], chatAgentDescription: string, baseurl: string|null= null): Promise<FunctionCallBlackboardAccessor|null> => {
     const client: PostsClient = createClient(baseurl)
