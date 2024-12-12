@@ -9,7 +9,14 @@ import { agentDefinitions, chatAgentDescription } from "./resources_test_domain.
 // =================================================
 // Chat with the Agents
 async function main(): Promise<void> {
-    await chatWithAgentsRepl(agentDefinitions, chatAgentDescription, "http://127.0.0.1:8000")  // TODO make baseurl read from a config .env
+    const onExecuteStart = async () => {
+        console.log("(execution started)")
+    }
+    const onExecuteEnd = async () => {
+        console.log("(execution ended)")
+    }
+
+    await chatWithAgentsRepl(agentDefinitions, chatAgentDescription, "http://127.0.0.1:8000", onExecuteStart, onExecuteEnd)  // TODO make baseurl read from a config .env
 }
 
 main();
