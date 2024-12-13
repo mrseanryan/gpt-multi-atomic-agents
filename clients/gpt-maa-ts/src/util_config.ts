@@ -4,6 +4,7 @@ import { readJsonFromFile } from "./util_file.js";
 export interface Config
 {
     baseurl: string;
+    isDebug: boolean;
     localAgentsDirPath: string;
     localBlackboardsDirPath: string;
 }

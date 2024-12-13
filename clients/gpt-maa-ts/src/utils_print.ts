@@ -3,6 +3,7 @@ import * as spinners from "cli-spinners";
 import colors from "colors";
 import * as inquirer from "@inquirer/prompts";
 import { Message } from "../gpt_maa_client/models/index.js";
+import { getConfig } from "./util_config.js";
 
 export const print = (...args: any[]): void => {
   console.log(...args);
@@ -55,9 +56,11 @@ export const readInputFromUser = async (
   return answer.trim() ?? null;
 };
 
-// TODO: only if is debug config
 export const dumpJson = (json: any) => {
-  console.dir(json, { depth: null, colors: true });
+  if (getConfig().isDebug)
+  {
+    console.dir(json, { depth: null, colors: true });
+  }
 };
 
 export const isQuit = (userInput: string | null): boolean => {

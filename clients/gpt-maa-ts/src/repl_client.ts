@@ -45,13 +45,14 @@ export const chatWithAgentsRepl = async (
 
   let blackboardAccessor: FunctionCallBlackboardAccessor | null = null;
 
-  // TODO: refactor to a state machine
+  // TODO: refactor to a state machine. then if user uses commands, we stay in the current state.
   while (true) {
     const userPrompt = previousPrompt ?? (await readInputFromUser(""));
     if (!userPrompt) continue;
     previousPrompt = null;
 
-    // TODO: add more commands:
+    // TODO: first, define a SerializedAgent in terms of functionGroups (not function names)
+    // TODO: then, add more commands:
     //   list-agents - List the active agents
     //   reload-agents - reload the agent definition files.
 

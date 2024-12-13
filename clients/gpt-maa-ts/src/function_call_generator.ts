@@ -1,9 +1,9 @@
 import { PostsClient } from "../gpt_maa_client/postsClient.js";
 
-import {AgentExecutionPlanSchema, FunctionAgentDefinitionMinimal, FunctionCallBlackboardOutput, FunctionCallGenerateRequest, FunctionCallSchema} from "../gpt_maa_client/models/index.js"
+import {AgentExecutionPlanSchema, FunctionAgentDefinitionMinimal, FunctionCallGenerateRequest, FunctionCallSchema} from "../gpt_maa_client/models/index.js"
 
 import { FunctionCallBlackboardAccessor } from "./function_call_blackboard_accessor.js";
-import { dumpJson, print, printDetail, printTimeTaken, showSpinner, startTimer, stopSpinner } from "./utils_print.js";
+import { dumpJson, printDetail, printTimeTaken, showSpinner, startTimer, stopSpinner } from "./utils_print.js";
 
 export const generate_mutations_from_function_calls = async (client: PostsClient, userPrompt: string, agentDefinitions: FunctionAgentDefinitionMinimal[], chatAgentDescription: string, existing_plan: AgentExecutionPlanSchema | undefined = undefined, user_data: FunctionCallSchema[]|null = null): Promise<FunctionCallBlackboardAccessor|null> => {
     const blackboard = new FunctionCallBlackboardAccessor(

@@ -26,7 +26,7 @@ async function main(): Promise<void> {
     getConfig().baseurl,
     onExecuteStart,
     onExecuteEnd
-  ); // TODO make baseurl read from a config .env
+  );
 }
 
 main();
