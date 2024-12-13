@@ -3,7 +3,7 @@ import { PostsClient } from "../gpt_maa_client/postsClient.js";
 import {AgentExecutionPlanSchema, FunctionAgentDefinitionMinimal, FunctionCallBlackboardOutput, FunctionCallGenerateRequest, FunctionCallSchema} from "../gpt_maa_client/models/index.js"
 
 import { FunctionCallBlackboardAccessor } from "./function_call_blackboard_accessor.js";
-import { dumpJson, print, printDetail } from "./utils_print.js";
+import { dumpJson, print, printDetail, printTimeTaken, showSpinner, startTimer, stopSpinner } from "./utils_print.js";
 
 export const generate_mutations_from_function_calls = async (client: PostsClient, userPrompt: string, agentDefinitions: FunctionAgentDefinitionMinimal[], chatAgentDescription: string, existing_plan: AgentExecutionPlanSchema | undefined = undefined, user_data: FunctionCallSchema[]|null = null): Promise<FunctionCallBlackboardAccessor|null> => {
     const blackboard = new FunctionCallBlackboardAccessor(
@@ -22,6 +22,7 @@ export const generate_mutations_from_function_calls = async (client: PostsClient
 }
 
 export const generate_mutations = async (client: PostsClient, userPrompt: string, agentDefinitions: FunctionAgentDefinitionMinimal[], chatAgentDescription: string, existing_plan: AgentExecutionPlanSchema | undefined = undefined, blackboardAccessor: FunctionCallBlackboardAccessor|null = null): Promise<FunctionCallBlackboardAccessor|null> => {
+    const timer = startTimer("generate_mutations")
     printDetail(`USER: ${userPrompt}`)
 
     printDetail(`Generating from the Execution Plan...`)
@@ -32,9 +33,14 @@ export const generate_mutations = async (client: PostsClient, userPrompt: string
         executionPlan: existing_plan,
         userPrompt: userPrompt
     }
+
+    let spinner = showSpinner()
     const blackboard = await client.generate_function_calls.post(function_call_generate_request)
+    stopSpinner(spinner)
 
     dumpJson(JSON.stringify(blackboard))
+
+    printTimeTaken(timer)
 
     if (!blackboard) {
         return null;

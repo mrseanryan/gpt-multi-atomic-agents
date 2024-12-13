@@ -41,12 +41,14 @@ export const chatWithAgentsRepl = async (
     //   clear - Clear the blackboard, starting over. (alias: reset)
     //   dump - Dump the current blackboard state to the console (alias: show)
     //   help - Display help text
+    //   list-agents - List the active agents
+    //   reload-agents - reload the agents from disk
     //   load - Load a blackboard from the local data store (also list the files)
     //   save - Save the blackboard to the local data store
     //   quit - Exit the chat loop (alias: bye, exit, stop)
     //
     //   NEW to TS only:
-    //   load-agent - Lists the available agent definition files, so you can load one.
+    //   reload-agents - Reloads the agent definition files.
     if (isQuit(userPrompt)) {
       printAssistant("Goodbye!\n");
       return null;

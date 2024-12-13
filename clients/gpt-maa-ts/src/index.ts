@@ -9,7 +9,7 @@ import { FunctionCallBlackboardAccessor } from "./function_call_blackboard_acces
 import { generate_mutations } from "./function_call_generator.js";
 import { generate_plan } from "./function_call_planner.js";
 import { createClient } from "./kiota_client.js";
-import { printAssistant, printDetail } from "./utils_print.js";
+import { printAssistant, printDetail, printUser } from "./utils_print.js";
 
 // Exports for consumers of this package
 export { generate_mutations, generate_plan, createClient };
@@ -24,6 +24,7 @@ export * from "./repl_client.js";
 export * from "./utils_print.js";
 
 export const handleUserPrompt = async (userPrompt: string, agentDefinitions: FunctionAgentDefinitionMinimal[], chatAgentDescription: string, baseurl: string|null= null): Promise<FunctionCallBlackboardAccessor|null> => {
+    printUser(userPrompt)
     const client: PostsClient = createClient(baseurl)
 
     const executionPlan = await generate_plan(client, userPrompt, agentDefinitions, chatAgentDescription)

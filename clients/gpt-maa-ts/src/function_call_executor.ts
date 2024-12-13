@@ -1,7 +1,7 @@
 
 import { FunctionCallSchema } from "../gpt_maa_client/models/index.js";
 import { IDictionary } from "./utils.js";
-import { print } from "./utils_print.js";
+import { print, printTimeTaken, showSpinner, startTimer, stopSpinner } from "./utils_print.js";
 
 export interface IFunctionCallHandler
 {
@@ -103,7 +103,11 @@ export interface ExecutionError
 }
 
 export const execute = async (functionCalls: FunctionCallSchema[], registry: FunctionRegistry, onExecuteStart: () => Promise<void>, onExecuteEnd: (errors: ExecutionError[]) => Promise<void>): Promise<void> => {
+    const timer = startTimer("execute")
+
+    let spinner = showSpinner()
     await onExecuteStart();
+    stopSpinner(spinner)
 
     const errors: ExecutionError[] = [];
 
@@ -116,6 +120,7 @@ export const execute = async (functionCalls: FunctionCallSchema[], registry: Fun
 
             const handler = registry.getHandler(call.functionName!);
             print(`Executing handler ${handler.name()} for function call ${call.functionName} from agent ${call.agentName}`)
+
             handler.Handle(call);
         }
         catch(e: any) {
@@ -127,5 +132,8 @@ export const execute = async (functionCalls: FunctionCallSchema[], registry: Fun
         }
     });
 
+    spinner = showSpinner()
     await onExecuteEnd(errors);
+    stopSpinner(spinner)
+    printTimeTaken(timer)
 };

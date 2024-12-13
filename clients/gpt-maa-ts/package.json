@@ -49,8 +49,10 @@
     "typescript": "^5.7.2"
   },
   "dependencies": {
+    "@inquirer/prompts": "^7.2.0",
     "@microsoft/kiota-bundle": "^1.0.0-preview.77",
-    "@types/terminal-kit": "^2.5.6",
-    "terminal-kit": "^3.1.1"
+    "cli-spinners": "^3.2.0",
+    "colors": "^1.4.0",
+    "yocto-spinner": "^0.1.2"
   }
 }
