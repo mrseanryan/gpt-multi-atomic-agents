@@ -126,7 +126,7 @@ export const printTimeTaken = (name: string): void => {
 export const showSpinner = (): Spinner => {
   return yoctoSpinner({
     text: "Processing…",
-    spinner: spinners.randomSpinner(),
+    spinner: spinners.default.sand // spinners.randomSpinner(), - ref: https://jsfiddle.net/sindresorhus/2eLtsbey/embedded/result/
   }).start();
 };
 

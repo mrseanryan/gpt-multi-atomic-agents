@@ -11,7 +11,7 @@ import {
   load_blackboard_from_file,
   save_blackboard_to_file,
 } from "./index.js";
-import { functionRegistry } from "./resources_test_domain.js";
+import { agentDefinitions, functionRegistry } from "./resources_test_domain.js";
 import {
   askUserIfOk,
   dumpJson,
@@ -28,6 +28,19 @@ import {
   CommandAction,
   print_help,
 } from "./repl_commands.js";
+import { convertSerializableAgentToContractAgent, SerializableAgentWithCategories } from "./serializable_agent.js";
+import { getAgentStores, loadCustomAgents } from "./function_call_agent_stores.js";
+import { FunctionRegistry } from "./function_call_execution_registry.js";
+
+const getCombinedAgentDefinitions = (
+  agentDefinitions: FunctionAgentDefinitionMinimal[],
+  customAgents: SerializableAgentWithCategories[],
+  functionRegistry: FunctionRegistry
+): FunctionAgentDefinitionMinimal[] => {
+  return agentDefinitions.concat(
+    customAgents.map(a => convertSerializableAgentToContractAgent(a, functionRegistry))
+  )
+}
 
 export const chatWithAgentsRepl = async (
   agentDefinitions: FunctionAgentDefinitionMinimal[],
@@ -45,13 +58,14 @@ export const chatWithAgentsRepl = async (
 
   let blackboardAccessor: FunctionCallBlackboardAccessor | null = null;
 
+  let customAgents = loadCustomAgents()
+
   // TODO: refactor to a state machine. then if user uses commands, we stay in the current state.
   while (true) {
     const userPrompt = previousPrompt ?? (await readInputFromUser(""));
     if (!userPrompt) continue;
     previousPrompt = null;
 
-    // TODO: first, define a SerializedAgent in terms of functionGroups (not function names)
     // TODO: then, add more commands:
     //   list-agents - List the active agents
     //   reload-agents - reload the agent definition files.
@@ -100,7 +114,7 @@ export const chatWithAgentsRepl = async (
     executionPlan = await generate_plan(
       client,
       userPrompt,
-      agentDefinitions,
+      getCombinedAgentDefinitions(agentDefinitions, customAgents, functionRegistry),
       chatAgentDescription,
       executionPlan
     );
@@ -124,7 +138,7 @@ export const chatWithAgentsRepl = async (
     blackboardAccessor = await generate_mutations(
       client,
       userPrompt,
-      agentDefinitions,
+      getCombinedAgentDefinitions(agentDefinitions, customAgents, functionRegistry),
       chatAgentDescription,
       executionPlan,
       blackboardAccessor

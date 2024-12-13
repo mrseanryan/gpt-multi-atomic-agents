@@ -1,6 +1,7 @@
 // Resource: an example of a 'household chores bots' domain.
-import { FunctionAgentDefinitionMinimal, FunctionCallSchema, FunctionSpecSchema, ParameterSpec } from "../gpt_maa_client/models/index.js"
-import { DefaultHandler, execute, FunctionRegistry, HandlerBase } from "./function_call_executor.js"
+import { FunctionAgentDefinitionMinimal, FunctionCallSchema, FunctionCallSchema_parameters, FunctionSpecSchema, ParameterSpec } from "../gpt_maa_client/models/index.js"
+import { DefaultAreaHandler, AreaHandlerBase } from "./function_call_execution_handlers.js"
+import { FunctionRegistry } from "./function_call_execution_registry.js"
 import { dumpJson, print, printDetail } from "./utils_print.js"
 
 // =================================================
@@ -55,25 +56,27 @@ const wasteDisposerOutputFunctions: FunctionSpecSchema[] = [
 
 export const functionRegistry = new FunctionRegistry();
 
-
-const handleMowLawn = (functionCall: FunctionCallSchema): void => {
-    print("<mowing the lawn>")
+const printParams = (params: FunctionCallSchema_parameters | null | undefined) => {
     printDetail(`  params:`)
-    dumpJson(functionCall.parameters)
+    dumpJson(params)
 }
 
-const handleProduceCutGrass = (functionCall: FunctionCallSchema): void => {
-    print("<producing cut grass>")
-    printDetail(`  params:`)
-    dumpJson(functionCall.parameters)
-}
-
-class LawnHandler extends HandlerBase
+class LawnHandler extends AreaHandlerBase
 {
     constructor(registry: FunctionRegistry) {
         super(registry);
-        this.registerFunction(mowLawnFunction.functionName!, fc => handleMowLawn(fc))
-        this.registerFunction(produceCutGrassFunction.functionName!, fc => handleProduceCutGrass(fc))
+
+        const self = this;
+        this.registerFunctionHandler(mowLawnFunction, "lawn", fc => self.handleMowLawn(fc))
+        this.registerFunctionHandler(produceCutGrassFunction, "lawn-waste", fc => self.handleProduceCutGrass(fc))
+    }
+    private handleMowLawn(fc: FunctionCallSchema): void {
+        print("<mowing the lawn>")
+        printParams(fc)
+    }
+    private handleProduceCutGrass(fc: FunctionCallSchema): void {
+        print("<producing cut grass>")
+        printParams(fc)
     }
 
     protected nameImplementation(): string
@@ -82,13 +85,38 @@ class LawnHandler extends HandlerBase
     }
 }
 
+class WasteDisposalHandler extends AreaHandlerBase
+{
+    constructor(registry: FunctionRegistry) {
+        super(registry);
+
+        const category = "waste"
+
+        const self = this;
+        wasteDisposerOutputFunctions.forEach(wd => 
+            self.registerFunctionHandler(wd, category, fc => self.handleWaste(fc))
+        )
+    }
+
+    private handleWaste(fc: FunctionCallSchema): void {
+        print(`<handling waste from ${fc.functionName}>`)
+        printDetail
+    }
+
+    protected nameImplementation(): string
+    {
+        return "Waste Handler";
+    }
+}
+
 // Create the handlers (they register themselves)
-new DefaultHandler(functionRegistry, (functionCall: FunctionCallSchema) => {
+new DefaultAreaHandler(functionRegistry, (functionCall: FunctionCallSchema) => {
     printDetail(`[default handler] for function call: ${functionCall.functionName}`, functionCall.parameters)
 })
 new LawnHandler(functionRegistry);
+new WasteDisposalHandler(functionRegistry)
 
-// TODO add WasteHandler, FurnitureHandler
+// TODO add FurnitureHandler
 
 // =================================================
 // Declare the Agents in terms of the shared Functions
@@ -103,22 +131,16 @@ const lawnMowerAgent: FunctionAgentDefinitionMinimal = {
 const furnitureMoverAgent: FunctionAgentDefinitionMinimal = {
     agentName: "Furniture Mover",
     description: "Knows how to move furniture to different parts of garden, and move in or out of garden",
-    acceptedFunctions: [...furnitureMoverOutputFunctions, mowLawnFunction]  // The furniture mover can observe when the lawn-mower needs to access that area
-    ,
+    acceptedFunctions: [...furnitureMoverOutputFunctions, mowLawnFunction],  // The furniture mover can observe when the lawn-mower needs to access that area
     functionsAllowedToGenerate: furnitureMoverOutputFunctions,
     topics: ["furniture"],
 }
 
-const wasteDisposerAgent: FunctionAgentDefinitionMinimal = {
-    agentName: "Waste Disposer",
-    description: "Knows how to collect and dispose of waste",
-    acceptedFunctions: [...wasteDisposerOutputFunctions, produceCutGrassFunction], // The waste disposer can observe when the lawn-mower has generated waste
-    functionsAllowedToGenerate: wasteDisposerOutputFunctions,
-    topics: ["waste", "dispose"],
-}
+// note: The WasteDisposer Agent is a 'custom' agent defined in a JSON file ('waste-diposer.agent.json').
+// - this is an example of reading 'custom' agents from an Agent Store.
 
 export const agentDefinitions: FunctionAgentDefinitionMinimal[] = [
-    lawnMowerAgent, furnitureMoverAgent, wasteDisposerAgent
+    lawnMowerAgent, furnitureMoverAgent
 ]
 
 export const chatAgentDescription = "Handles questions about household chores such as garden, garden furniture and waste maintenance.";
