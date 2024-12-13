@@ -4,9 +4,15 @@ import typing
 from atomic_agents.agents.base_agent import (
     BaseAgent,
     BaseAgentConfig,
+    BaseIOSchema,
 )
 from cornsnake import util_time, util_wait
 from rich.console import Console
+
+from gpt_multi_atomic_agents.graphql_dto import GraphQLAgentOutputSchema
+
+from .functions_dto import FunctionAgentOutputSchema
+from .util_output import print_warning
 
 from .blackboard_serde import load_blackboard_from_file
 
@@ -99,8 +105,9 @@ def generate(
     chat_agent_description: str,
     _config: Config,
     user_prompt: str,
-    blackboard: BlackboardAccessor
-    | None = None,  # If used as a web service, then would also accept previous state + new data (which the user has updated either by executing its implementation of Function Calls OR by updating via GraphQL mutations).
+    blackboard: (
+        BlackboardAccessor | None
+    ) = None,  # If used as a web service, then would also accept previous state + new data (which the user has updated either by executing its implementation of Function Calls OR by updating via GraphQL mutations).
     execution_plan: AgentExecutionPlanSchema | None = None,
 ) -> BlackboardAccessor:
     blackboard = generate_with_blackboard(
@@ -124,13 +131,33 @@ def _create_blackboard(
     return blackboard
 
 
+def _fix_agent_name(
+    response: BaseIOSchema, agent_definition: AgentDefinitionBase
+) -> None:
+    """Sometimes generate() hallucincates a new Agent Name (but planning does not!). We can easily post-fix it here."""
+    if isinstance(response, FunctionAgentOutputSchema):
+        did_warn = False
+        for fun in response.generated_function_calls:
+            if fun.agent_name != agent_definition.agent_name:
+                if not did_warn:
+                    print_warning(
+                        message=f"LLM reponse has incorrect agent name '{fun.agent_name}' - fixing it to be '{agent_definition.agent_name}'")
+                    did_warn = True
+                fun.agent_name = agent_definition.agent_name
+    elif isinstance(response, GraphQLAgentOutputSchema):
+        pass  # no agent name in response
+    else:
+        raise RuntimeError("Not a recognised agent response")
+
+
 def generate_with_blackboard(
     agent_definitions: list[AgentDefinitionBase],
     chat_agent_description: str,
     _config: Config,
     user_prompt: str,
-    blackboard: Blackboard
-    | None = None,  # If used as a web service, then would also accept previous state + new data (which the user has updated either by executing its implementation of Function Calls OR by updating via GraphQL mutations).
+    blackboard: (
+        Blackboard | None
+    ) = None,  # If used as a web service, then would also accept previous state + new data (which the user has updated either by executing its implementation of Function Calls OR by updating via GraphQL mutations).
     execution_plan: AgentExecutionPlanSchema | None = None,
 ) -> Blackboard:
     """
@@ -189,8 +216,8 @@ def generate_with_blackboard(
                             f"Could not match recommended agent {recommended_agent.agent_name}"
                         )
                     if len(matching_agent_definitions) > 1:
-                        console.print(
-                            f":warning: Matched more than one agent to {recommended_agent.agent_name}"
+                        print_warning(
+                            f"Matched more than one agent to {recommended_agent.agent_name}"
                         )
                     agent_definition = matching_agent_definitions[0]
                     agent = _create_agent(agent_definition, _config=_config)
@@ -202,6 +229,7 @@ def generate_with_blackboard(
                             config=_config,
                         )
                     )
+                    _fix_agent_name(response, agent_definition)
                     util_print_agent.print_assistant_output(response, agent_definition)
 
                     agent_definition.update_blackboard(
@@ -226,8 +254,9 @@ def run_chat_loop(
     chat_agent_description: str,
     _config: Config,
     given_user_prompt: str | None = None,
-    blackboard: BlackboardAccessor
-    | None = None,  # If used as a web service, then would also accept previous state + new data (which the user has updated either by executing its implementation of Function Calls OR by updating via GraphQL mutations).
+    blackboard: (
+        BlackboardAccessor | None
+    ) = None,  # If used as a web service, then would also accept previous state + new data (which the user has updated either by executing its implementation of Function Calls OR by updating via GraphQL mutations).
 ) -> BlackboardAccessor:
     """
     Use the provided agents to fulfill the user's prompt.
