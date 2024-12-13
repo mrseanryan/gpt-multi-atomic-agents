@@ -1,6 +1,6 @@
 {
   "name": "gpt-maa-ts",
-  "version": "0.0.9",
+  "version": "0.1.0",
   "description": "A TypeScript client for submitting AgentDefinitions and user prompt to a gpt-multi-atomic-agents REST API, to generate supported mutations.",
   "scripts": {
     "test": "test",
@@ -45,6 +45,7 @@
   "homepage": "https://github.com/mrseanryan/gpt-multi-atomic-agents#readme",
   "devDependencies": {
     "@types/node": "^22.10.1",
+    "pkgroll": "^2.5.1",
     "tsx": "^4.19.2",
     "typescript": "^5.7.2"
   },

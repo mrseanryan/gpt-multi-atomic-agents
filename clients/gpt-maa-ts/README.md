@@ -169,13 +169,15 @@ For more details, see [TypeScript Example Agents](https://github.com/mrseanryan/
 Install the depdencencies:
 
 - [Node](https://nodejs.org/en/download/package-manager) v20.18+
-- [Kiota](https://learn.microsoft.com/en-us/openapi/kiota/install?tabs=bash)
+- (for contributing) [Kiota](https://learn.microsoft.com/en-us/openapi/kiota/install?tabs=bash)
 
-note: You need to add the kioto install location to your system path environment variable
+> **_NOTE:_** You need to add the kioto install location to your system path environment variable
 
 ```
 ./install.sh
 ```
+
+> **_NOTE:_** You need to have the [gpt-multi-atomic-agents](https://github.com/mrseanryan/gpt-multi-atomic-agents) REST API running.
 
 # Usage
 
