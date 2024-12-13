@@ -5,7 +5,7 @@ import {
 } from "./serializable_agent.js";
 import { getConfig } from "./util_config.js";
 import { findFilesByExtension, readJsonFromFile } from "./util_file.js";
-import { printWarning } from "./utils_print.js";
+import { printDetail, printWarning } from "./utils_print.js";
 
 class LocalFunctionCallAgentStore implements IAgentStore {
   loadAgents(): SerializableAgentWithCategories[] {
@@ -35,7 +35,9 @@ export const getAgentStores = (): IAgentStore[] => [
   new LocalFunctionCallAgentStore(),
 ];
 
-export const loadCustomAgents = (): SerializableAgentWithCategories[] =>
-  getAgentStores()
+export const loadCustomAgents = (): SerializableAgentWithCategories[] => {
+  printDetail("(loading custom agents)");
+  return getAgentStores()
     .map((a) => a.loadAgents())
     .flat();
+};

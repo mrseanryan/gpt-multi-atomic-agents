@@ -1,18 +1,13 @@
 import { FunctionCallBlackboardAccessor } from "./function_call_blackboard_accessor.js";
-import {
-  list_blackboard_files,
-} from "./function_call_serde.js";
-import {
-  dumpJson,
-  print,
-  printAssistant,
-  printDetail,
-} from "./utils_print.js";
+import { list_blackboard_files } from "./function_call_serde.js";
+import { dumpJson, print, printAssistant, printDetail } from "./utils_print.js";
 
 export enum CommandAction {
   no_action = "no_action",
   handled_already = "handled_already",
+  list_agents = "list_agents",
   load_blackboard = "load_blackboard",
+  reload_agents = "reload_agents",
   save_blackboard = "save_blackboard",
   quit = "quit",
 }
@@ -86,6 +81,18 @@ class ListReplCommand extends ReplCommandBase {
   }
 }
 
+class ListAgentsReplCommand extends ReplCommandBase {
+  public get_name = () => "list-agents";
+  public get_aliases = () => ["lag"];
+
+  public get_description = () =>
+    "List the active agents (both hard-coded agents and custom agents that were loaded from Agent Stores)";
+
+  public do(blackboard: FunctionCallBlackboardAccessor | null): CommandAction {
+    return CommandAction.list_agents;
+  }
+}
+
 class LoadReplCommand extends ReplCommandBase {
   public get_name = () => "load";
   public get_aliases = () => [];
@@ -95,6 +102,18 @@ class LoadReplCommand extends ReplCommandBase {
   public do = (
     blackboard: FunctionCallBlackboardAccessor | null
   ): CommandAction => CommandAction.load_blackboard;
+}
+
+class ReloadAgentsReplCommand extends ReplCommandBase {
+  public get_name = () => "reload-agents";
+  public get_aliases = () => ["rag"];
+
+  public get_description = () =>
+    "Reload the custom agents from the Agent Stores";
+
+  public do(blackboard: FunctionCallBlackboardAccessor | null): CommandAction {
+    return CommandAction.reload_agents;
+  }
 }
 
 class SaveReplCommand extends ReplCommandBase {
@@ -129,12 +148,14 @@ const commands: ReplCommandBase[] = [
   new ClearReplCommand(),
   new DumpReplCommand(),
   new HelpReplCommand(),
+  new ListAgentsReplCommand(),
   new ListReplCommand(),
   new LoadReplCommand(),
+  new ReloadAgentsReplCommand(),
   new SaveReplCommand(),
   new QuitReplCommand(),
 ];
-const MIN_USER_PROMPT = 3;
+const MIN_USER_PROMPT = 4;
 
 const _is_user_input_matching = (
   user_prompt: string,
@@ -146,9 +167,7 @@ export const check_user_prompt = (
   blackboard: FunctionCallBlackboardAccessor | null
 ): CommandAction => {
   user_prompt = user_prompt.trim();
-  // special case:
-  if (!user_prompt || user_prompt.length < MIN_USER_PROMPT)
-    return new HelpReplCommand().do((blackboard = blackboard));
+  if (!user_prompt) return new HelpReplCommand().do((blackboard = blackboard));
 
   for (let i = 0; i < commands.length; i++) {
     const command = commands[i];
@@ -157,6 +176,11 @@ export const check_user_prompt = (
       return command.do((blackboard = blackboard));
     }
   }
+
+  // user prompt is suspiciously short:
+  if (user_prompt.length < MIN_USER_PROMPT)
+    return new HelpReplCommand().do((blackboard = blackboard));
+
   return CommandAction.no_action;
 };
 

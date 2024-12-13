@@ -1,8 +1,8 @@
 {
-    "agentName": "Waste Disposer",
-    "description": "Knows how to collect and dispose of waste",
-    "acceptedFunctionCategories": ["waste", "lawn-waste"],
-    "functionCategoriesAllowedToGenerate": ["waste"],
-    "topics": ["waste", "dispose"],
-    "agentParameters": []
+  "agentName": "Waste Disposer",
+  "description": "Knows how to collect and dispose of waste",
+  "acceptedFunctionCategories": ["waste", "lawn-waste"],
+  "functionCategoriesAllowedToGenerate": ["waste"],
+  "topics": ["waste", "dispose"],
+  "agentParameters": []
 }

@@ -11,11 +11,11 @@ import {
   load_blackboard_from_file,
   save_blackboard_to_file,
 } from "./index.js";
-import { agentDefinitions, functionRegistry } from "./resources_test_domain.js";
+import { functionRegistry } from "./resources_test_domain.js";
 import {
   askUserIfOk,
   dumpJson,
-  isQuit,
+  dumpJsonAlways,
   printAssistant,
   printDetail,
   printError,
@@ -32,10 +32,7 @@ import {
   convertSerializableAgentToContractAgent,
   SerializableAgentWithCategories,
 } from "./serializable_agent.js";
-import {
-  getAgentStores,
-  loadCustomAgents,
-} from "./function_call_agent_stores.js";
+import { loadCustomAgents } from "./function_call_agent_stores.js";
 import { FunctionRegistry } from "./function_call_execution_registry.js";
 
 const getCombinedAgentDefinitions = (
@@ -68,23 +65,41 @@ export const chatWithAgentsRepl = async (
 
   let customAgents = loadCustomAgents();
 
+  const getCombinedAgents = () =>
+    getCombinedAgentDefinitions(
+      agentDefinitions,
+      customAgents,
+      functionRegistry
+    );
+
   // TODO: refactor to a state machine. then if user uses commands, we stay in the current state.
   while (true) {
     const userPrompt = previousPrompt ?? (await readInputFromUser(""));
     if (!userPrompt) continue;
     previousPrompt = null;
 
-    // TODO: then, add more commands:
-    //   list-agents - List the active agents
-    //   reload-agents - reload the agent definition files.
-
     const action = check_user_prompt(userPrompt, blackboardAccessor);
     switch (action) {
-      case CommandAction.quit:
-        printAssistant("Good bye!");
-        return null;
       case CommandAction.handled_already:
         continue;
+      case CommandAction.list_agents: {
+        const customAgentSummaries = customAgents.map((a) => {
+          return {
+            agentName: a.agentName!,
+            description: a.description!,
+            source: "custom",
+          };
+        });
+        const hardCodedAgentSummaries = agentDefinitions.map((a) => {
+          return {
+            agentName: a.agentName!,
+            description: a.description!,
+            source: "hard-coded",
+          };
+        });
+        dumpJsonAlways(customAgentSummaries.concat(hardCodedAgentSummaries));
+        continue;
+      }
       case CommandAction.load_blackboard:
         {
           const filename = await readInputFromUser("Please enter a filename:");
@@ -99,6 +114,13 @@ export const chatWithAgentsRepl = async (
           }
         }
         continue;
+      case CommandAction.quit:
+        printAssistant("Good bye!");
+        return null;
+      case CommandAction.reload_agents: {
+        customAgents = loadCustomAgents();
+        continue;
+      }
       case CommandAction.save_blackboard:
         {
           if (!blackboardAccessor) {
@@ -122,11 +144,7 @@ export const chatWithAgentsRepl = async (
     executionPlan = await generate_plan(
       client,
       userPrompt,
-      getCombinedAgentDefinitions(
-        agentDefinitions,
-        customAgents,
-        functionRegistry
-      ),
+      getCombinedAgents(),
       chatAgentDescription,
       executionPlan
     );
@@ -150,11 +168,7 @@ export const chatWithAgentsRepl = async (
     blackboardAccessor = await generate_mutations(
       client,
       userPrompt,
-      getCombinedAgentDefinitions(
-        agentDefinitions,
-        customAgents,
-        functionRegistry
-      ),
+      getCombinedAgents(),
       chatAgentDescription,
       executionPlan,
       blackboardAccessor

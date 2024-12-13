@@ -57,13 +57,16 @@ export const readInputFromUser = async (
 };
 
 export const dumpJson = (json: any) => {
-  if (getConfig().isDebug)
-  {
-    console.dir(json, { depth: null, colors: true });
+  if (getConfig().isDebug) {
+    dumpJsonAlways(json);
   }
 };
 
-export const isQuit = (userInput: string | null): boolean => {
+export const dumpJsonAlways = (json: any) => {
+  console.dir(json, { depth: null, colors: true });
+};
+
+const isQuit = (userInput: string | null): boolean => {
   if (!userInput) return true;
 
   return ["quit", "bye", "exit", "stop"].includes(
@@ -126,7 +129,7 @@ export const printTimeTaken = (name: string): void => {
 export const showSpinner = (): Spinner => {
   return yoctoSpinner({
     text: "Processing…",
-    spinner: spinners.default.sand // spinners.randomSpinner(), - ref: https://jsfiddle.net/sindresorhus/2eLtsbey/embedded/result/
+    spinner: spinners.default.sand, // spinners.randomSpinner(), - ref: https://jsfiddle.net/sindresorhus/2eLtsbey/embedded/result/
   }).start();
 };
 

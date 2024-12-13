@@ -32,6 +32,12 @@ const produceCutGrassFunction: FunctionSpecSchema = {
   parameters: [areaParameter],
 };
 
+const textOutputFunction: FunctionSpecSchema = {
+  functionName: "AddText",
+  description: "Generate text",
+  parameters: [],
+};
+
 const mowerOutputFunctions: FunctionSpecSchema[] = [
   mowLawnFunction,
   produceCutGrassFunction,
