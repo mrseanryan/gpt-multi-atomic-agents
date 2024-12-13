@@ -17,11 +17,11 @@ export const printWarning = (...args: any[]): void => {
 };
 
 export const printError = (...args: any[]): void => {
-    console.log(...colorArgs((a) => colors.red(a), args));
-  };
-  
-const EMOJI_ASSISTANT = "🤖"
-const EMOJI_USER = "😕"
+  console.log(...colorArgs((a) => colors.red(a), args));
+};
+
+const EMOJI_ASSISTANT = "🤖";
+const EMOJI_USER = "😕";
 
 export const printAssistant = (...args: any[]): void => {
   console.log(
@@ -48,7 +48,9 @@ export const printDetail = (...args: any[]): void => {
 export const readInputFromUser = async (
   prompt: string
 ): Promise<string | null> => {
-  const answer = await inquirer.input({ message: `${EMOJI_USER} You: ` + prompt });
+  const answer = await inquirer.input({
+    message: `${EMOJI_USER} You: ` + prompt,
+  });
 
   return answer.trim() ?? null;
 };

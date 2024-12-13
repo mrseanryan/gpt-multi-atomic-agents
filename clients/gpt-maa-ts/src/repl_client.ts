@@ -4,7 +4,13 @@ import {
 } from "../gpt_maa_client/models/index.js";
 import { FunctionCallBlackboardAccessor } from "./function_call_blackboard_accessor.js";
 import { execute, ExecutionError } from "./function_call_executor.js";
-import { createClient, generate_mutations, generate_plan, load_blackboard_from_file, save_blackboard_to_file } from "./index.js";
+import {
+  createClient,
+  generate_mutations,
+  generate_plan,
+  load_blackboard_from_file,
+  save_blackboard_to_file,
+} from "./index.js";
 import { functionRegistry } from "./resources_test_domain.js";
 import {
   askUserIfOk,
@@ -17,7 +23,11 @@ import {
   readInputFromUser,
 } from "./utils_print.js";
 import { PostsClient } from "../gpt_maa_client/postsClient.js";
-import { check_user_prompt, CommandAction, print_help } from "./repl_commands.js";
+import {
+  check_user_prompt,
+  CommandAction,
+  print_help,
+} from "./repl_commands.js";
 
 export const chatWithAgentsRepl = async (
   agentDefinitions: FunctionAgentDefinitionMinimal[],
@@ -26,7 +36,7 @@ export const chatWithAgentsRepl = async (
   onExecuteStart: () => Promise<void>,
   onExecuteEnd: (errors: ExecutionError[]) => Promise<void>
 ): Promise<FunctionCallBlackboardAccessor | null> => {
-  print_help()
+  print_help();
   const client: PostsClient = createClient(baseurl);
 
   let executionPlan: AgentExecutionPlanSchema | undefined = undefined;
@@ -45,50 +55,46 @@ export const chatWithAgentsRepl = async (
     //   list-agents - List the active agents
     //   reload-agents - reload the agent definition files.
 
-    const action = check_user_prompt(userPrompt, blackboardAccessor)
-    switch(action)
-    {
-        case CommandAction.quit:
-            printAssistant("Good bye!")
-            return null;
-        case CommandAction.handled_already:
-          continue
-        case CommandAction.load_blackboard:
-          {
-              const filename = await readInputFromUser("Please enter a filename:")
-              if (!filename)
-              {
-                  printError("A filename is required in order to load")
-                  continue
-              }
-              const newBlackboard = load_blackboard_from_file(filename)
-              if (newBlackboard)
-              {
-                  blackboardAccessor = newBlackboard
-                  printDetail("(Blackboard loaded)")
-              }
+    const action = check_user_prompt(userPrompt, blackboardAccessor);
+    switch (action) {
+      case CommandAction.quit:
+        printAssistant("Good bye!");
+        return null;
+      case CommandAction.handled_already:
+        continue;
+      case CommandAction.load_blackboard:
+        {
+          const filename = await readInputFromUser("Please enter a filename:");
+          if (!filename) {
+            printError("A filename is required in order to load");
+            continue;
           }
-          continue
-        case CommandAction.save_blackboard:
-            {
-                if (!blackboardAccessor) {
-                    printError("No blackboard to save")
-                    continue
-                }
-                const filename = await readInputFromUser("Please enter a filename:")
-                if (!filename)
-                {
-                    printError("A filename is required in order to save")
-                    continue
-                }
-                save_blackboard_to_file(blackboardAccessor, filename)
-            }
-            continue
-        case CommandAction.no_action:
-            break
-        default:
-            throw new Error(`Not a recognised CommandAction: ${action}`)
+          const newBlackboard = load_blackboard_from_file(filename);
+          if (newBlackboard) {
+            blackboardAccessor = newBlackboard;
+            printDetail("(Blackboard loaded)");
+          }
         }
+        continue;
+      case CommandAction.save_blackboard:
+        {
+          if (!blackboardAccessor) {
+            printError("No blackboard to save");
+            continue;
+          }
+          const filename = await readInputFromUser("Please enter a filename:");
+          if (!filename) {
+            printError("A filename is required in order to save");
+            continue;
+          }
+          save_blackboard_to_file(blackboardAccessor, filename);
+        }
+        continue;
+      case CommandAction.no_action:
+        break;
+      default:
+        throw new Error(`Not a recognised CommandAction: ${action}`);
+    }
 
     executionPlan = await generate_plan(
       client,
@@ -173,4 +179,3 @@ function isOnlyChat(
     recommendedAgents.length === 1 && recommendedAgents[0].agentName == "chat"
   );
 }
-
