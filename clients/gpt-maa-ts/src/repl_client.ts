@@ -28,8 +28,14 @@ import {
   CommandAction,
   print_help,
 } from "./repl_commands.js";
-import { convertSerializableAgentToContractAgent, SerializableAgentWithCategories } from "./serializable_agent.js";
-import { getAgentStores, loadCustomAgents } from "./function_call_agent_stores.js";
+import {
+  convertSerializableAgentToContractAgent,
+  SerializableAgentWithCategories,
+} from "./serializable_agent.js";
+import {
+  getAgentStores,
+  loadCustomAgents,
+} from "./function_call_agent_stores.js";
 import { FunctionRegistry } from "./function_call_execution_registry.js";
 
 const getCombinedAgentDefinitions = (
@@ -38,9 +44,11 @@ const getCombinedAgentDefinitions = (
   functionRegistry: FunctionRegistry
 ): FunctionAgentDefinitionMinimal[] => {
   return agentDefinitions.concat(
-    customAgents.map(a => convertSerializableAgentToContractAgent(a, functionRegistry))
-  )
-}
+    customAgents.map((a) =>
+      convertSerializableAgentToContractAgent(a, functionRegistry)
+    )
+  );
+};
 
 export const chatWithAgentsRepl = async (
   agentDefinitions: FunctionAgentDefinitionMinimal[],
@@ -58,7 +66,7 @@ export const chatWithAgentsRepl = async (
 
   let blackboardAccessor: FunctionCallBlackboardAccessor | null = null;
 
-  let customAgents = loadCustomAgents()
+  let customAgents = loadCustomAgents();
 
   // TODO: refactor to a state machine. then if user uses commands, we stay in the current state.
   while (true) {
@@ -114,7 +122,11 @@ export const chatWithAgentsRepl = async (
     executionPlan = await generate_plan(
       client,
       userPrompt,
-      getCombinedAgentDefinitions(agentDefinitions, customAgents, functionRegistry),
+      getCombinedAgentDefinitions(
+        agentDefinitions,
+        customAgents,
+        functionRegistry
+      ),
       chatAgentDescription,
       executionPlan
     );
@@ -138,7 +150,11 @@ export const chatWithAgentsRepl = async (
     blackboardAccessor = await generate_mutations(
       client,
       userPrompt,
-      getCombinedAgentDefinitions(agentDefinitions, customAgents, functionRegistry),
+      getCombinedAgentDefinitions(
+        agentDefinitions,
+        customAgents,
+        functionRegistry
+      ),
       chatAgentDescription,
       executionPlan,
       blackboardAccessor
