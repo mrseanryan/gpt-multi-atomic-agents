@@ -82,13 +82,13 @@ const handleProduceCutGrass = (functionCall: FunctionCallSchema): void => {
   console.log(`  params:`, functionCall.parameters);
 };
 
-class LawnHandler extends HandlerBase {
+class LawnHandler extends AreaHandlerBase {
   constructor(registry: FunctionRegistry) {
     super(registry);
-    this.registerFunction(mowLawnFunction.functionName!, (fc) =>
+    this.registerFunctionHandler(mowLawnFunction, "lawn", (fc) =>
       handleMowLawn(fc)
     );
-    this.registerFunction(produceCutGrassFunction.functionName!, (fc) =>
+    this.registerFunctionHandler(produceCutGrassFunction, "lawn", (fc) =>
       handleProduceCutGrass(fc)
     );
   }
@@ -170,10 +170,10 @@ console.log(messages);
 // =================================================
 // Execute the Function Calls using our Handlers
 blackboardAccessor.get_new_functions();
-const onExecuteStart = () => {
+const onExecuteStart = async (): Promise<void> => {
   console.log("(execution started)");
 };
-const onExecuteEnd = () => {
+const onExecuteEnd = async (): Promise<void> => {
   console.log("(execution ended)");
 };
 await execute(

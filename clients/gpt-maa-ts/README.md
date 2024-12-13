@@ -164,18 +164,13 @@ execute(blackboardAccessor.get_new_functions(), functionRegistry, onExecuteStart
 
 For more details, see [TypeScript Example Agents](https://github.com/mrseanryan/gpt-multi-atomic-agents/tree/master/clients/gpt-maa-ts/src/test_gpt_maa_client.ts).
 
-# Setup
+# Setup (for consuming as a package)
 
-Install the depdencencies:
+Depdencencies:
 
 - [Node](https://nodejs.org/en/download/package-manager) v20.18+
-- (for contributing) [Kiota](https://learn.microsoft.com/en-us/openapi/kiota/install?tabs=bash)
 
-> **_NOTE:_** You need to add the kioto install location to your system path environment variable
-
-```
-./install.sh
-```
+> **_NOTE:_** You need a copy of the [config.gpt-maa-ts.json](https://github.com/mrseanryan/gpt-multi-atomic-agents/tree/master/clients/gpt-maa-ts/config.gpt-maa-ts.json) file in your folder.
 
 > **_NOTE:_** You need to have the [gpt-multi-atomic-agents](https://github.com/mrseanryan/gpt-multi-atomic-agents) REST API running.
 
