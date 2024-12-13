@@ -16,21 +16,24 @@ export const printWarning = (...args: any[]): void => {
   console.log(colorArgs((a) => colors.yellow(a), args));
 };
 
+const EMOJI_ASSISTANT = "🤖"
+const EMOJI_USER = "😕"
+
 export const printAssistant = (...args: any[]): void => {
   console.log(
-    colors.green("\n🤖 Assistant: "),
+    colors.green(`\n${EMOJI_ASSISTANT} Assistant: `),
     ...args.map((a) => colors.green(a))
   );
 };
 
 export const printUser = (...args: any[]): void => {
   const cargs = colorArgs((a) => colors.magenta(a), args);
-  console.log("\n😕 You: ", ...cargs, "\n");
+  console.log(`\n${EMOJI_USER} You: `, ...cargs, "\n");
 };
 
 export const printUserNoNewline = (...args: any[]): void => {
   const cargs = colorArgs((a) => colors.magenta(a), args);
-  console.log("\n😕 You: ", ...cargs);
+  console.log(`\n${EMOJI_USER} You: `, ...cargs);
 };
 
 export const printDetail = (...args: any[]): void => {
@@ -41,7 +44,7 @@ export const printDetail = (...args: any[]): void => {
 export const readInputFromUser = async (
   prompt: string
 ): Promise<string | null> => {
-  const answer = await inquirer.input({ message: "\n😕 You: " + prompt });
+  const answer = await inquirer.input({ message: `\n${EMOJI_USER} You: ` + prompt });
 
   return answer.trim() ?? null;
 };
