@@ -5,7 +5,7 @@ import * as inquirer from "@inquirer/prompts";
 import { Message } from "../gpt_maa_client/models/index.js";
 
 export const print = (...args: any[]): void => {
-  console.log(...args, "\n");
+  console.log(...args);
 };
 
 const colorArgs = (cb: (s: string) => string, ...args: any[]): string[] => {
@@ -13,38 +13,42 @@ const colorArgs = (cb: (s: string) => string, ...args: any[]): string[] => {
 };
 
 export const printWarning = (...args: any[]): void => {
-  console.log(colorArgs((a) => colors.yellow(a), args));
+  console.log(...colorArgs((a) => colors.yellow(a), args));
 };
 
+export const printError = (...args: any[]): void => {
+    console.log(...colorArgs((a) => colors.red(a), args));
+  };
+  
 const EMOJI_ASSISTANT = "🤖"
 const EMOJI_USER = "😕"
 
 export const printAssistant = (...args: any[]): void => {
   console.log(
-    colors.green(`\n${EMOJI_ASSISTANT} Assistant: `),
+    colors.green(`${EMOJI_ASSISTANT} Assistant: `),
     ...args.map((a) => colors.green(a))
   );
 };
 
 export const printUser = (...args: any[]): void => {
   const cargs = colorArgs((a) => colors.magenta(a), args);
-  console.log(`\n${EMOJI_USER} You: `, ...cargs, "\n");
+  console.log(`${EMOJI_USER} You: `, ...cargs);
 };
 
 export const printUserNoNewline = (...args: any[]): void => {
   const cargs = colorArgs((a) => colors.magenta(a), args);
-  console.log(`\n${EMOJI_USER} You: `, ...cargs);
+  console.log(`${EMOJI_USER} You: `, ...cargs);
 };
 
 export const printDetail = (...args: any[]): void => {
   const cargs = colorArgs((a) => colors.gray(a), args);
-  console.log("\n  ", ...cargs, "\n");
+  console.log("  ", ...cargs);
 };
 
 export const readInputFromUser = async (
   prompt: string
 ): Promise<string | null> => {
-  const answer = await inquirer.input({ message: `\n${EMOJI_USER} You: ` + prompt });
+  const answer = await inquirer.input({ message: `${EMOJI_USER} You: ` + prompt });
 
   return answer.trim() ?? null;
 };

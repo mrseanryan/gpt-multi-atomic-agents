@@ -4,7 +4,13 @@ import {
   Message,
 } from "../gpt_maa_client/models/index.js";
 
+export enum TypeScriptBlackboardFormat
+{
+  function_call = "function_call",
+}
+
 export class FunctionCallBlackboardAccessor {
+  public readonly format: TypeScriptBlackboardFormat = TypeScriptBlackboardFormat.function_call;
   private blackboard: FunctionCallBlackboardOutput; // The inner blackboard - should only be used to send to REST API, not used directly by the client
 
   constructor(blackboard: FunctionCallBlackboardOutput) {
@@ -37,5 +43,12 @@ export class FunctionCallBlackboardAccessor {
 
   public get_internal_blackboard(): FunctionCallBlackboardOutput {
     return this.blackboard;
+  }
+
+  public _reset_all() {
+    this.blackboard.internalNewlyGeneratedFunctions = [];
+    this.blackboard.internalNewlyGeneratedMessages = [];
+    this.blackboard.internalPreviousMessages = [];
+    this.blackboard.internalPreviouslyGeneratedFunctions = [];
   }
 }

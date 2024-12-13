@@ -8,6 +8,7 @@ import {
   agentDefinitions,
   chatAgentDescription,
 } from "./resources_test_domain.js";
+import { getConfig } from "./util_config.js";
 
 // =================================================
 // Chat with the Agents
@@ -22,7 +23,7 @@ async function main(): Promise<void> {
   await chatWithAgentsRepl(
     agentDefinitions,
     chatAgentDescription,
-    "http://127.0.0.1:8000",
+    getConfig().baseurl,
     onExecuteStart,
     onExecuteEnd
   ); // TODO make baseurl read from a config .env

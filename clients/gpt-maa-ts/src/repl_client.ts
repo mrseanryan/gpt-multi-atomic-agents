@@ -4,17 +4,20 @@ import {
 } from "../gpt_maa_client/models/index.js";
 import { FunctionCallBlackboardAccessor } from "./function_call_blackboard_accessor.js";
 import { execute, ExecutionError } from "./function_call_executor.js";
-import { createClient, generate_mutations, generate_plan } from "./index.js";
+import { createClient, generate_mutations, generate_plan, load_blackboard_from_file, save_blackboard_to_file } from "./index.js";
 import { functionRegistry } from "./resources_test_domain.js";
 import {
   askUserIfOk,
   dumpJson,
   isQuit,
   printAssistant,
+  printDetail,
+  printError,
   printMessages,
   readInputFromUser,
 } from "./utils_print.js";
 import { PostsClient } from "../gpt_maa_client/postsClient.js";
+import { check_user_prompt, CommandAction, print_help } from "./repl_commands.js";
 
 export const chatWithAgentsRepl = async (
   agentDefinitions: FunctionAgentDefinitionMinimal[],
@@ -23,37 +26,69 @@ export const chatWithAgentsRepl = async (
   onExecuteStart: () => Promise<void>,
   onExecuteEnd: (errors: ExecutionError[]) => Promise<void>
 ): Promise<FunctionCallBlackboardAccessor | null> => {
-  printAssistant("Hello, can may I help you?");
+  print_help()
   const client: PostsClient = createClient(baseurl);
 
   let executionPlan: AgentExecutionPlanSchema | undefined = undefined;
 
   let previousPrompt: string | null = null;
 
+  let blackboardAccessor: FunctionCallBlackboardAccessor | null = null;
+
+  // TODO: refactor to a state machine
   while (true) {
     const userPrompt = previousPrompt ?? (await readInputFromUser(""));
     if (!userPrompt) continue;
-
-    // TODO: check for other commands, not just quitting - see repl_commands.py
-    // Type in a question for the AI. If you are not sure what to type, then ask it a question like 'What can you do?'
-    // To exit, use the quit command
-    // Available commands:
-    //   clear - Clear the blackboard, starting over. (alias: reset)
-    //   dump - Dump the current blackboard state to the console (alias: show)
-    //   help - Display help text
-    //   list-agents - List the active agents
-    //   reload-agents - reload the agents from disk
-    //   load - Load a blackboard from the local data store (also list the files)
-    //   save - Save the blackboard to the local data store
-    //   quit - Exit the chat loop (alias: bye, exit, stop)
-    //
-    //   NEW to TS only:
-    //   reload-agents - Reloads the agent definition files.
-    if (isQuit(userPrompt)) {
-      printAssistant("Goodbye!\n");
-      return null;
-    }
     previousPrompt = null;
+
+    // TODO: add more commands:
+    //   list-agents - List the active agents
+    //   reload-agents - reload the agent definition files.
+
+    const action = check_user_prompt(userPrompt, blackboardAccessor)
+    switch(action)
+    {
+        case CommandAction.quit:
+            printAssistant("Good bye!")
+            return null;
+        case CommandAction.handled_already:
+          continue
+        case CommandAction.load_blackboard:
+          {
+              const filename = await readInputFromUser("Please enter a filename:")
+              if (!filename)
+              {
+                  printError("A filename is required in order to load")
+                  continue
+              }
+              const newBlackboard = load_blackboard_from_file(filename)
+              if (newBlackboard)
+              {
+                  blackboardAccessor = newBlackboard
+                  printDetail("(Blackboard loaded)")
+              }
+          }
+          continue
+        case CommandAction.save_blackboard:
+            {
+                if (!blackboardAccessor) {
+                    printError("No blackboard to save")
+                    continue
+                }
+                const filename = await readInputFromUser("Please enter a filename:")
+                if (!filename)
+                {
+                    printError("A filename is required in order to save")
+                    continue
+                }
+                save_blackboard_to_file(blackboardAccessor, filename)
+            }
+            continue
+        case CommandAction.no_action:
+            break
+        default:
+            throw new Error(`Not a recognised CommandAction: ${action}`)
+        }
 
     executionPlan = await generate_plan(
       client,
@@ -79,12 +114,13 @@ export const chatWithAgentsRepl = async (
       continue;
     }
 
-    const blackboardAccessor = await generate_mutations(
+    blackboardAccessor = await generate_mutations(
       client,
       userPrompt,
       agentDefinitions,
       chatAgentDescription,
-      executionPlan
+      executionPlan,
+      blackboardAccessor
     );
     if (!blackboardAccessor) {
       throw new Error("No blackboard accessor was returned!");
@@ -137,3 +173,4 @@ function isOnlyChat(
     recommendedAgents.length === 1 && recommendedAgents[0].agentName == "chat"
   );
 }
+
