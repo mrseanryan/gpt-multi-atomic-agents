@@ -38,7 +38,7 @@ export const generate_mutations = async (client: PostsClient, userPrompt: string
     const blackboard = await client.generate_function_calls.post(function_call_generate_request)
     stopSpinner(spinner)
 
-    dumpJson(JSON.stringify(blackboard))
+    dumpJson(blackboard)
 
     printTimeTaken(timer)
 
