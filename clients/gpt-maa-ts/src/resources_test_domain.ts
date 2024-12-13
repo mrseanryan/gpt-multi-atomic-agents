@@ -35,7 +35,12 @@ const produceCutGrassFunction: FunctionSpecSchema = {
 const textOutputFunction: FunctionSpecSchema = {
   functionName: "AddText",
   description: "Generate text",
-  parameters: [],
+  parameters: [
+    {
+      name: "text",
+      type: "string",
+    },
+  ],
 };
 
 const mowerOutputFunctions: FunctionSpecSchema[] = [
@@ -133,14 +138,20 @@ class WasteDisposalHandler extends AreaHandlerBase {
 }
 
 // Create the handlers (they register themselves)
-new DefaultAreaHandler(functionRegistry, (functionCall: FunctionCallSchema) => {
-  printDetail(
-    `[default handler] for function call: ${functionCall.functionName}`,
-    functionCall.parameters
-  );
-});
+const defaultHandler = new DefaultAreaHandler(
+  functionRegistry,
+  (functionCall: FunctionCallSchema) => {
+    printDetail(
+      `[default handler] for function call: ${functionCall.functionName}`,
+      functionCall.parameters
+    );
+  }
+);
 new LawnHandler(functionRegistry);
 new WasteDisposalHandler(functionRegistry);
+
+// Register other functions that are not used by the hard-coded agents:
+functionRegistry.registerHandler(textOutputFunction, "text", defaultHandler);
 
 // TODO add FurnitureHandler
 

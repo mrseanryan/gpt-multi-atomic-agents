@@ -1,0 +1,8 @@
+{
+  "agentName": "Summarizer",
+  "description": "Knows how to summarize the activities of other agents",
+  "acceptedFunctionCategories": ["waste", "lawn-waste", "lawn"],
+  "functionCategoriesAllowedToGenerate": ["text"],
+  "topics": ["summary"],
+  "agentParameters": []
+}
