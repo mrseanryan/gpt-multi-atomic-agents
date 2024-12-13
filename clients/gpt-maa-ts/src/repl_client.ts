@@ -4,13 +4,6 @@ import {
 } from "../gpt_maa_client/models/index.js";
 import { FunctionCallBlackboardAccessor } from "./function_call_blackboard_accessor.js";
 import { execute, ExecutionError } from "./function_call_executor.js";
-import {
-  createClient,
-  generate_mutations,
-  generate_plan,
-  load_blackboard_from_file,
-  save_blackboard_to_file,
-} from "./index.js";
 import { functionRegistry } from "./resources_test_domain.js";
 import {
   askUserIfOk,
@@ -34,6 +27,13 @@ import {
 } from "./serializable_agent.js";
 import { loadCustomAgents } from "./function_call_agent_stores.js";
 import { FunctionRegistry } from "./function_call_execution_registry.js";
+import { createClient } from "./kiota_client.js";
+import {
+  load_blackboard_from_file,
+  save_blackboard_to_file,
+} from "./function_call_serde.js";
+import { generate_plan } from "./function_call_planner.js";
+import { generate_mutations } from "./function_call_generator.js";
 
 const getCombinedAgentDefinitions = (
   agentDefinitions: FunctionAgentDefinitionMinimal[],

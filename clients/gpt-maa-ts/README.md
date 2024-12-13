@@ -99,7 +99,7 @@ Finally, we also need to provide Handlers, to be able to execute the generated f
 ```TypeScript
 const functionRegistry = new FunctionRegistry();
 
-class LawnHandler extends HandlerBase
+class LawnHandler extends AreaHandlerBase
 {
     constructor(registry: FunctionRegistry) {
         super(registry);
@@ -124,7 +124,7 @@ class LawnHandler extends HandlerBase
 }
 
 // Create the handlers (they register themselves)
-const defaultHandler = new DefaultHandler(functionRegistry, (functionCall: FunctionCallSchema) => {
+const defaultHandler = new DefaultAreaHandler(functionRegistry, (functionCall: FunctionCallSchema) => {
     console.log(`[default handler] for function call: ${functionCall.functionName}`, functionCall.parameters);
 });
 const lawnHandler = new LawnHandler(functionRegistry);
