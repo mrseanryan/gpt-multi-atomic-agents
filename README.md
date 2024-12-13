@@ -67,7 +67,7 @@ The router rewrites the user prompt to suit each agent, which improves quality a
 
 > **_NOTE:_** Optionally, the router can be run separately, allowing for human-in-the-loop feedback on the execution plan that the router generated. In this way, the user can collaborate more with the router, before the generative agents are actually executed.
 
-> **_NOTE:_** An agent is serializable (basically a JSON document), so Agents can be imported, exported and even edited by clients as needed.
+> **_NOTE:_** An agent is serializable (basically a JSON document), so Agents can be imported, exported and even edited by clients as needed. For an example 'dynamic' Custom Agents, see the [TypeScript client dynamic agents](https://github.com/mrseanryan/gpt-multi-atomic-agents/blob/master/clients/gpt-maa-ts/data-agents).
 
 - this allows the user to have more control over the output, and has the added benefit of reducing the *perceived* time taken to generate, since the user has intermediate interaction with the router.
 

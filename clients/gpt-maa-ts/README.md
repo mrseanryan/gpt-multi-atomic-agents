@@ -176,6 +176,14 @@ Depdencencies:
 
 # Usage
 
+To run a REPL loop:
+
+```
+./go.sh
+```
+
+> **_NOTE:_** 'Dynamic' Custom Agents are stored locally in the [data-agents](https://github.com/mrseanryan/gpt-multi-atomic-agents/tree/master/clients/gpt-maa-ts/data-agents) folder. Even while running the REPL, you can edit the agent files or add new ones. If you edit or add a custom agent, then use the REPL command to reload agents. There is also a command to list the active agents.
+
 For examples, see the [TypeScript Example Agents](https://github.com/mrseanryan/gpt-multi-atomic-agents/tree/master/clients/gpt-maa-ts/src/test_gpt_maa_client.ts).
 
 # Test
