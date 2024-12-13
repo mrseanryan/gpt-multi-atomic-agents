@@ -141,7 +141,8 @@ def _fix_agent_name(
             if fun.agent_name != agent_definition.agent_name:
                 if not did_warn:
                     print_warning(
-                        message=f"LLM reponse has incorrect agent name '{fun.agent_name}' - fixing it to be '{agent_definition.agent_name}'")
+                        message=f"LLM reponse has incorrect agent name '{fun.agent_name}' - fixing it to be '{agent_definition.agent_name}'"
+                    )
                     did_warn = True
                 fun.agent_name = agent_definition.agent_name
     elif isinstance(response, GraphQLAgentOutputSchema):
