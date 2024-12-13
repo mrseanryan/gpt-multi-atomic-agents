@@ -49,6 +49,7 @@ export const readInputFromUser = async (
   return answer.trim() ?? null;
 };
 
+// TODO: only if is debug config
 export const dumpJson = (json: any) => {
   console.dir(json, { depth: null, colors: true });
 };
