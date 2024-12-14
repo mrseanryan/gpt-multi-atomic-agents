@@ -1,3 +1,5 @@
+// Handle the results of a State: this DOES involve changing States.
+
 import { ExecutionError } from "./function_call_executor.js";
 import { functionRegistry } from "./resources_test_domain.js";
 import {
