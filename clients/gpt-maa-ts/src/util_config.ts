@@ -13,3 +13,18 @@ export const getConfig = (): Config => {
   const filepath = path.join(process.cwd(), filename);
   return readJsonFromFile(filepath) as Config;
 };
+
+let isDebugActiveValue: boolean | undefined = undefined;
+
+export const isDebugActive = (): boolean => {
+  if (isDebugActiveValue === undefined) {
+    isDebugActiveValue = getConfig().isDebug;
+  }
+  return isDebugActiveValue;
+};
+
+export const toggleIsDebugActive = (): boolean => {
+  let oldValue = isDebugActive();
+  isDebugActiveValue = !oldValue;
+  return isDebugActiveValue;
+};

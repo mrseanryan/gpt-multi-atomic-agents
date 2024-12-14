@@ -1,5 +1,6 @@
 import { FunctionCallBlackboardAccessor } from "./function_call_blackboard_accessor.js";
 import { list_blackboard_files } from "./function_call_serde.js";
+import { isDebugActive, toggleIsDebugActive } from "./util_config.js";
 import { dumpJson, print, printAssistant, printDetail } from "./utils_print.js";
 
 export enum CommandAction {
@@ -13,6 +14,7 @@ export enum CommandAction {
 }
 
 export abstract class ReplCommandBase {
+  public isDebugOnly = (): boolean => true;
   public abstract get_name(): string;
   public abstract get_description(): string;
   public abstract get_aliases(): string[];
@@ -20,6 +22,10 @@ export abstract class ReplCommandBase {
   public abstract do(
     blackboard: FunctionCallBlackboardAccessor | null
   ): CommandAction;
+}
+
+abstract class UserVisibleReplCommandBase extends ReplCommandBase {
+  public override isDebugOnly = (): boolean => false;
 }
 
 class ClearReplCommand extends ReplCommandBase {
@@ -56,7 +62,21 @@ class DumpReplCommand extends ReplCommandBase {
   }
 }
 
-class HelpReplCommand extends ReplCommandBase {
+class ToggleDebugCommand extends UserVisibleReplCommandBase {
+  public get_name = () => "toggle-debug";
+  public get_aliases = () => ["td"];
+  public get_description = () =>
+    "Toggles debug mode on and off (in debug mode, more commands are available).";
+  public do(blackboard: FunctionCallBlackboardAccessor | null): CommandAction {
+    const isDebug = toggleIsDebugActive();
+    print_help({ hideWelcome: true });
+    printDetail(isDebug ? "<Debugging is ON>" : "<Debugging is OFF>");
+
+    return CommandAction.handled_already;
+  }
+}
+
+class HelpReplCommand extends UserVisibleReplCommandBase {
   public get_name = () => "help";
   public get_aliases = () => [];
 
@@ -132,7 +152,7 @@ class SaveReplCommand extends ReplCommandBase {
   }
 }
 
-class QuitReplCommand extends ReplCommandBase {
+class QuitReplCommand extends UserVisibleReplCommandBase {
   public get_name = () => "quit";
 
   public get_aliases = () => ["bye", "exit", "stop"];
@@ -147,6 +167,7 @@ class QuitReplCommand extends ReplCommandBase {
 const commands: ReplCommandBase[] = [
   new ClearReplCommand(),
   new DumpReplCommand(),
+  new ToggleDebugCommand(),
   new HelpReplCommand(),
   new ListAgentsReplCommand(),
   new ListReplCommand(),
@@ -156,6 +177,12 @@ const commands: ReplCommandBase[] = [
   new QuitReplCommand(),
 ];
 const MIN_USER_PROMPT = 4;
+
+const getActiveCommands = (): ReplCommandBase[] => {
+  return commands
+    .filter((c) => !c.isDebugOnly() || isDebugActive())
+    .sort((a, b) => (a.get_name() > b.get_name() ? 0 : 1));
+};
 
 const _is_user_input_matching = (
   user_prompt: string,
@@ -167,10 +194,13 @@ export const check_user_prompt = (
   blackboard: FunctionCallBlackboardAccessor | null
 ): CommandAction => {
   user_prompt = user_prompt.trim();
-  if (!user_prompt) return new HelpReplCommand().do((blackboard = blackboard));
+  if (!user_prompt) {
+    return new HelpReplCommand().do((blackboard = blackboard));
+  }
 
-  for (let i = 0; i < commands.length; i++) {
-    const command = commands[i];
+  const activeCommands = getActiveCommands();
+  for (let i = 0; i < activeCommands.length; i++) {
+    const command = activeCommands[i];
     const aliases = command.get_aliases().concat([command.get_name()]);
     if (_is_user_input_matching(user_prompt, aliases)) {
       return command.do((blackboard = blackboard));
@@ -184,15 +214,19 @@ export const check_user_prompt = (
   return CommandAction.no_action;
 };
 
-export const print_help = (): void => {
-  printAssistant("Welcome to multi-agent chat");
-  print(
-    "Type in a question for the AI. If you are not sure what to type, then ask it a question like 'What can you do?'"
-  );
-  print("To exit, use the quit command");
+export const print_help = (options?: { hideWelcome: boolean }): void => {
+  if (!options?.hideWelcome) {
+    printAssistant("Welcome to multi-agent chat");
+    print(
+      "Type in a question for the AI. If you are not sure what to type, then ask it a question like 'What can you do?'"
+    );
+    print("To exit, use the quit command");
+  }
+
   print("Available commands:");
-  for (let i = 0; i < commands.length; i++) {
-    const command = commands[i];
+  const activeCommands = getActiveCommands();
+  for (let i = 0; i < activeCommands.length; i++) {
+    const command = activeCommands[i];
     const aliases = command.get_aliases().join(", ");
 
     let aliasesDescription = "";
