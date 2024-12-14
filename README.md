@@ -5,10 +5,10 @@ A simple dynamic multi-agent framework based on [atomic-agents](https://github.c
 - convert user input into data modifications (functions or GraphQL mutations)
 - to maximise user engagement, uses a 2-phase process:
   - Planning Phase:
-    - a router uses an LLM to process complex 'composite' user prompts, and automatically route them to the best sequence of your agents
-      - the router rewrites the user prompt, to best suit each agent
+    - the `Orchestrator` uses an LLM to process complex 'composite' user prompts, and automatically route them to the best sequence of your agents
+      - the Orchestrator rewrites the user prompt, to best suit each agent. This is to ensure quality and avoid unwanted 'over-eager' output.
       - an execution plan is generated
-      - the client can use the `router` to iterate over the execution plan, with user feedback
+      - the client can use the Orchestrator to iterate over the execution plan, with user feedback
   - Generation Phase:
       - when the user is happy -> the client can use the `generator` to execute the plan, using the recommended agents
       - the client then receives function calls (or GraphQL mutations) to update the data
@@ -59,17 +59,17 @@ The agents communicate indirectly using a blackboard. The language is composed o
 
 ![System overview](https://raw.githubusercontent.com/mrseanryan/gpt-multi-atomic-agents/master/images/diagram-Multi-LLM-based-Agent-collaboration-via-Dynamic-Router-GraphQL-context.jpg)
 
-A router takes the user prompt and generates an agent execution plan.
+A `Dynamic Router Orchestrator` takes the user prompt and generates an agent execution plan. This is an LLM-backed Orchestrator which builds an execution plan to dynamically route the user prompt to the relevant agents.
 
 The execution plan uses the best sequence of the most suitable agents, to handle the user prompt.
 
-The router rewrites the user prompt to suit each agent, which improves quality and avoids unwanted output.
+The Orchestrator rewrites the user prompt to suit each agent, which improves quality and avoids unwanted output.
 
-> **_NOTE:_** Optionally, the router can be run separately, allowing for human-in-the-loop feedback on the execution plan that the router generated. In this way, the user can collaborate more with the router, before the generative agents are actually executed.
+> **_NOTE:_** Optionally, the Orchestrator can be run separately, allowing for human-in-the-loop feedback on the execution plan that the Orchestrator generated. In this way, the user can collaborate more with the Orchestrator, before the generative agents are actually executed.
 
 > **_NOTE:_** An agent is serializable (basically a JSON document), so Agents can be imported, exported and even edited by clients as needed. For example 'dynamic' Custom Agents, see the [TypeScript client dynamic agents](https://github.com/mrseanryan/gpt-multi-atomic-agents/blob/master/clients/gpt-maa-ts/data-agents).
 
-- this allows the user to have more control over the output, and has the added benefit of reducing the *perceived* time taken to generate, since the user has intermediate interaction with the router.
+- this allows the user to have more control over the output, and has the added benefit of reducing the *perceived* time taken to generate, since the user has intermediate interaction with the Orchestrator.
 
 Finally, the output is returned in the form of an ordered list of (Function or GraphQL) calls.
 
@@ -312,13 +312,13 @@ Generated 3 function calls
 [Agent: Relationship Creator] AddCreatureRelationship( from_name=sheep, to_name=grass, relationship_name=eats )
 ```
 
-Because the framework has a dynamic router, it can handle more complex 'composite' prompts, such as:
+Because the framework has a 'Dynamic Router' Orchestrator, it can handle more complex 'composite' prompts, such as:
 
 > Add a cow that eats grass. Add a human - the cow feeds the human. Add and alien that eats the human. The human also eats cows.
 
-The router figures out which agents to use, what order to run them in, and what prompt to send to each agent.
+The Orchestrator figures out which agents to use, what order to run them in, and what prompt to send to each agent.
 
-Optionally, the router can be re-executed with user feedback on its genereated plan, before actually executing the agents.
+Optionally, the Orchestrator can be re-executed with user feedback on its genereated plan, before actually executing the agents.
 
 The recommended agents are then executed in order, building up their results in the shared blackboard.
 
