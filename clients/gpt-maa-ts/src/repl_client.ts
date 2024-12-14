@@ -1,19 +1,12 @@
-import {
-  AgentExecutionPlanSchema,
-  FunctionAgentDefinitionMinimal,
-} from "../gpt_maa_client/models/index.js";
+import { FunctionAgentDefinitionMinimal } from "../gpt_maa_client/models/index.js";
 import { FunctionCallBlackboardAccessor } from "./function_call_blackboard_accessor.js";
-import { execute, ExecutionError } from "./function_call_executor.js";
+import { ExecutionError } from "./function_call_executor.js";
 import { functionRegistry } from "./resources_test_domain.js";
 import {
-  askUserIfOk,
-  dumpJson,
   dumpJsonAlways,
   printAssistant,
   printDetail,
   printError,
-  printMessages,
-  readInputFromUser,
 } from "./utils_print.js";
 import { PostsClient } from "../gpt_maa_client/postsClient.js";
 import {
@@ -21,31 +14,24 @@ import {
   CommandAction,
   print_help,
 } from "./repl_commands.js";
-import {
-  convertSerializableAgentToContractAgent,
-  SerializableAgentWithCategories,
-} from "./serializable_agent.js";
 import { loadCustomAgents } from "./function_call_agent_stores.js";
-import { FunctionRegistry } from "./function_call_execution_registry.js";
 import { createClient } from "./kiota_client.js";
 import {
   load_blackboard_from_file,
   save_blackboard_to_file,
 } from "./function_call_serde.js";
-import { generate_plan } from "./function_call_planner.js";
-import { generate_mutations } from "./function_call_generator.js";
-
-const getCombinedAgentDefinitions = (
-  agentDefinitions: FunctionAgentDefinitionMinimal[],
-  customAgents: SerializableAgentWithCategories[],
-  functionRegistry: FunctionRegistry
-): FunctionAgentDefinitionMinimal[] => {
-  return agentDefinitions.concat(
-    customAgents.map((a) =>
-      convertSerializableAgentToContractAgent(a, functionRegistry)
-    )
-  );
-};
+import {
+  ExecuteReplState,
+  GenerateReplState,
+  PlanReplState,
+  ReplContext,
+} from "./repl_state_machine.js";
+import { readInputFromUser } from "./util_input.js";
+import {
+  handleExecuteStateResult,
+  handleGenerateStateResult,
+  handlePlanStateResult,
+} from "./repl_state_handlers.js";
 
 export const chatWithAgentsRepl = async (
   agentDefinitions: FunctionAgentDefinitionMinimal[],
@@ -57,40 +43,34 @@ export const chatWithAgentsRepl = async (
   print_help();
   const client: PostsClient = createClient(baseurl);
 
-  let executionPlan: AgentExecutionPlanSchema | undefined = undefined;
+  const context = new ReplContext(
+    client,
+    chatAgentDescription,
+    functionRegistry,
+    agentDefinitions,
+    loadCustomAgents()
+  );
+  context.setState(new PlanReplState());
 
-  let previousPrompt: string | null = null;
-
-  let blackboardAccessor: FunctionCallBlackboardAccessor | null = null;
-
-  let customAgents = loadCustomAgents();
-
-  const getCombinedAgents = () =>
-    getCombinedAgentDefinitions(
-      agentDefinitions,
-      customAgents,
-      functionRegistry
-    );
-
-  // TODO: refactor to a state machine. then if user uses commands, we stay in the current state.
   while (true) {
-    const userPrompt = previousPrompt ?? (await readInputFromUser(""));
+    // TODO: allow for skipping of user input: currently using a special prompt 'PROCEED'
+    const userPrompt = context.previousPrompt ?? (await readInputFromUser(""));
     if (!userPrompt) continue;
-    previousPrompt = null;
+    context.previousPrompt = null;
 
-    const action = check_user_prompt(userPrompt, blackboardAccessor);
+    const action = check_user_prompt(userPrompt, context.blackboardAccessor); // TODO xxx pass context: ICommandContext, then can move code down into cmds
     switch (action) {
       case CommandAction.handled_already:
         continue;
       case CommandAction.list_agents: {
-        const customAgentSummaries = customAgents.map((a) => {
+        const customAgentSummaries = context.customAgents.map((a) => {
           return {
             agentName: a.agentName!,
             description: a.description!,
             source: "custom",
           };
         });
-        const hardCodedAgentSummaries = agentDefinitions.map((a) => {
+        const hardCodedAgentSummaries = context.agentDefinitions.map((a) => {
           return {
             agentName: a.agentName!,
             description: a.description!,
@@ -109,7 +89,7 @@ export const chatWithAgentsRepl = async (
           }
           const newBlackboard = load_blackboard_from_file(filename);
           if (newBlackboard) {
-            blackboardAccessor = newBlackboard;
+            context.blackboardAccessor = newBlackboard;
             printDetail("(Blackboard loaded)");
           }
         }
@@ -118,12 +98,12 @@ export const chatWithAgentsRepl = async (
         printAssistant("Good bye!");
         return null;
       case CommandAction.reload_agents: {
-        customAgents = loadCustomAgents();
+        context.customAgents = loadCustomAgents();
         continue;
       }
       case CommandAction.save_blackboard:
         {
-          if (!blackboardAccessor) {
+          if (!context.blackboardAccessor) {
             printError("No blackboard to save");
             continue;
           }
@@ -132,7 +112,7 @@ export const chatWithAgentsRepl = async (
             printError("A filename is required in order to save");
             continue;
           }
-          save_blackboard_to_file(blackboardAccessor, filename);
+          save_blackboard_to_file(context.blackboardAccessor, filename);
         }
         continue;
       case CommandAction.no_action:
@@ -141,86 +121,23 @@ export const chatWithAgentsRepl = async (
         throw new Error(`Not a recognised CommandAction: ${action}`);
     }
 
-    executionPlan = await generate_plan(
-      client,
-      userPrompt,
-      getCombinedAgents(),
-      chatAgentDescription,
-      executionPlan
-    );
+    // Ask context to handle the user prompt, with the current state:
+    context.userPrompt = userPrompt;
+    await context.request();
 
-    printAssistant(executionPlan?.chatMessage);
-
-    if (isOnlyChat(executionPlan?.recommendedAgents)) continue;
-
-    const doContinue = await askUserIfOk(
-      "Would you like to go ahead with that plan?",
-      {
-        yes: "Go ahead",
-        no: "Say if you would like to change something",
-      }
-    );
-    if (!doContinue.yes) {
-      previousPrompt = doContinue.message;
+    // Now, process the result of the state execution, deciding on the next state.
+    // note: Changing states is responsiblity of this client.
+    if (context.getState() instanceof PlanReplState) {
+      await handlePlanStateResult(context);
       continue;
-    }
-
-    blackboardAccessor = await generate_mutations(
-      client,
-      userPrompt,
-      getCombinedAgents(),
-      chatAgentDescription,
-      executionPlan,
-      blackboardAccessor
-    );
-    if (!blackboardAccessor) {
-      throw new Error("No blackboard accessor was returned!");
-    }
-
-    // =================================================
-    // Display the messages from the Agents
-    const messages = blackboardAccessor.get_new_messages();
-    printMessages(messages);
-
-    const doCreateApp = await askUserIfOk(
-      "Would you like to apply those changes now?",
-      {
-        yes: "Go ahead",
-        no: "Say if you would like to change something",
-      }
-    );
-    if (!doCreateApp.yes) {
-      previousPrompt = doCreateApp.message;
+    } else if (context.getState() instanceof GenerateReplState) {
+      await handleGenerateStateResult(context, onExecuteStart, onExecuteEnd);
       continue;
+    } else if (context.getState() instanceof ExecuteReplState) {
+      await handleExecuteStateResult(context);
+      continue;
+    } else {
+      throw new Error("Not a recognised state!");
     }
-
-    // =================================================
-    // Execute the Function Calls using our Handlers
-    printAssistant("Performing your requested tasks now...");
-    dumpJson(blackboardAccessor.get_new_functions());
-    await execute(
-      blackboardAccessor.get_new_functions(),
-      functionRegistry,
-      onExecuteStart,
-      onExecuteEnd
-    );
-
-    // The client needs to update the blackboard at this point. Assumption: all the functions have been executed by the client.
-    const new_user_data = blackboardAccessor.get_new_functions();
-    blackboardAccessor.set_user_data(new_user_data);
-
-    printAssistant("Is there anything else I can help with?");
   }
 };
-
-function isOnlyChat(
-  recommendedAgents: import("./index.js").RecommendedAgent[] | null | undefined
-) {
-  if (!recommendedAgents) {
-    return true;
-  }
-
-  return (
-    recommendedAgents.length === 1 && recommendedAgents[0].agentName == "chat"
-  );
-}

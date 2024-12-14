@@ -25,10 +25,13 @@ export * from "./function_call_serde.js";
 export * from "./kiota_client.js";
 export * from "./repl_client.js";
 export * from "./repl_commands.js";
+export * from "./repl_state_handlers.js";
+export * from "./repl_state_machine.js";
 export * from "./serializable_agent.js";
 export * from "./util_config.js";
 export * from "./util_file.js";
 export * from "./utils.js";
+export * from "./util_input.js";
 export * from "./utils_print.js";
 
 export const handleUserPrompt = async (

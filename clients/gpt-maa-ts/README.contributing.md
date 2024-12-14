@@ -15,6 +15,15 @@ Install the depdencencies:
 ./install.sh
 ```
 
+## Debugging
+
+Tips:
+
+- open Visual Code at this 'client' project, so then you can debug
+- open the relevant 'test entry' file
+  - for REPL = `test_gpt_maa_client_repl.ts`
+- press F5
+
 ## Maintenance
 
 To update the client, if the REST API has changed:

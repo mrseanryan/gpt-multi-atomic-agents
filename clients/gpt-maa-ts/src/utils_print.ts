@@ -1,7 +1,6 @@
 import yoctoSpinner, { Spinner } from "yocto-spinner";
 import * as spinners from "cli-spinners";
 import colors from "colors";
-import * as inquirer from "@inquirer/prompts";
 import { Message } from "../gpt_maa_client/models/index.js";
 import { isDebugActive } from "./util_config.js";
 
@@ -22,7 +21,7 @@ export const printError = (...args: any[]): void => {
 };
 
 const EMOJI_ASSISTANT = "🤖";
-const EMOJI_USER = "😕";
+export const EMOJI_USER = "😕";
 
 export const printAssistant = (...args: any[]): void => {
   console.log(
@@ -46,16 +45,6 @@ export const printDetail = (...args: any[]): void => {
   console.log("  ", ...cargs);
 };
 
-export const readInputFromUser = async (
-  prompt: string
-): Promise<string | null> => {
-  const answer = await inquirer.input({
-    message: `${EMOJI_USER} You: ` + prompt,
-  });
-
-  return answer.trim() ?? null;
-};
-
 export const dumpJson = (json: any) => {
   if (isDebugActive()) {
     dumpJsonAlways(json);
@@ -64,50 +53,6 @@ export const dumpJson = (json: any) => {
 
 export const dumpJsonAlways = (json: any) => {
   console.dir(json, { depth: null, colors: true });
-};
-
-const isQuit = (userInput: string | null): boolean => {
-  if (!userInput) return true;
-
-  return ["quit", "bye", "exit", "stop"].includes(
-    userInput.trim().toLowerCase()
-  );
-};
-
-interface YesOrNoOptions {
-  yes: string;
-  no: string;
-}
-
-export const askUserIfOk = async (
-  prompt: string,
-  options: YesOrNoOptions
-): Promise<{ yes: boolean; message: string | null }> => {
-  while (true) {
-    printAssistant(prompt);
-    print("yes: ", options.yes);
-    print("no: ", options.no);
-
-    const userInput = await readInputFromUser("");
-    if (!userInput) continue;
-
-    if (isQuit(userInput))
-      return {
-        yes: false,
-        message: userInput,
-      };
-
-    if (userInput.toLowerCase().startsWith("y"))
-      return {
-        yes: true,
-        message: null,
-      };
-
-    return {
-      yes: false,
-      message: userInput,
-    };
-  }
 };
 
 export const printMessages = (messages: Message[]): void => {
