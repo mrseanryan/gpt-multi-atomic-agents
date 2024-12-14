@@ -6,7 +6,7 @@ import {
   TypeScriptBlackboardFormat,
 } from "./function_call_blackboard_accessor.js";
 import { getConfig } from "./util_config.js";
-import { printDetail, printError, readInputFromUser } from "./utils_print.js";
+import { printDetail, printError } from "./utils_print.js";
 import {
   findFilesByExtension,
   readJsonFromFile,
