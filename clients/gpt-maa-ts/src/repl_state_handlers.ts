@@ -19,11 +19,22 @@ import { askUserWithOptions } from "./util_input.js";
 const PROCEED_PROMPT = "proceed";
 
 export const handlePlanStateResult = async (context: ReplContext) => {
-  printAssistant(context.executionPlan?.chatMessage);
-  if (isOnlyChat(context.executionPlan?.recommendedAgents)) {
+  if (!context.executionPlan || !context.executionPlan.chatMessage) {
+    printAssistant(
+      "I am sorry, I could not quite understand that request. How else may I help you?"
+    );
+    return;
+  }
+
+  printAssistant(context.executionPlan.chatMessage);
+  if (isOnlyChat(context.executionPlan.recommendedAgents)) {
     printDetail("(TODO: direct to Chat agent)");
     return;
   } else {
+    context.executionPlan.recommendedAgents?.forEach((ra) => {
+      printDetail(`  DETAILS: ${ra.rewrittenUserPrompt}`);
+    });
+
     const chosen = await askUserWithOptions({
       prompt: "Would you like to go ahead with that plan?",
       options: [
@@ -52,14 +63,12 @@ export const handlePlanStateResult = async (context: ReplContext) => {
         context.generateNeedsApproval = true;
         context.setState(new GenerateReplState());
         context.previousPrompt = PROCEED_PROMPT;
-        // context.request();
         return;
       }
       case "yes": {
         context.generateNeedsApproval = false;
         context.setState(new GenerateReplState());
         context.previousPrompt = PROCEED_PROMPT;
-        // context.request();
         return;
       }
       default: {
@@ -75,7 +84,6 @@ export const handleGenerateStateResult = async (
   onExecuteStart: () => Promise<void>,
   onExecuteEnd: (errors: ExecutionError[]) => Promise<void>
 ) => {
-  // =================================================
   // Display the messages from the Agents
   if (!context.blackboardAccessor) {
     printError(
