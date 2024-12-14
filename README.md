@@ -5,8 +5,9 @@ A simple dynamic multi-agent framework based on [atomic-agents](https://github.c
 - convert user input into data modifications (functions or GraphQL mutations)
 - to maximise user engagement, uses a 2-phase process:
   - Planning Phase:
-    - the `Orchestrator` uses an LLM to process complex 'composite' user prompts, and automatically route them to the best sequence of your agents
+    - the `'Dynamic Router' Orchestrator` uses an LLM to process complex 'composite' user prompts, and automatically route them to the best sequence of your agents
       - the Orchestrator rewrites the user prompt, to best suit each agent. This is to ensure quality and avoid unwanted 'over-eager' output.
+      - > **_NOTE:_** the term 'Dynamic Router' is used to distinguish from other systems which either use imperative logic to decide on agent selection, or use chains of agents etc.
       - an execution plan is generated
       - the client can use the Orchestrator to iterate over the execution plan, with user feedback
   - Generation Phase:
