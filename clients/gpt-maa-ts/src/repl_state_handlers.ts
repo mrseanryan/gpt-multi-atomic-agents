@@ -1,6 +1,11 @@
 import { ExecutionError } from "./function_call_executor.js";
 import { functionRegistry } from "./resources_test_domain.js";
-import { printAssistant, printError, printMessages } from "./utils_print.js";
+import {
+  printAssistant,
+  printDetail,
+  printError,
+  printMessages,
+} from "./utils_print.js";
 import {
   ExecuteReplState,
   GenerateReplState,
@@ -13,8 +18,10 @@ const PROCEED_PROMPT = "proceed";
 
 export const handlePlanStateResult = async (context: ReplContext) => {
   printAssistant(context.executionPlan?.chatMessage);
-  if (isOnlyChat(context.executionPlan?.recommendedAgents)) return;
-  else {
+  if (isOnlyChat(context.executionPlan?.recommendedAgents)) {
+    printDetail("(TODO: direct to Chat agent)");
+    return;
+  } else {
     const chosen = await askUserWithOptions({
       prompt: "Would you like to go ahead with that plan?",
       options: [

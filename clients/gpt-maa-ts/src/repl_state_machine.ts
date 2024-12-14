@@ -3,7 +3,6 @@
 // - also helps allow for running debug commands, without resetting the state
 
 import { dumpJson, printAssistant, printDetail } from "./utils_print.js";
-import { loadCustomAgents } from "./function_call_agent_stores.js";
 import { FunctionRegistry } from "./function_call_execution_registry.js";
 import {
   AgentExecutionPlanSchema,
@@ -18,12 +17,7 @@ import { generate_plan } from "./function_call_planner.js";
 import { generate_mutations } from "./function_call_generator.js";
 import { PostsClient } from "../gpt_maa_client/postsClient.js";
 import { execute, ExecutionError } from "./function_call_executor.js";
-
-// enum ReplStateEnum {
-//   plan = "plan",
-//   generate = "generate",
-//   execute = "execute",
-// }
+import { IReplCommandContext } from "./repl_commands.js";
 
 /**
  * Allow States to manipulate the Context, but NOT to change state.
@@ -122,7 +116,7 @@ const getCombinedAgentDefinitions = (
   );
 };
 
-export class ReplContext implements IReplStateContext {
+export class ReplContext implements IReplStateContext, IReplCommandContext {
   private state: ReplState | null = null;
   private readonly client: PostsClient;
   private readonly chatAgentDescription: string;
