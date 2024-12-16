@@ -28,7 +28,12 @@ export const handlePlanStateResult = async (context: ReplContext) => {
 
   printAssistant(context.executionPlan.chatMessage);
   if (isOnlyChat(context.executionPlan.recommendedAgents)) {
-    printDetail("(TODO: direct to Chat agent)");
+    let chatRewrittenUserPrompt = "";
+    if (context.executionPlan.recommendedAgents)
+      chatRewrittenUserPrompt =
+        context.executionPlan.recommendedAgents[0].rewrittenUserPrompt ??
+        "<unknown>";
+    printDetail(`(TODO: direct to Chat agent): ${chatRewrittenUserPrompt}`);
     return;
   } else {
     context.executionPlan.recommendedAgents?.forEach((ra) => {
