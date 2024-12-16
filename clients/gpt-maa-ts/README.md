@@ -172,6 +172,8 @@ Depdencencies:
 
 > **_NOTE:_** You need a copy of the [config.gpt-maa-ts.json](https://github.com/mrseanryan/gpt-multi-atomic-agents/tree/master/clients/gpt-maa-ts/config.gpt-maa-ts.json) file in your folder.
 
+> **_NOTE:_** You need to ensure that any directories referred to by `config.gpt-maa-ts.json` have been created.
+
 > **_NOTE:_** You need to have the [gpt-multi-atomic-agents](https://github.com/mrseanryan/gpt-multi-atomic-agents) REST API running.
 
 # Usage
