@@ -1,7 +1,6 @@
 import { FunctionAgentDefinitionMinimal } from "../gpt_maa_client/models/index.js";
 import { FunctionCallBlackboardAccessor } from "./function_call_blackboard_accessor.js";
 import { ExecutionError } from "./function_call_executor.js";
-import { functionRegistry } from "./resources_test_domain.js";
 import { PostsClient } from "../gpt_maa_client/postsClient.js";
 import {
   check_user_prompt,
@@ -23,10 +22,12 @@ import {
   handlePlanStateResult,
 } from "./repl_state_handlers.js";
 import { printAssistant } from "./utils_print.js";
+import { FunctionRegistry } from "./function_call_execution_registry.js";
 
 export const chatWithAgentsRepl = async (
   agentDefinitions: FunctionAgentDefinitionMinimal[],
   chatAgentDescription: string,
+  functionRegistry: FunctionRegistry,
   baseurl: string,
   onExecuteStart: () => Promise<void>,
   onExecuteEnd: (errors: ExecutionError[]) => Promise<void>

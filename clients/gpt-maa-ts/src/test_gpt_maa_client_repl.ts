@@ -7,6 +7,7 @@ import { chatWithAgentsRepl } from "./repl_client.js";
 import {
   agentDefinitions,
   chatAgentDescription,
+  functionRegistry,
 } from "./resources_test_domain.js";
 import { getConfig } from "./util_config.js";
 
@@ -23,6 +24,7 @@ async function main(): Promise<void> {
   await chatWithAgentsRepl(
     agentDefinitions,
     chatAgentDescription,
+    functionRegistry,
     getConfig().baseurl,
     onExecuteStart,
     onExecuteEnd
