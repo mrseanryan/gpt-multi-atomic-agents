@@ -1,7 +1,6 @@
 // Handle the results of a State: this DOES involve changing States.
 
 import { ExecutionError } from "./function_call_executor.js";
-import { functionRegistry } from "./resources_test_domain.js";
 import {
   printAssistant,
   printDetail,
@@ -102,7 +101,11 @@ export const handleGenerateStateResult = async (
 
   if (!context.generateNeedsApproval!) {
     context.setState(
-      new ExecuteReplState(functionRegistry, onExecuteStart, onExecuteEnd)
+      new ExecuteReplState(
+        context.functionRegistry,
+        onExecuteStart,
+        onExecuteEnd
+      )
     );
     context.previousPrompt = PROCEED_PROMPT;
     return;
@@ -132,7 +135,11 @@ export const handleGenerateStateResult = async (
     switch (chosen.chosen.name) {
       case "yes": {
         context.setState(
-          new ExecuteReplState(functionRegistry, onExecuteStart, onExecuteEnd)
+          new ExecuteReplState(
+            context.functionRegistry,
+            onExecuteStart,
+            onExecuteEnd
+          )
         );
         context.previousPrompt = PROCEED_PROMPT;
         return;
