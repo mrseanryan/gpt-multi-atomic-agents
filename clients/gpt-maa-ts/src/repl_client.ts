@@ -29,7 +29,7 @@ export const chatWithAgentsRepl = async (
   chatAgentDescription: string,
   functionRegistry: FunctionRegistry,
   baseurl: string,
-  onExecuteStart: () => Promise<void>,
+  onExecuteStart: () => Promise<boolean>,
   onExecuteEnd: (errors: ExecutionError[]) => Promise<void>
 ): Promise<FunctionCallBlackboardAccessor | null> => {
   print_help();

@@ -1,45 +1,66 @@
 import { FunctionCallSchema } from "../gpt_maa_client/models/index.js";
 import { FunctionRegistry } from "./function_call_execution_registry.js";
-import { print, printTimeTaken, showSpinner, startTimer, stopSpinner } from "./utils_print.js";
+import {
+  print,
+  printTimeTaken,
+  showSpinner,
+  startTimer,
+  stopSpinner,
+} from "./utils_print.js";
 
-export interface ExecutionError
-{
-    functionCallName: string;
-    error: string;
+export interface ExecutionError {
+  functionCallName: string;
+  error: string;
 }
 
-export const execute = async (functionCalls: FunctionCallSchema[], registry: FunctionRegistry, onExecuteStart: () => Promise<void>, onExecuteEnd: (errors: ExecutionError[]) => Promise<void>): Promise<void> => {
-    const timer = startTimer("execute")
+export const execute = async (
+  functionCalls: FunctionCallSchema[],
+  registry: FunctionRegistry,
+  onExecuteStart: () => Promise<boolean>,
+  onExecuteEnd: (errors: ExecutionError[]) => Promise<void>
+): Promise<void> => {
+  const timer = startTimer("execute");
 
-    let spinner = showSpinner()
-    await onExecuteStart();
-    stopSpinner(spinner)
+  let spinner = showSpinner();
+  const isOkToContinue = await onExecuteStart();
+  stopSpinner(spinner);
 
-    const errors: ExecutionError[] = [];
+  if (!isOkToContinue) {
+    // allow client to cancel, since Execution can be expensive for some clients
+    return;
+  }
 
-    functionCalls.forEach(call => {
-        try {
-            if (!call.functionName) {
-                errors.push({functionCallName: "<unknown>", error: "No function call name, so cannot identify a handler"})
-                return;
-            }
+  const errors: ExecutionError[] = [];
 
-            const handler = registry.getHandler(call.functionName!);
-            print(`Executing handler ${handler.name()} for function call ${call.functionName} from agent ${call.agentName}`)
+  functionCalls.forEach((call) => {
+    try {
+      if (!call.functionName) {
+        errors.push({
+          functionCallName: "<unknown>",
+          error: "No function call name, so cannot identify a handler",
+        });
+        return;
+      }
 
-            handler.HandleFunctionCall(call);
-        }
-        catch(e: any) {
-            if (e instanceof(Error)) {
-                errors.push({ functionCallName: call.functionName!, error: e.message});
-            } else {
-                errors.push({ functionCallName: call.functionName!, error: e });
-            }
-        }
-    });
+      const handler = registry.getHandler(call.functionName!);
+      print(
+        `Executing handler ${handler.name()} for function call ${
+          call.functionName
+        } from agent ${call.agentName}`
+      );
 
-    spinner = showSpinner()
-    await onExecuteEnd(errors);
-    stopSpinner(spinner)
-    printTimeTaken(timer)
+      handler.HandleFunctionCall(call);
+    } catch (e: any) {
+      if (e instanceof Error) {
+        errors.push({ functionCallName: call.functionName!, error: e.message });
+      } else {
+        errors.push({ functionCallName: call.functionName!, error: e });
+      }
+    }
+  });
+
+  spinner = showSpinner();
+  await onExecuteEnd(errors);
+  stopSpinner(spinner);
+  printTimeTaken(timer);
 };

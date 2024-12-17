@@ -38,8 +38,9 @@ dumpJson(messages);
 // =================================================
 // Execute the Function Calls using our Handlers
 blackboardAccessor.get_new_functions();
-const onExecuteStart = async () => {
+const onExecuteStart = async (): Promise<boolean> => {
   printDetail("(execution started)");
+  return true;
 };
 const onExecuteEnd = async () => {
   printDetail("(execution ended)");

@@ -85,7 +85,7 @@ export const handlePlanStateResult = async (context: ReplContext) => {
 
 export const handleGenerateStateResult = async (
   context: ReplContext,
-  onExecuteStart: () => Promise<void>,
+  onExecuteStart: () => Promise<boolean>,
   onExecuteEnd: (errors: ExecutionError[]) => Promise<void>
 ) => {
   // Display the messages from the Agents

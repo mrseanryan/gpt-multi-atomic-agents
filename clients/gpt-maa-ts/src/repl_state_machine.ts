@@ -71,12 +71,12 @@ export class GenerateReplState extends ReplState {
 
 export class ExecuteReplState extends ReplState {
   private functionRegistry: FunctionRegistry;
-  private onExecuteStart: () => Promise<void>;
+  private onExecuteStart: () => Promise<boolean>;
   private onExecuteEnd: (errors: ExecutionError[]) => Promise<void>;
 
   constructor(
     functionRegistry: FunctionRegistry,
-    onExecuteStart: () => Promise<void>,
+    onExecuteStart: () => Promise<boolean>,
     onExecuteEnd: (errors: ExecutionError[]) => Promise<void>
   ) {
     super();

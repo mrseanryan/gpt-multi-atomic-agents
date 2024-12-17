@@ -14,8 +14,9 @@ import { getConfig } from "./util_config.js";
 // =================================================
 // Chat with the Agents
 async function main(): Promise<void> {
-  const onExecuteStart = async () => {
+  const onExecuteStart = async (): Promise<boolean> => {
     console.log("(execution started)");
+    return true;
   };
   const onExecuteEnd = async () => {
     console.log("(execution ended)");
