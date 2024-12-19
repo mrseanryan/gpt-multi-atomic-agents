@@ -72,10 +72,6 @@ export const execute = async (
         .internalPreviouslyGeneratedFunctions!;
   }
 
-  blackboardAccessor
-    .get_new_functions()
-    .forEach((f) => functionsToExecute.push(f));
-
   dumpJson(functionsToExecute);
   functionsToExecute.forEach((call) => {
     try {
