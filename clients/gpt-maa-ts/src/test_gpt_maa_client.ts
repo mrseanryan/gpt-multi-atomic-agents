@@ -4,7 +4,11 @@
 // - Because the service uses a Blackboard, the agents are then able to collaborate together, since they understand a subset of one another's output.
 
 import { FunctionCallBlackboardAccessor } from "./function_call_blackboard_accessor.js";
-import { execute, ExecutionError } from "./function_call_executor.js";
+import {
+  execute,
+  ExecuteStartResult,
+  ExecutionError,
+} from "./function_call_executor.js";
 import { handleUserPrompt } from "./index.js";
 import {
   agentDefinitions,
@@ -39,9 +43,12 @@ dumpJson(messages);
 // =================================================
 // Execute the Function Calls using our Handlers
 blackboardAccessor.get_new_functions();
-const onExecuteStart = async (): Promise<boolean> => {
+const onExecuteStart = async (): Promise<ExecuteStartResult> => {
   printDetail("(execution started)");
-  return true;
+  return {
+    isOkToContinue: true,
+    alsoExecutePreviousFunctions: false,
+  };
 };
 const onExecuteEnd = async (
   errors: ExecutionError[],

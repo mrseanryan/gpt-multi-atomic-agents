@@ -1,6 +1,9 @@
 // Handle the results of a State: this DOES involve changing States.
 
-import { ExecutionError } from "./function_call_executor.js";
+import {
+  ExecuteStartResult,
+  ExecutionError,
+} from "./function_call_executor.js";
 import {
   printAssistant,
   printDetail,
@@ -86,7 +89,7 @@ export const handlePlanStateResult = async (context: ReplContext) => {
 
 export const handleGenerateStateResult = async (
   context: ReplContext,
-  onExecuteStart: () => Promise<boolean>,
+  onExecuteStart: () => Promise<ExecuteStartResult>,
   onExecuteEnd: (
     errors: ExecutionError[],
     blackboardAccessor: FunctionCallBlackboardAccessor

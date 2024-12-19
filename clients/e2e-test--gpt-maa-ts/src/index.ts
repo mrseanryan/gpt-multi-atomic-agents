@@ -1,11 +1,15 @@
 // TS e2e example, consuming the TS framework and using 3 'Sim Life' Agents to generate Function Calls. A basic Handler is used during Execution, to output a DOT file.
 
 import {
+  ExecuteStartResult,
+  ExecutionError,
   FunctionAgentDefinitionMinimal,
+  FunctionCallBlackboardAccessor,
   FunctionCallSchema,
   FunctionSpecSchema,
   handleUserPrompt,
   ParameterSpec,
+  printError,
 } from "gpt-maa-ts";
 import {
   DefaultAreaHandler,
@@ -170,15 +174,28 @@ console.log(messages);
 // =================================================
 // Execute the Function Calls using our Handlers
 blackboardAccessor.get_new_functions();
-const onExecuteStart = async (): Promise<void> => {
+const onExecuteStart = async (): Promise<ExecuteStartResult> => {
   console.log("(execution started)");
+  return {
+    isOkToContinue: true,
+    alsoExecutePreviousFunctions: false
+  }
 };
-const onExecuteEnd = async (): Promise<void> => {
+const onExecuteEnd = async (
+  errors: ExecutionError[],
+  blackboardAccessor: FunctionCallBlackboardAccessor
+): Promise<void> => {
   console.log("(execution ended)");
+  if (errors.length) {
+    printError(errors);
+  }
+    // Assuming that client has applied all functions, and wants to continue from that state:
+    const new_user_data = blackboardAccessor.get_new_functions();
+    blackboardAccessor.set_user_data(new_user_data);
 };
 await execute(
-  blackboardAccessor.get_new_functions(),
   functionRegistry,
+  blackboardAccessor,
   onExecuteStart,
   onExecuteEnd
 );

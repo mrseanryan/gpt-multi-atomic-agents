@@ -16,7 +16,11 @@ import { FunctionCallBlackboardAccessor } from "./function_call_blackboard_acces
 import { generate_plan } from "./function_call_planner.js";
 import { generate_mutations } from "./function_call_generator.js";
 import { PostsClient } from "../gpt_maa_client/postsClient.js";
-import { execute, ExecutionError } from "./function_call_executor.js";
+import {
+  execute,
+  ExecuteStartResult,
+  ExecutionError,
+} from "./function_call_executor.js";
 import { IReplCommandContext } from "./repl_commands.js";
 
 /**
@@ -71,7 +75,7 @@ export class GenerateReplState extends ReplState {
 
 export class ExecuteReplState extends ReplState {
   private functionRegistry: FunctionRegistry;
-  private onExecuteStart: () => Promise<boolean>;
+  private onExecuteStart: () => Promise<ExecuteStartResult>;
   private onExecuteEnd: (
     errors: ExecutionError[],
     blackboardAccessor: FunctionCallBlackboardAccessor
@@ -79,7 +83,7 @@ export class ExecuteReplState extends ReplState {
 
   constructor(
     functionRegistry: FunctionRegistry,
-    onExecuteStart: () => Promise<boolean>,
+    onExecuteStart: () => Promise<ExecuteStartResult>,
     onExecuteEnd: (
       errors: ExecutionError[],
       blackboardAccessor: FunctionCallBlackboardAccessor
@@ -100,7 +104,6 @@ export class ExecuteReplState extends ReplState {
     }
 
     printAssistant("Performing your requested tasks now...");
-    dumpJson(context.blackboardAccessor.get_new_functions());
     await execute(
       this.functionRegistry,
       context.blackboardAccessor,

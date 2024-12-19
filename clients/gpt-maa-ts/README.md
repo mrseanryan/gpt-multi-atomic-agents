@@ -151,9 +151,12 @@ console.log(blackboardAccessor.get_new_messages());
 // =================================================
 // Execute the Function Calls using our Handlers
 blackboardAccessor.get_new_functions()
-const onExecuteStart = (): Promise<boolean> => {
+const onExecuteStart = (): Promise<ExecuteStartResult> => {
     console.log("(execution started)");
-    return true;
+    return {
+        isOkToContinue: true,
+        alsoExecutePreviousFunctions: false
+    }
 }
 const onExecuteEnd = (errors: ExecutionError[], blackboardAccessor: FunctionCallBlackboardAccessor): Promise<void> => {
     console.log("(execution ended)");

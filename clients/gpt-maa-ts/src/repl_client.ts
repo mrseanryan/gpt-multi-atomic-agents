@@ -1,6 +1,9 @@
 import { FunctionAgentDefinitionMinimal } from "../gpt_maa_client/models/index.js";
 import { FunctionCallBlackboardAccessor } from "./function_call_blackboard_accessor.js";
-import { ExecutionError } from "./function_call_executor.js";
+import {
+  ExecuteStartResult,
+  ExecutionError,
+} from "./function_call_executor.js";
 import { PostsClient } from "../gpt_maa_client/postsClient.js";
 import {
   check_user_prompt,
@@ -30,7 +33,7 @@ import { FunctionRegistry } from "./function_call_execution_registry.js";
  * @param chatAgentDescription - Describes the 'fallback' chat agent: if no suitable agents are recommended, this chat agent will be recommended, if the user's prompt is supported. The description should include the purpose and domain of this chat system.
  * @param functionRegistry - The function call registry, which maps function calls to handlers.
  * @param baseurl - The URL of the gpt-multi-atomic-agents server.
- * @param onExecuteStart - Called at the start of execution, allowing client to prepare. If this returns false, then the execution is cancelled.
+ * @param onExecuteStart - Called at the start of execution, allowing client to prepare. If this returns with isOkToContinue=false, then the execution is cancelled.
  * @param onExecuteEnd - Called at the end of execution, allowing client to do any final operations or clean up.
  *                       errors: Any errors that occured during execution.
  *                       blackboardAccessor: Normally, the client has applied all new mutations, and want to continue from that state:
@@ -43,7 +46,7 @@ export const chatWithAgentsRepl = async (
   chatAgentDescription: string,
   functionRegistry: FunctionRegistry,
   baseurl: string,
-  onExecuteStart: () => Promise<boolean>,
+  onExecuteStart: () => Promise<ExecuteStartResult>,
   onExecuteEnd: (
     errors: ExecutionError[],
     blackboardAccessor: FunctionCallBlackboardAccessor

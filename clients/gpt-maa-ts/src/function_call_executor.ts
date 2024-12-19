@@ -2,7 +2,9 @@ import { FunctionCallSchema } from "../gpt_maa_client/models/index.js";
 import { FunctionCallBlackboardAccessor } from "./function_call_blackboard_accessor.js";
 import { FunctionRegistry } from "./function_call_execution_registry.js";
 import {
+  dumpJson,
   print,
+  printDetail,
   printTimeTaken,
   showSpinner,
   startTimer,
@@ -14,11 +16,16 @@ export interface ExecutionError {
   error: string;
 }
 
+export interface ExecuteStartResult {
+  isOkToContinue: boolean; // False if the execution should be cancelled.
+  alsoExecutePreviousFunctions: boolean; // True for clients that are executing from a 'fresh start' each time. Normally false, since client would continue executing from its current state.
+}
+
 /**
  *
  * @param registry - The function call registry, which maps function calls to handlers.
  * @param blackboardAccessor - The accessor for the blackboard, to allow client decide how to update, after execution.
- * @param onExecuteStart - Called at the start of execution, allowing client to prepare. If this returns false, then the execution is cancelled.
+ * @param onExecuteStart - Called at the start of execution, allowing client to prepare. If this returns with isOkToContinue=false, then the execution is cancelled.
  * @param onExecuteEnd - Called at the end of execution, allowing client to do any final operations or clean up.
  *                       errors: Any errors that occured during execution.
  *                       blackboardAccessor: Normally, the client has applied all new mutations, and want to continue from that state:
@@ -31,7 +38,7 @@ export interface ExecutionError {
 export const execute = async (
   registry: FunctionRegistry,
   blackboardAccessor: FunctionCallBlackboardAccessor,
-  onExecuteStart: () => Promise<boolean>,
+  onExecuteStart: () => Promise<ExecuteStartResult>,
   onExecuteEnd: (
     errors: ExecutionError[],
     blackboardAccessor: FunctionCallBlackboardAccessor
@@ -40,17 +47,36 @@ export const execute = async (
   const timer = startTimer("execute");
 
   let spinner = showSpinner();
-  const isOkToContinue = await onExecuteStart();
+  const executeStartResult = await onExecuteStart();
   stopSpinner(spinner);
 
-  if (!isOkToContinue) {
+  if (!executeStartResult.isOkToContinue) {
     // allow client to cancel, since Execution can be expensive for some clients
     return;
   }
 
   const errors: ExecutionError[] = [];
 
-  blackboardAccessor.get_new_functions().forEach((call) => {
+  const functionsToExecute: FunctionCallSchema[] = [];
+  if (
+    executeStartResult.alsoExecutePreviousFunctions &&
+    blackboardAccessor.get_internal_blackboard()
+      .internalPreviouslyGeneratedFunctions
+  ) {
+    printDetail("(also executing previous functions, assuming a 'fresh start'");
+    blackboardAccessor
+      .get_internal_blackboard()
+      .internalPreviouslyGeneratedFunctions?.forEach((f) =>
+        functionsToExecute.push(f)
+      );
+  }
+
+  blackboardAccessor
+    .get_new_functions()
+    .forEach((f) => functionsToExecute.push(f));
+
+  dumpJson(functionsToExecute);
+  functionsToExecute.forEach((call) => {
     try {
       if (!call.functionName) {
         errors.push({
