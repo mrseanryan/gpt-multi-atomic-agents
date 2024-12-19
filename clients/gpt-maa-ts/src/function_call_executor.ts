@@ -57,18 +57,19 @@ export const execute = async (
 
   const errors: ExecutionError[] = [];
 
-  const functionsToExecute: FunctionCallSchema[] = [];
+  let functionsToExecute: FunctionCallSchema[] =
+    blackboardAccessor.get_new_functions();
   if (
     executeStartResult.alsoExecutePreviousFunctions &&
     blackboardAccessor.get_internal_blackboard()
       .internalPreviouslyGeneratedFunctions
   ) {
-    printDetail("(also executing previous functions, assuming a 'fresh start'");
-    blackboardAccessor
-      .get_internal_blackboard()
-      .internalPreviouslyGeneratedFunctions?.forEach((f) =>
-        functionsToExecute.push(f)
-      );
+    printDetail(
+      "(executing previous functions (that include new functions), assuming a 'fresh start'"
+    );
+    functionsToExecute =
+      blackboardAccessor.get_internal_blackboard()
+        .internalPreviouslyGeneratedFunctions!;
   }
 
   blackboardAccessor
