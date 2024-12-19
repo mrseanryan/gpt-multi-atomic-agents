@@ -151,13 +151,22 @@ console.log(blackboardAccessor.get_new_messages());
 // =================================================
 // Execute the Function Calls using our Handlers
 blackboardAccessor.get_new_functions()
-const onExecuteStart = () => {
-    console.log("(execution started)")
+const onExecuteStart = (): Promise<boolean> => {
+    console.log("(execution started)");
+    return true;
 }
-const onExecuteEnd = () => {
-    console.log("(execution ended)")
+const onExecuteEnd = (errors: ExecutionError[], blackboardAccessor: FunctionCallBlackboardAccessor): Promise<void> => {
+    console.log("(execution ended)");
+
+    if (errors.length) {
+      console.error(errors);
+    }
+
+    // Assuming that client has applied all functions, and wants to continue from that state:
+    const new_user_data = blackboardAccessor.get_new_functions();
+    blackboardAccessor.set_user_data(new_user_data);
 }
-execute(blackboardAccessor.get_new_functions(), functionRegistry, onExecuteStart, onExecuteEnd);
+execute(blackboardAccessor, functionRegistry, onExecuteStart, onExecuteEnd);
 ```
 
 > **_NOTE:_** The Blackboard is serialized back to the client, in order to avoid making the server statefull. If that produces heavy network traffic, then future versions of the server may allow for state-full operation (however this comes with tradeoffs).

@@ -24,14 +24,31 @@ import {
 import { printAssistant } from "./utils_print.js";
 import { FunctionRegistry } from "./function_call_execution_registry.js";
 
+/**
+ *
+ * @param agentDefinitions - The available Agent Definitions to use to plan and generate.
+ * @param chatAgentDescription - Describes the 'fallback' chat agent: if no suitable agents are recommended, this chat agent will be recommended, if the user's prompt is supported. The description should include the purpose and domain of this chat system.
+ * @param functionRegistry - The function call registry, which maps function calls to handlers.
+ * @param baseurl - The URL of the gpt-multi-atomic-agents server.
+ * @param onExecuteStart - Called at the start of execution, allowing client to prepare. If this returns false, then the execution is cancelled.
+ * @param onExecuteEnd - Called at the end of execution, allowing client to do any final operations or clean up.
+ *                       errors: Any errors that occured during execution.
+ *                       blackboardAccessor: Normally, the client has applied all new mutations, and want to continue from that state:
+ *                       -> The client needs to update the blackboard, marking all new functions as 'previous' ->  const new_user_data = context.blackboardAccessor.get_new_functions(); context.blackboardAccessor.set_user_data(new_user_data);
+ *                       -> BUT for clients where execution is always on a 'fresh copy', then they would NOT want to mark new functions as 'previous' (so they can iterate over them again).
+ *
+ */
 export const chatWithAgentsRepl = async (
   agentDefinitions: FunctionAgentDefinitionMinimal[],
   chatAgentDescription: string,
   functionRegistry: FunctionRegistry,
   baseurl: string,
   onExecuteStart: () => Promise<boolean>,
-  onExecuteEnd: (errors: ExecutionError[]) => Promise<void>
-): Promise<FunctionCallBlackboardAccessor | null> => {
+  onExecuteEnd: (
+    errors: ExecutionError[],
+    blackboardAccessor: FunctionCallBlackboardAccessor
+  ) => Promise<void>
+): Promise<void> => {
   print_help();
   const client: PostsClient = createClient(baseurl);
 
@@ -56,7 +73,7 @@ export const chatWithAgentsRepl = async (
         continue;
       case CommandAction.quit:
         printAssistant("Good bye!");
-        return null;
+        return;
       case CommandAction.no_action:
         break;
       default:

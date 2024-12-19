@@ -14,6 +14,7 @@ import {
   ReplContext,
 } from "./repl_state_machine.js";
 import { askUserWithOptions } from "./util_input.js";
+import { FunctionCallBlackboardAccessor } from "./function_call_blackboard_accessor.js";
 
 const PROCEED_PROMPT = "proceed";
 
@@ -86,7 +87,10 @@ export const handlePlanStateResult = async (context: ReplContext) => {
 export const handleGenerateStateResult = async (
   context: ReplContext,
   onExecuteStart: () => Promise<boolean>,
-  onExecuteEnd: (errors: ExecutionError[]) => Promise<void>
+  onExecuteEnd: (
+    errors: ExecutionError[],
+    blackboardAccessor: FunctionCallBlackboardAccessor
+  ) => Promise<void>
 ) => {
   // Display the messages from the Agents
   if (!context.blackboardAccessor) {
@@ -162,14 +166,6 @@ export const handleGenerateStateResult = async (
 };
 
 export const handleExecuteStateResult = async (context: ReplContext) => {
-  if (!context.blackboardAccessor) {
-    throw new Error("Blackboard not set, even after generate");
-  }
-
-  // The client needs to update the blackboard at this point. Assumption: all the functions have been executed by the client.
-  const new_user_data = context.blackboardAccessor.get_new_functions();
-  context.blackboardAccessor.set_user_data(new_user_data);
-
   printAssistant("Is there anything else I can help with?");
   context.setState(new PlanReplState());
 };

@@ -3,14 +3,15 @@
 // - Agents can be configured to understand a subset of each others output
 // - Because the service uses a Blackboard, the agents are then able to collaborate together, since they understand a subset of one another's output.
 
-import { execute } from "./function_call_executor.js";
+import { FunctionCallBlackboardAccessor } from "./function_call_blackboard_accessor.js";
+import { execute, ExecutionError } from "./function_call_executor.js";
 import { handleUserPrompt } from "./index.js";
 import {
   agentDefinitions,
   chatAgentDescription,
   functionRegistry,
 } from "./resources_test_domain.js";
-import { dumpJson, print, printDetail } from "./utils_print.js";
+import { dumpJson, printDetail, printError } from "./utils_print.js";
 
 // =================================================
 // Chat with the Agents
@@ -42,12 +43,22 @@ const onExecuteStart = async (): Promise<boolean> => {
   printDetail("(execution started)");
   return true;
 };
-const onExecuteEnd = async () => {
-  printDetail("(execution ended)");
+const onExecuteEnd = async (
+  errors: ExecutionError[],
+  blackboardAccessor: FunctionCallBlackboardAccessor
+) => {
+  console.log("(execution ended)");
+  if (errors.length) {
+    printError(errors);
+  }
+
+  // Assuming that client has applied all functions, and wants to continue from that state:
+  const new_user_data = blackboardAccessor.get_new_functions();
+  blackboardAccessor.set_user_data(new_user_data);
 };
 await execute(
-  blackboardAccessor.get_new_functions(),
   functionRegistry,
+  blackboardAccessor,
   onExecuteStart,
   onExecuteEnd
 );

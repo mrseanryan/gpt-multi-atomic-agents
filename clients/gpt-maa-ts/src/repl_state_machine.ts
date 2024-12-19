@@ -72,12 +72,18 @@ export class GenerateReplState extends ReplState {
 export class ExecuteReplState extends ReplState {
   private functionRegistry: FunctionRegistry;
   private onExecuteStart: () => Promise<boolean>;
-  private onExecuteEnd: (errors: ExecutionError[]) => Promise<void>;
+  private onExecuteEnd: (
+    errors: ExecutionError[],
+    blackboardAccessor: FunctionCallBlackboardAccessor
+  ) => Promise<void>;
 
   constructor(
     functionRegistry: FunctionRegistry,
     onExecuteStart: () => Promise<boolean>,
-    onExecuteEnd: (errors: ExecutionError[]) => Promise<void>
+    onExecuteEnd: (
+      errors: ExecutionError[],
+      blackboardAccessor: FunctionCallBlackboardAccessor
+    ) => Promise<void>
   ) {
     super();
     this.functionRegistry = functionRegistry;
@@ -96,8 +102,8 @@ export class ExecuteReplState extends ReplState {
     printAssistant("Performing your requested tasks now...");
     dumpJson(context.blackboardAccessor.get_new_functions());
     await execute(
-      context.blackboardAccessor.get_new_functions(),
       this.functionRegistry,
+      context.blackboardAccessor,
       this.onExecuteStart,
       this.onExecuteEnd
     );

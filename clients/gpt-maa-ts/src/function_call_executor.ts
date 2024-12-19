@@ -1,4 +1,5 @@
 import { FunctionCallSchema } from "../gpt_maa_client/models/index.js";
+import { FunctionCallBlackboardAccessor } from "./function_call_blackboard_accessor.js";
 import { FunctionRegistry } from "./function_call_execution_registry.js";
 import {
   print,
@@ -13,11 +14,28 @@ export interface ExecutionError {
   error: string;
 }
 
+/**
+ *
+ * @param registry - The function call registry, which maps function calls to handlers.
+ * @param blackboardAccessor - The accessor for the blackboard, to allow client decide how to update, after execution.
+ * @param onExecuteStart - Called at the start of execution, allowing client to prepare. If this returns false, then the execution is cancelled.
+ * @param onExecuteEnd - Called at the end of execution, allowing client to do any final operations or clean up.
+ *                       errors: Any errors that occured during execution.
+ *                       blackboardAccessor: Normally, the client has applied all new mutations, and want to continue from that state:
+ *                       -> The client needs to update the blackboard, marking all new functions as 'previous':
+ *                          const new_user_data = blackboardAccessor.get_new_functions();
+ *                          blackboardAccessor.set_user_data(new_user_data);
+ *                       -> BUT for clients where execution is always on a 'fresh copy', then they would NOT want to mark new functions as 'previous' (so they can iterate over them again).
+ * @returns
+ */
 export const execute = async (
-  functionCalls: FunctionCallSchema[],
   registry: FunctionRegistry,
+  blackboardAccessor: FunctionCallBlackboardAccessor,
   onExecuteStart: () => Promise<boolean>,
-  onExecuteEnd: (errors: ExecutionError[]) => Promise<void>
+  onExecuteEnd: (
+    errors: ExecutionError[],
+    blackboardAccessor: FunctionCallBlackboardAccessor
+  ) => Promise<void>
 ): Promise<void> => {
   const timer = startTimer("execute");
 
@@ -32,7 +50,7 @@ export const execute = async (
 
   const errors: ExecutionError[] = [];
 
-  functionCalls.forEach((call) => {
+  blackboardAccessor.get_new_functions().forEach((call) => {
     try {
       if (!call.functionName) {
         errors.push({
@@ -60,7 +78,8 @@ export const execute = async (
   });
 
   spinner = showSpinner();
-  await onExecuteEnd(errors);
+  await onExecuteEnd(errors, blackboardAccessor); // Pass the Blackboard accessor back to client, so they can decide how to update.
+
   stopSpinner(spinner);
   printTimeTaken(timer);
 };
