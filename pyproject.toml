@@ -32,8 +32,10 @@ groq = "^0.11.0"
 pydantic = "^2.9.2"
 anthropic = {extras = ["bedrock"], version = "^0.39.0"}
 cornsnake = "^0.0.67"
-ruff = "^0.8.0"
 fastapi = {extras = ["standard"], version = "^0.115.6"}
+
+[tool.poetry.group.dev.dependencies]
+ruff = "^0.8.0"
 
 [tool.poetry.group.test.dependencies]
 parameterized = "~=0.9.0"
