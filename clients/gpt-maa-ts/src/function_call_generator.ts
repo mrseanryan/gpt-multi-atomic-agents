@@ -99,6 +99,25 @@ const _fixUpAgentParameters = (
   });
 };
 
+export const EMPTY_USER_PROMPT_TO_ENABLE_PLAN = "";
+
+export const generate_mutations_with_existing_plan = async (
+  client: PostsClient,
+  agentDefinitions: FunctionAgentDefinitionMinimal[],
+  chatAgentDescription: string,
+  existing_plan: AgentExecutionPlanSchema,
+  blackboardAccessor: FunctionCallBlackboardAccessor | null = null
+): Promise<FunctionCallBlackboardAccessor | null> => {
+  return generate_mutations(
+    client,
+    EMPTY_USER_PROMPT_TO_ENABLE_PLAN,
+    agentDefinitions,
+    chatAgentDescription,
+    existing_plan,
+    blackboardAccessor
+  );
+};
+
 export const generate_mutations = async (
   client: PostsClient,
   userPrompt: string,

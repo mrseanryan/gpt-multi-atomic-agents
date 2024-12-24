@@ -14,7 +14,10 @@ import {
 } from "./serializable_agent.js";
 import { FunctionCallBlackboardAccessor } from "./function_call_blackboard_accessor.js";
 import { generate_plan } from "./function_call_planner.js";
-import { generate_mutations } from "./function_call_generator.js";
+import {
+  generate_mutations,
+  generate_mutations_with_existing_plan,
+} from "./function_call_generator.js";
 import { PostsClient } from "../gpt_maa_client/postsClient.js";
 import {
   execute,
@@ -60,14 +63,25 @@ export class GenerateReplState extends ReplState {
   public getName = (): string => "Generate";
 
   public async handleRequest(context: IReplStateContext): Promise<void> {
-    context.blackboardAccessor = await generate_mutations(
-      context.getClient(),
-      context.getUserPrompt(),
-      context.getCombinedAgents(),
-      context.getChatAgentDescription(),
-      context.executionPlan,
-      context.blackboardAccessor
-    );
+    if (context.executionPlan) {
+      context.blackboardAccessor = await generate_mutations_with_existing_plan(
+        context.getClient(),
+        context.getCombinedAgents(),
+        context.getChatAgentDescription(),
+        context.executionPlan,
+        context.blackboardAccessor
+      );
+    } else {
+      context.blackboardAccessor = await generate_mutations(
+        context.getClient(),
+        context.getUserPrompt(),
+        context.getCombinedAgents(),
+        context.getChatAgentDescription(),
+        context.executionPlan,
+        context.blackboardAccessor
+      );
+    }
+
     if (!context.blackboardAccessor) {
       throw new Error("No blackboard accessor was returned!");
     }

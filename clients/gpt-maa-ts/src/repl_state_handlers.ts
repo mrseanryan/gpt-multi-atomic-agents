@@ -53,7 +53,7 @@ export const handlePlanStateResult = async (context: ReplContext) => {
         },
         {
           name: "yes",
-          description: "Go ahead, and take care of the details",
+          description: "Go ahead, and take care of the details (execute)",
           needsUserInput: false,
         },
         {
@@ -124,7 +124,7 @@ export const handleGenerateStateResult = async (
       options: [
         {
           name: "yes",
-          description: "Go ahead, and take care of the details",
+          description: "Go ahead, and take care of the details (execute)",
           needsUserInput: false,
         },
         {
