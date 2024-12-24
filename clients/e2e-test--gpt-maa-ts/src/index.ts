@@ -121,6 +121,11 @@ const lawnMowerAgent: FunctionAgentDefinitionMinimal = {
   acceptedFunctions: mowerOutputFunctions,
   functionsAllowedToGenerate: mowerOutputFunctions,
   topics: ["garden", "lawn", "grass"],
+  agentParameters: {
+    additionalData: {
+      "lawn-condition": [],
+    },
+  },
 };
 
 const furnitureMoverAgent: FunctionAgentDefinitionMinimal = {
@@ -130,6 +135,11 @@ const furnitureMoverAgent: FunctionAgentDefinitionMinimal = {
   acceptedFunctions: [...furnitureMoverOutputFunctions, mowLawnFunction], // The furniture mover can observe when the lawn-mower needs to access that area
   functionsAllowedToGenerate: furnitureMoverOutputFunctions,
   topics: ["furniture"],
+  agentParameters: {
+    additionalData: {
+      "furniture-kind": [],
+    },
+  },
 };
 
 const wasteDisposerAgent: FunctionAgentDefinitionMinimal = {
@@ -157,7 +167,7 @@ await handleUserPrompt(
   chatAgentDescription
 );
 const blackboardAccessor = await handleUserPrompt(
-  "Mow the lawn, dealing with any lawn furniture and waste. After mowing make sure waste is disposed of.",
+  "Mow the dirty lawn, dealing with any old lawn furniture and waste. After mowing make sure waste is disposed of.",
   agentDefinitions,
   chatAgentDescription
 );
