@@ -132,7 +132,7 @@ class FunctionAgentDefinition(AgentDefinitionBase):
     def update_blackboard(self, response: BaseIOSchema, blackboard: Blackboard) -> None:
         function_response = self._cast_response(response)
         function_blackboard = self._cast_blackboard(blackboard)
-        function_blackboard.add_mesage(
+        function_blackboard.add_message(
             Message(role=MessageRole.assistant, message=function_response.chat_message)
         )
         function_blackboard.add_generated_functions(
@@ -224,7 +224,7 @@ class GraphQLAgentDefinition(AgentDefinitionBase):
         graphql_response = self._cast_response(response)
 
         graphql_blackboard.add_generated_mutations(graphql_response.generated_mutations)
-        graphql_blackboard.add_mesage(
+        graphql_blackboard.add_message(
             Message(role=MessageRole.assistant, message=graphql_response.chat_message)
         )
 

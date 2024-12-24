@@ -73,18 +73,21 @@ class AgentExecutionPlanSchema(BaseIOSchema):
 class RouterAgentInputSchema(BaseIOSchema):
     """
     This schema represents the input to the Router agent.
-    The schema contains the user's prompt and the list of available agents. Each agent has a special purpose. You need to recommend one or more agents to handle the users prompt.
+    The schema contains the user's prompt and the list of available agents. Each agent has a special purpose. You need to recommend one or more agents to handle the users prompt, allowing for previous messages and any previous plan.
     """
 
-    user_prompt: str = Field(description="The chat message from the user", default="")
+    user_prompt: str = Field(
+        description="The current chat message from the user - this takes priority.",
+        default="",
+    )
     agent_descriptions: list[AgentDescription] = Field(
         description="The list of available agents, describing their abilities and topics"
     )
     previous_plan: AgentExecutionPlanSchema | None = Field(
-        description="The previously executed plan which the user wants you to modify",
+        description="The previously executed plan which the user wants you to modify - always prioritize the user prompt.",
         default=None,
     )
-    messages: list[Message]|None = Field(
+    messages: list[Message] | None = Field(
         description="The chat message history, in case user is referring to previous messages. You must take account of the previous messages, but prioritize the user_prompt.",
         default=None,
     )
@@ -144,7 +147,7 @@ def build_input(
     agent_descriptions: list[AgentDescription],
     chat_agent_description: str,
     previous_plan: AgentExecutionPlanSchema | None = None,
-    messages: list[Message]|None = None
+    messages: list[Message] | None = None,
 ) -> RouterAgentInputSchema:
     agent_descriptions.append(_build_chat_agent_description(chat_agent_description))
 
@@ -152,5 +155,5 @@ def build_input(
         user_prompt=user_prompt,
         agent_descriptions=agent_descriptions,
         previous_plan=previous_plan,
-        messages=messages
+        messages=messages,
     )

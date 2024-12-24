@@ -5,7 +5,7 @@ import unittest
 from rich.console import Console
 
 from gpt_multi_atomic_agents import main_generator, main_router
-from gpt_multi_atomic_agents.blackboard import GraphQLBlackboard
+from gpt_multi_atomic_agents.blackboard import GraphQLBlackboard, Message
 from gpt_multi_atomic_agents.blackboard_accessor import GraphQLBlackboardAccessor
 
 from . import main
@@ -159,15 +159,24 @@ class TestSimLifeViaGraphQL(unittest.TestCase):
     @parameterized.expand(
         [
             (
-                "complex test: Add cow, grass, alien - with human already in GraphQL data.",
+                "complex test [NO message history]: Add cow, grass, alien - with human already in GraphQL data.",
                 "Add a cow that eats grass. The cow feeds the human. Add alien that eats the human. The human also eats cows.",
+                [],
                 """
                 {
-                id: "H001",
-                creature_name: "Human",
-                allowed_terrain: TerrainType.LAND,
-                age: 30,
-                icon_name: IconType.HUMAN
+                    "creatures": [
+                        {
+                        "id": "H001",
+                        "creature_name": "Human",
+                        "allowed_terrain": "LAND",
+                        "age": 30,
+                        "icon_name": "HUMAN"
+                        }
+                    ],
+                    "vegetations": [
+                    ],
+                    "relationships": [
+                    ]
                 }
                 """,
                 3,
@@ -177,12 +186,64 @@ class TestSimLifeViaGraphQL(unittest.TestCase):
                     "addCreatureRelationship(": 4,
                 },
             ),
+            (
+                "complex test [WITH message history]: Add alien - with human, cow, grass already in GraphQL data.",
+                "Add alien that eats the human. The human also eats cows.",
+                [
+                    {
+                        "role": "user",
+                        "message": "Add a cow that eats grass. The cow feeds the human.",
+                    },
+                    {
+                        "role": "assistant",
+                        "message": "Sure! I will add a cow. The cow will eat grass and feed the human.",
+                    },
+                    {
+                        "role": "user",
+                        "message": "Add alien that eats the human. The human also eats cows.",
+                    },
+                ],
+                """
+                {
+                    "creatures": [
+                        {
+                            "id": "H001",
+                            "creature_name": "Human",
+                            "allowed_terrain": "LAND",
+                            "age": 30,
+                            "icon_name": "HUMAN"
+                        },
+                        {
+                            "id": "C001",
+                            "creature_name": "Cow",
+                            "allowed_terrain": "LAND",
+                            "age": 4,
+                            "icon_name": "OTHER_ICON"
+                        },
+                    ],
+                    "vegetations": [
+                        { "vegetation_name": "grass",      "icon_name": "GRASS_ICON",      "allowed_terrain": "LAND" }
+                    ],
+                    "relationships": [
+                        {      "from_name": "Cow",      "to_name: "Grass",  "relationship_kind": "EATS" },
+                        {      "from_name": "Cow",    "to_name": "Human",   "relationship_kind": "FEEDS" }
+                    ]
+                }
+                """,
+                2,
+                {
+                    "addCreature(": 1,  # Only the Alien is new
+                    "addVegetation(": 0,
+                    "addCreatureRelationship(": 2,
+                },
+            ),
         ]
     )
     def test_generate_execution_plan_then_generate_creatures_via_graphql(
         self,
         _test_name_implicitly_used: str,
         user_prompt: str,
+        messages: list[Message],
         user_data: str,
         expected_agent_count: int,
         expected_mutation_counts: dict[str, int],
@@ -200,6 +261,8 @@ class TestSimLifeViaGraphQL(unittest.TestCase):
             chat_agent_description=main.CHAT_AGENT_DESCRIPTION,
             _config=_config,
             user_prompt=user_prompt,
+            previous_plan=None,  # TODO (someone): Also test iterating over a previous plan
+            messages=messages,
         )
         console.print("GENERATED OUTPUT (Execution Plan):")
         console.print(execution_plan)
@@ -215,11 +278,12 @@ class TestSimLifeViaGraphQL(unittest.TestCase):
         initial_blackboard.update_with_new_client_data(user_data=user_data)
 
         # Act
+        EMPTY_USER_PROMPT_TO_ENABLE_PLAN = ""
         generation_result = main_generator.generate(
             agent_definitions=main.agent_definitions,
             chat_agent_description=main.CHAT_AGENT_DESCRIPTION,
             _config=_config,
-            user_prompt=user_prompt,
+            user_prompt=EMPTY_USER_PROMPT_TO_ENABLE_PLAN,
             blackboard=initial_blackboard,
             execution_plan=execution_plan,
         )

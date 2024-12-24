@@ -109,10 +109,11 @@ class GeneratePlanRequest(CustomBaseModel):
         ],
         default=None,
     )
-    messages: list[Message]|None = Field(
+    messages: list[Message] | None = Field(
         description="The chat message history, in case user is referring to previous messages. AI must take account of the previous messages, but prioritize the user_prompt.",
         default=None,
     )
+
 
 class FunctionCallGenerateRequest(CustomBaseModel):
     agent_definitions: list[FunctionAgentDefinitionMinimal] = Field(
@@ -158,7 +159,7 @@ async def generate_plan(
         _config=_load_config_from_ini(),
         user_prompt=request.user_prompt,
         previous_plan=request.previous_plan,
-        messages=request.messages
+        messages=request.messages,
     )
 
 

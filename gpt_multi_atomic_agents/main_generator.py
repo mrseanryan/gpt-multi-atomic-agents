@@ -150,15 +150,19 @@ def _fix_agent_name(
     else:
         raise RuntimeError("Not a recognised agent response")
 
+
 PROCEED_PROMPT = "proceed"
+
 
 def is_user_prompt_proceed(user_prompt: str) -> bool:
     user_prompt = user_prompt.strip()
     return not user_prompt or user_prompt.strip() == PROCEED_PROMPT
 
+
 def _has_new_user_prompt(user_prompt: str) -> bool:
     # In theory, we could auto detect if the new user prompt really needs a new plan, but this seems tricky.
     return not is_user_prompt_proceed(user_prompt=user_prompt)
+
 
 def generate_with_blackboard(
     agent_definitions: list[AgentDefinitionBase],
@@ -184,21 +188,28 @@ def generate_with_blackboard(
     else:
         blackboard = _create_blackboard(agent_definitions)
 
-    blackboard.add_previous_mesage(Message(role=MessageRole.user, message=user_prompt))
+    blackboard.add_previous_message(Message(role=MessageRole.user, message=user_prompt))
 
     with console.status("[bold green]Processing...") as _status:
         try:
-            if not execution_plan or _has_new_user_prompt(user_prompt=user_prompt): # A new user prompt means we likely need a new plan, for example if different agents are needed.
+            if (
+                not execution_plan or _has_new_user_prompt(user_prompt=user_prompt)
+            ):  # A new user prompt means we likely need a new plan, for example if different agents are needed.
                 if execution_plan:
-                    print_warning("Generate received a user prompt, so discarding the current generation plan (to optimize, you can send a plan with no user prompt)")
+                    print_warning(
+                        "Generating a new plan: Generate received a user prompt, so discarding the current generation plan (to optimize, you can send a plan with an empty user prompt)"
+                    )
+                else:
+                    print("Generating a new plan")
                 execution_plan = main_router.generate_plan(
                     agent_definitions=agent_definitions,
                     chat_agent_description=chat_agent_description,
                     _config=_config,
                     user_prompt=user_prompt,
-                    mesages=blackboard.internal_previous_messages
+                    previous_plan=None,
+                    messages=blackboard.internal_previous_messages,
                 )
-                blackboard.add_mesage(
+                blackboard.add_message(
                     Message(
                         role=MessageRole.assistant, message=execution_plan.chat_message
                     )
@@ -289,7 +300,7 @@ def run_chat_loop(
         chat_message=initial_assistant_message
     )
 
-    blackboard._blackboard.add_mesage(
+    blackboard._blackboard.add_message(
         Message(role=MessageRole.assistant, message=initial_assistant_message)
     )
 

@@ -11,4 +11,4 @@ def print_debug(message, config: config.Config):
 
 
 def print_warning(message):
-    console.log(f":warning: {message}")
+    console.log(f":warning: {message}", style="yellow")
