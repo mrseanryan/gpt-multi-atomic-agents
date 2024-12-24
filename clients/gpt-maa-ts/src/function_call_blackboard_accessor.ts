@@ -19,19 +19,20 @@ export class FunctionCallBlackboardAccessor {
 
   public get_new_functions(): FunctionCallSchema[] {
     // Get the new function calls which the client needs to execute. After executing, the client should call set_user_data() to pass in the updated and/or missing data.
-    if (!this.blackboard.internalNewlyGeneratedFunctions) return [];
-    return this.blackboard.internalNewlyGeneratedFunctions;
+    return this.blackboard.internalNewlyGeneratedFunctions ?? [];
   }
 
   public get_new_messages(): Message[] {
     // Gets newly created messages that should be displayed to the user.
-    if (!this.blackboard.internalNewlyGeneratedMessages) return [];
-    return this.blackboard.internalNewlyGeneratedMessages;
+    return this.blackboard.internalNewlyGeneratedMessages ?? [];
   }
 
   public get_previous_messages(): Message[] {
-    if (!this.blackboard.internalPreviousMessages) return [];
-    return this.blackboard.internalPreviousMessages;
+    return this.blackboard.internalPreviousMessages ?? [];
+  }
+
+  public get_previously_generated_functions(): FunctionCallSchema[] {
+    return this.blackboard.internalPreviouslyGeneratedFunctions ?? [];
   }
 
   private _reset() {

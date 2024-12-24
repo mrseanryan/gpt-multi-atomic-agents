@@ -17,6 +17,8 @@ import {
 import { getConfig } from "./util_config.js";
 import { printError } from "./utils_print.js";
 
+const isExecutingPreviousFunctions = false; // normally false, unless for clients that need to 'execute all from start'.
+
 // =================================================
 // Chat with the Agents
 async function main(): Promise<void> {
@@ -24,7 +26,7 @@ async function main(): Promise<void> {
     console.log("(execution started)");
     return {
       isOkToContinue: true,
-      alsoExecutePreviousFunctions: false,
+      alsoExecutePreviousFunctions: isExecutingPreviousFunctions,
     };
   };
 
@@ -38,7 +40,8 @@ async function main(): Promise<void> {
     }
 
     // Assuming that client has applied all functions, and wants to continue from that state:
-    const new_user_data = blackboardAccessor.get_new_functions();
+    const new_user_data =
+      blackboardAccessor.get_previously_generated_functions();
     blackboardAccessor.set_user_data(new_user_data);
   };
 

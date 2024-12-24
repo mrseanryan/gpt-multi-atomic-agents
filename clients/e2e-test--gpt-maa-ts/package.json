@@ -10,7 +10,7 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "gpt-maa-ts": "^0.5.0"
+    "gpt-maa-ts": "^0.5.1"
   },
   "devDependencies": {
     "@types/node": "^22.10.1",

@@ -200,7 +200,7 @@ const onExecuteEnd = async (
     printError(errors);
   }
     // Assuming that client has applied all functions, and wants to continue from that state:
-    const new_user_data = blackboardAccessor.get_new_functions();
+    const new_user_data = blackboardAccessor.get_previously_generated_functions();
     blackboardAccessor.set_user_data(new_user_data);
 };
 await execute(
