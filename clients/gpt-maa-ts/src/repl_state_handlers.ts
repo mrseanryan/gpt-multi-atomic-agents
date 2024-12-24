@@ -5,6 +5,7 @@ import {
   ExecutionError,
 } from "./function_call_executor.js";
 import {
+  dumpJson,
   printAssistant,
   printDetail,
   printError,
@@ -80,7 +81,7 @@ export const handlePlanStateResult = async (context: ReplContext) => {
         return;
       }
       default: {
-        printError("(not a recognised option");
+        printError(`(not a recognised option '${chosen.chosen.name}'`);
         return;
       }
     }
@@ -129,7 +130,12 @@ export const handleGenerateStateResult = async (
         },
         {
           name: "no - change plan",
-          description: "You want to change the plan (start over)",
+          description: "You want to change the plan",
+          needsUserInput: true,
+        },
+        {
+          name: "no - start over",
+          description: "You want to make a fresh start",
           needsUserInput: true,
         },
       ],
@@ -153,8 +159,13 @@ export const handleGenerateStateResult = async (
         context.setState(new PlanReplState());
         return;
       }
+      case "no - start over": {
+        context.reset();
+        context.previousPrompt = chosen.userInput;
+        context.setState(new PlanReplState());
+      }
       default: {
-        printError("(not a recognised option");
+        printError(`(not a recognised option '${chosen.chosen.name}'`);
         return;
       }
     }

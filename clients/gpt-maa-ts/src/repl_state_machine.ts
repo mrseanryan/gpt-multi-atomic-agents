@@ -7,6 +7,7 @@ import { FunctionRegistry } from "./function_call_execution_registry.js";
 import {
   AgentExecutionPlanSchema,
   FunctionAgentDefinitionMinimal,
+  Message,
 } from "../gpt_maa_client/models/index.js";
 import {
   convertSerializableAgentToContractAgent,
@@ -33,8 +34,9 @@ interface IReplStateContext {
   getClient(): PostsClient;
   getUserPrompt(): string;
   getChatAgentDescription(): string;
+  getPlanMessages(): Message[];
+  resetPlanMessages(): void;
   executionPlan: AgentExecutionPlanSchema | undefined;
-  getPreviousPrompt(): string | null;
   blackboardAccessor: FunctionCallBlackboardAccessor | null;
   getCombinedAgents(): FunctionAgentDefinitionMinimal[];
 }
@@ -54,7 +56,7 @@ export class PlanReplState extends ReplState {
       context.getCombinedAgents(),
       context.getChatAgentDescription(),
       context.executionPlan,
-      context.blackboardAccessor?.get_previous_messages() ?? null
+      context.getPlanMessages() // NOT using blackboard messages - keeping plan/blackboard messages separate.
     );
   }
 }
@@ -125,6 +127,8 @@ export class ExecuteReplState extends ReplState {
       this.onExecuteStart,
       this.onExecuteEnd
     );
+
+    context.resetPlanMessages(); // always reset the plan messages, since even if we need to Execute from start, we would not want to Plan from start.
   }
 }
 
@@ -146,9 +150,10 @@ export class ReplContext implements IReplStateContext, IReplCommandContext {
   private readonly chatAgentDescription: string;
 
   userPrompt: string | null = null;
+  previousPrompt: string | null = null;
+  private planMessages: Message[] = [];
 
   executionPlan: AgentExecutionPlanSchema | undefined = undefined;
-  previousPrompt: string | null = null;
   blackboardAccessor: FunctionCallBlackboardAccessor | null = null;
 
   functionRegistry: FunctionRegistry;
@@ -173,7 +178,6 @@ export class ReplContext implements IReplStateContext, IReplCommandContext {
 
   getClient = (): PostsClient => this.client;
   getChatAgentDescription = (): string => this.chatAgentDescription;
-  getPreviousPrompt = (): string | null => this.previousPrompt;
 
   public getCombinedAgents = () =>
     getCombinedAgentDefinitions(
@@ -182,10 +186,27 @@ export class ReplContext implements IReplStateContext, IReplCommandContext {
       this.functionRegistry
     );
 
+  addPlanMessage = (message: Message): void => {
+    this.planMessages.push(message);
+  };
+  getPlanMessages = (): Message[] => this.planMessages;
+  resetPlanMessages = () => (this.planMessages = []);
+
   getState = (): ReplState | null => this.state;
   getUserPrompt(): string {
     if (!this.userPrompt) throw new Error("User prompt not set");
     return this.userPrompt;
+  }
+
+  public reset(): void {
+    this.userPrompt = null;
+    this.previousPrompt = null;
+    this.planMessages = [];
+
+    this.executionPlan = undefined;
+    this.blackboardAccessor = null;
+
+    this.generateNeedsApproval = false;
   }
 
   public setState(state: ReplState): void {

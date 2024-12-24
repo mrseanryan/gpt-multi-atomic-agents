@@ -68,6 +68,7 @@ export const chatWithAgentsRepl = async (
     // TODO: allow for skipping of user input: currently using a special prompt 'PROCEED'
     const userPrompt = context.previousPrompt ?? (await readInputFromUser(""));
     if (!userPrompt) continue;
+    context.addPlanMessage({ role: "user", message: userPrompt });
     context.previousPrompt = null;
 
     const action = await check_user_prompt(userPrompt, context);
