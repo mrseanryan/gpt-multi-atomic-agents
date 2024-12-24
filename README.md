@@ -100,7 +100,7 @@ The overall flow occurs over 3 states:
 
 This diagram shows the overall flow, for Function Calls. The flow for GraphQL is essentially the same: instead of Function Calls, there are Mutations, and the user data would be in JSON format.
 
-![Plan-Generate-Execute Flow (Function Calls)](./images/plan-and-generate-flow.png)
+![Plan-Generate-Execute Flow (Function Calls)](https://raw.githubusercontent.com/mrseanryan/gpt-multi-atomic-agents/master/images/plan-and-generate-flow.png)
 
 ## Examples [Function Calls Based Approach]
 
