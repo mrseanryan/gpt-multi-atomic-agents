@@ -52,10 +52,10 @@ export const handleUserPrompt = async (
 
   printAssistant(executionPlan?.chatMessage);
 
-  printDetail(`Executing the plan`);
+  const EMPTY_USER_PROMPT_TO_ENABLE_PLAN = "";
   const blackboardAccessor = await generate_mutations(
     client,
-    userPrompt,
+    EMPTY_USER_PROMPT_TO_ENABLE_PLAN,
     agentDefinitions,
     chatAgentDescription,
     executionPlan

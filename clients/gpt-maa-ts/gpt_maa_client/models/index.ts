@@ -329,6 +329,7 @@ export function deserializeIntoGeneratePlanRequest(generatePlanRequest: Partial<
     return {
         "agent_descriptions": n => { generatePlanRequest.agentDescriptions = n.getCollectionOfObjectValues<AgentDescription>(createAgentDescriptionFromDiscriminatorValue); },
         "chat_agent_description": n => { generatePlanRequest.chatAgentDescription = n.getStringValue(); },
+        "messages": n => { generatePlanRequest.messages = n.getCollectionOfObjectValues<Message>(createMessageFromDiscriminatorValue); },
         "previous_plan": n => { generatePlanRequest.previousPlan = n.getObjectValue<AgentExecutionPlanSchema>(createAgentExecutionPlanSchemaFromDiscriminatorValue); },
         "user_prompt": n => { generatePlanRequest.userPrompt = n.getStringValue(); },
     }
@@ -492,7 +493,7 @@ export interface FunctionCallGenerateRequest extends Parsable {
      */
     chatAgentDescription?: string | null;
     /**
-     * Optionally also include a previously generated plan, to reduce latency. If no plan is included, then generate will also internally call generate_plan.
+     * Optionally also include a previously generated plan, to reduce latency. If no plan is included, OR there is a user prompt, then generate will also internally call generate_plan.
      */
     executionPlan?: AgentExecutionPlanSchema | null;
     /**
@@ -560,6 +561,10 @@ export interface GeneratePlanRequest extends Parsable {
      * Describes the 'fallback' chat agent: if no suitable agents are recommended, this chat agent will be recommended, if the user's prompt is supported. The description should include the purpose and domain of this chat system.
      */
     chatAgentDescription?: string | null;
+    /**
+     * The chat message history, in case user is referring to previous messages. AI must take account of the previous messages, but prioritize the user_prompt.
+     */
+    messages?: Message[] | null;
     /**
      * Optionally also send a previously generated plan, so the AI can generate a new plan taking into account the user's feedback (in user_prompt).
      */
@@ -784,6 +789,7 @@ export function serializeGeneratePlanRequest(writer: SerializationWriter, genera
     if (generatePlanRequest) {
         writer.writeCollectionOfObjectValues<AgentDescription>("agent_descriptions", generatePlanRequest.agentDescriptions, serializeAgentDescription);
         writer.writeStringValue("chat_agent_description", generatePlanRequest.chatAgentDescription);
+        writer.writeCollectionOfObjectValues<Message>("messages", generatePlanRequest.messages, serializeMessage);
         writer.writeObjectValue<AgentExecutionPlanSchema>("previous_plan", generatePlanRequest.previousPlan, serializeAgentExecutionPlanSchema);
         writer.writeStringValue("user_prompt", generatePlanRequest.userPrompt);
     }

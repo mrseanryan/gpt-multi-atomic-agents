@@ -28,7 +28,10 @@ Tips:
 
 To update the client, if the REST API has changed:
 
-1. Copy the OpenAPI JSON from the Swagger site and paste into `gpt-maa-0.6.0.json`
+1. Copy the OpenAPI JSON from the Swagger site and paste into `gpt-maa-current.json`
+
+- Optionally, also paste it into a versioned file like `gpt-maa-0.7.0.openapi-3.1.1.json`
+
 2. Edit the JSON to be OpenAPI Version 3.0.0 (not 3.1.1):
 
    - see the existing files for differences
@@ -40,7 +43,7 @@ To update the client, if the REST API has changed:
 3. Run kyoto to generate the TypeScript client
 
 ```
-./ update-from-openapi.sh
+./update-from-openapi.sh
 ```
 
 4. Run the test - update code as needed:

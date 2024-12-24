@@ -26,7 +26,7 @@ await handleUserPrompt(
   chatAgentDescription
 );
 const blackboardAccessor = await handleUserPrompt(
-  "mow lawn and clear waste. before that, move furniture away, and at the end, restore the furniture.",
+  "mow lawn of all areas and clear waste. before that, move furniture away, and at the end, restore the furniture.",
   agentDefinitions,
   chatAgentDescription
 );
@@ -42,6 +42,7 @@ dumpJson(messages);
 
 // =================================================
 // Execute the Function Calls using our Handlers
+printDetail(`Executing the generated Function Calls (using Handlers)...`);
 blackboardAccessor.get_new_functions();
 const onExecuteStart = async (): Promise<ExecuteStartResult> => {
   printDetail("(execution started)");

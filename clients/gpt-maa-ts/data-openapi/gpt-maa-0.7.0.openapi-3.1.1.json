@@ -1,14 +1,9 @@
 {
-    "openapi": "3.0.0",
+    "openapi": "3.1.0",
     "info": {
         "title": "FastAPI",
         "version": "0.1.0"
     },
-    "servers": [
-        {
-          "url": "http://127.0.0.1:8000/"
-        }
-      ],
     "paths": {
         "/generate_plan": {
             "post": {
@@ -95,7 +90,9 @@
                         "type": "string",
                         "title": "Agent Name",
                         "description": "The name of the agent",
-                        "example": "Creature Creator"
+                        "examples": [
+                            "Creature Creator"
+                        ]
                     },
                     "description": {
                         "type": "string",
@@ -110,12 +107,12 @@
                         "title": "Topics",
                         "description": "This agent ONLY generates if user mentioned one of these topics"
                     },
-                    "agent_parameters": {
+                    "agent_parameter_names": {
                         "items": {
                             "type": "string"
                         },
                         "type": "array",
-                        "title": "Agent Parameters",
+                        "title": "Agent Parameter Names",
                         "description": "A list of agent parameters that you can extract from the user's prompt."
                     }
                 },
@@ -124,7 +121,7 @@
                     "agent_name",
                     "description",
                     "topics",
-                    "agent_parameters"
+                    "agent_parameter_names"
                 ],
                 "title": "AgentDescription"
             },
@@ -166,7 +163,9 @@
                         "type": "string",
                         "title": "Agent Name",
                         "description": "The name of the agent",
-                        "example": "Creature Creator"
+                        "examples": [
+                            "Creature Creator"
+                        ]
                     },
                     "description": {
                         "type": "string",
@@ -196,6 +195,17 @@
                         "type": "array",
                         "title": "Topics",
                         "description": "This agent ONLY generates if user mentioned one of these topics"
+                    },
+                    "agent_parameters": {
+                        "additionalProperties": {
+                            "items": {
+                                "type": "string"
+                            },
+                            "type": "array"
+                        },
+                        "type": "object",
+                        "title": "Agent Parameters",
+                        "description": "A list of agent parameters to extract from the user prompt"
                     }
                 },
                 "additionalProperties": false,
@@ -223,7 +233,8 @@
                         "type": "array",
                         "title": "Internal Previously Generated Functions",
                         "description": "All previously generated functions: either from client (representing its data) or from agents in this generation",
-                        "example": [
+                        "examples": [
+                            [
                                 {
                                     "agent_name": "Creature Creator",
                                     "function_name": "AddCreature",
@@ -235,6 +246,7 @@
                                     }
                                 }
                             ]
+                        ]
                     },
                     "internal_previous_messages": {
                         "items": {
@@ -242,7 +254,8 @@
                         },
                         "type": "array",
                         "title": "Internal Previous Messages",
-                        "example": [
+                        "examples": [
+                            [
                                 {
                                     "message": "Add a wolf",
                                     "role": "user"
@@ -252,6 +265,7 @@
                                     "role": "assistant"
                                 }
                             ]
+                        ]
                     },
                     "internal_newly_generated_messages": {
                         "items": {
@@ -259,7 +273,9 @@
                         },
                         "type": "array",
                         "title": "Internal Newly Generated Messages",
-                        "example": []
+                        "examples": [
+                            []
+                        ]
                     },
                     "internal_newly_generated_functions": {
                         "items": {
@@ -267,7 +283,9 @@
                         },
                         "type": "array",
                         "title": "Internal Newly Generated Functions",
-                        "example": []
+                        "examples": [
+                            []
+                        ]
                     }
                 },
                 "additionalProperties": false,
@@ -288,7 +306,8 @@
                         "type": "array",
                         "title": "Internal Previously Generated Functions",
                         "description": "All previously generated functions: either from client (representing its data) or from agents in this generation",
-                        "example": [
+                        "examples": [
+                            [
                                 {
                                     "agent_name": "Creature Creator",
                                     "function_name": "AddCreature",
@@ -300,6 +319,7 @@
                                     }
                                 }
                             ]
+                        ]
                     },
                     "internal_previous_messages": {
                         "items": {
@@ -307,7 +327,8 @@
                         },
                         "type": "array",
                         "title": "Internal Previous Messages",
-                        "example": [
+                        "examples": [
+                            [
                                 {
                                     "message": "Add a wolf",
                                     "role": "user"
@@ -317,6 +338,7 @@
                                     "role": "assistant"
                                 }
                             ]
+                        ]
                     },
                     "internal_newly_generated_messages": {
                         "items": {
@@ -324,7 +346,9 @@
                         },
                         "type": "array",
                         "title": "Internal Newly Generated Messages",
-                        "example": []
+                        "examples": [
+                            []
+                        ]
                     },
                     "internal_newly_generated_functions": {
                         "items": {
@@ -332,7 +356,9 @@
                         },
                         "type": "array",
                         "title": "Internal Newly Generated Functions",
-                        "example": []
+                        "examples": [
+                            []
+                        ]
                     }
                 },
                 "additionalProperties": false,
@@ -348,7 +374,8 @@
                         "type": "array",
                         "title": "Agent Definitions",
                         "description": "The defintions of the Agents to execute, in order.",
-                        "example": [
+                        "examples": [
+                            [
                                 {
                                     "accepted_functions": [
                                         {
@@ -391,6 +418,7 @@
                                         }
                                     ],
                                     "agent_name": "Creature Creator",
+                                    "agent_parameters": {},
                                     "description": "Creates new creatures given the user prompt. Ensures that ALL creatures mentioned by the user are created.",
                                     "functions_allowed_to_generate": [
                                         {
@@ -438,18 +466,23 @@
                                     ]
                                 }
                             ]
+                        ]
                     },
                     "chat_agent_description": {
                         "type": "string",
                         "title": "Chat Agent Description",
                         "description": "Describe the purpose and domain of this chat system.",
-                        "example": "Handles users questions about an ecosystem game like Sim Life"
+                        "examples": [
+                            "Handles users questions about an ecosystem game like Sim Life"
+                        ]
                     },
                     "user_prompt": {
                         "type": "string",
                         "title": "User Prompt",
                         "description": "The input from the user",
-                        "example": "Add a sheep that eats grass"
+                        "examples": [
+                            "Add a sheep that eats grass"
+                        ]
                     },
                     "blackboard": {
                         "anyOf": [
@@ -457,7 +490,7 @@
                                 "$ref": "#/components/schemas/FunctionCallBlackboard-Input"
                             },
                             {
-                                "nullable": true
+                                "type": "null"
                             }
                         ],
                         "description": "Optionally include the previous Blackboard state, to have a conversation (avoids stateless server). This contains previous state and new data (which the user has updated either by executing its implementation of Function Calls)."
@@ -468,11 +501,12 @@
                                 "$ref": "#/components/schemas/AgentExecutionPlanSchema"
                             },
                             {
-                                "nullable": true
+                                "type": "null"
                             }
                         ],
-                        "description": "Optionally also include a previously generated plan, to reduce latency. If no plan is included, then generate will also internally call generate_plan.",
-                        "example": {
+                        "description": "Optionally also include a previously generated plan, to reduce latency. If no plan is included, OR there is a user prompt, then generate will also internally call generate_plan.",
+                        "examples": [
+                            {
                                 "chat_message": "Certainly! I'll help you add a sheep that eats grass to your ecosystem.",
                                 "recommended_agents": [
                                     {
@@ -486,6 +520,7 @@
                                     }
                                 ]
                             }
+                        ]
                     }
                 },
                 "additionalProperties": false,
@@ -566,10 +601,11 @@
                         "type": "array",
                         "title": "Agent Descriptions",
                         "description": "The descriptions of the available Agents. The response will contain the most suitable agents to execute in order.",
-                        "example": [
+                        "examples": [
+                            [
                                 {
                                     "agent_name": "Creature Creator",
-                                    "agent_parameters": [
+                                    "agent_parameter_names": [
                                         "creature_name"
                                     ],
                                     "description": "Creates new creatures given the user prompt. Ensures that ALL creatures mentioned by the user are created.",
@@ -578,18 +614,23 @@
                                     ]
                                 }
                             ]
+                        ]
                     },
                     "chat_agent_description": {
                         "type": "string",
                         "title": "Chat Agent Description",
                         "description": "Describes the 'fallback' chat agent: if no suitable agents are recommended, this chat agent will be recommended, if the user's prompt is supported. The description should include the purpose and domain of this chat system.",
-                        "example": "Handles users questions about an ecosystem game like Sim Life"
+                        "examples": [
+                            "Handles users questions about an ecosystem game like Sim Life"
+                        ]
                     },
                     "user_prompt": {
                         "type": "string",
                         "title": "User Prompt",
                         "description": "The input from the user",
-                        "example": "Add a goat instead of a sheep"
+                        "examples": [
+                            "Add a goat instead of a sheep"
+                        ]
                     },
                     "previous_plan": {
                         "anyOf": [
@@ -597,11 +638,12 @@
                                 "$ref": "#/components/schemas/AgentExecutionPlanSchema"
                             },
                             {
-                                "nullable": true
+                                "type": "null"
                             }
                         ],
                         "description": "Optionally also send a previously generated plan, so the AI can generate a new plan taking into account the user's feedback (in user_prompt).",
-                        "example": {
+                        "examples": [
+                            {
                                 "chat_message": "Certainly! I'll help you add a sheep that eats grass to your ecosystem.",
                                 "recommended_agents": [
                                     {
@@ -615,6 +657,34 @@
                                     }
                                 ]
                             }
+                        ]
+                    },
+                    "messages": {
+                        "anyOf": [
+                            {
+                                "items": {
+                                    "$ref": "#/components/schemas/Message"
+                                },
+                                "type": "array"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Messages",
+                        "description": "The chat message history, in case user is referring to previous messages. AI must take account of the previous messages, but prioritize the user_prompt.",
+                        "examples": [
+                            [
+                                {
+                                    "message": "Add grass",
+                                    "role": "user"
+                                },
+                                {
+                                    "message": "Certainly! I'll help you add grass to your ecosystem.",
+                                    "role": "assistant"
+                                }
+                            ]
+                        ]
                     }
                 },
                 "additionalProperties": false,

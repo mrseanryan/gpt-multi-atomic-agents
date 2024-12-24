@@ -11,7 +11,7 @@ import {
   AreaHandlerBase,
 } from "./function_call_execution_handlers.js";
 import { FunctionRegistry } from "./function_call_execution_registry.js";
-import { dumpJson, print, printDetail } from "./utils_print.js";
+import { dumpJsonAlways, print, printDetail } from "./utils_print.js";
 
 // =================================================
 // Define the Functions
@@ -28,7 +28,7 @@ const mowLawnFunction: FunctionSpecSchema = {
 };
 const produceCutGrassFunction: FunctionSpecSchema = {
   functionName: "ProduceCutGrass",
-  description: "Produce cut grass waster",
+  description: "Produce cut grass as waste",
   parameters: [areaParameter],
 };
 
@@ -82,11 +82,11 @@ const wasteDisposerOutputFunctions: FunctionSpecSchema[] = [
 
 export const functionRegistry = new FunctionRegistry();
 
-const printParams = (
-  params: FunctionCallSchema_parameters | null | undefined
+const printParameters = (
+  parameters: FunctionCallSchema_parameters | null | undefined
 ) => {
-  printDetail(`  params:`);
-  dumpJson(params);
+  printDetail(`  parameters:`);
+  dumpJsonAlways(parameters);
 };
 
 class LawnHandler extends AreaHandlerBase {
@@ -103,11 +103,11 @@ class LawnHandler extends AreaHandlerBase {
   }
   private handleMowLawn(fc: FunctionCallSchema): void {
     print("<mowing the lawn>");
-    printParams(fc);
+    printParameters(fc.parameters);
   }
   private handleProduceCutGrass(fc: FunctionCallSchema): void {
     print("<producing cut grass>");
-    printParams(fc);
+    printParameters(fc.parameters);
   }
 
   protected nameImplementation(): string {
