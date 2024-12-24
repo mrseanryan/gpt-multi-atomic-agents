@@ -53,7 +53,11 @@ class AgentDefinitionBase(CustomBaseModel):
 
     @abstractmethod
     def build_input(
-        self, rewritten_user_prompt: str, blackboard: Blackboard, config: Config, agent_parameters: ParamNameToValues
+        self,
+        rewritten_user_prompt: str,
+        blackboard: Blackboard,
+        config: Config,
+        agent_parameters: ParamNameToValues,
     ) -> BaseIOSchema:
         raise NotImplementedError
 
@@ -94,7 +98,11 @@ class FunctionAgentDefinition(AgentDefinitionBase):
         return typing.cast(FunctionAgentOutputSchema, response)
 
     def build_input(
-        self, rewritten_user_prompt: str, blackboard: Blackboard, config: Config, agent_parameters: ParamNameToValues
+        self,
+        rewritten_user_prompt: str,
+        blackboard: Blackboard,
+        config: Config,
+        agent_parameters: ParamNameToValues,
     ) -> BaseIOSchema:
         function_blackboard = self._cast_blackboard(blackboard)
 
@@ -191,7 +199,11 @@ class GraphQLAgentDefinition(AgentDefinitionBase):
         return typing.cast(GraphQLAgentOutputSchema, response)
 
     def build_input(
-        self, rewritten_user_prompt: str, blackboard: Blackboard, config: Config, agent_parameters: ParamNameToValues
+        self,
+        rewritten_user_prompt: str,
+        blackboard: Blackboard,
+        config: Config,
+        agent_parameters: ParamNameToValues,
     ) -> BaseIOSchema:
         graphql_blackboard = self._cast_blackboard(blackboard)
 
