@@ -111,6 +111,18 @@ class GeneratePlanRequest(CustomBaseModel):
     )
     messages: list[Message] | None = Field(
         description="The chat message history, in case user is referring to previous messages. AI must take account of the previous messages, but prioritize the user_prompt.",
+        examples=[
+            [
+            {
+                "role": "user",
+                "message": "Add grass"
+            },
+            {
+                "role": "assistant",
+                "message": "Certainly! I'll help you add grass to your ecosystem."
+            }
+            ]
+        ],
         default=None,
     )
 
