@@ -1,0 +1,58 @@
+digraph G {
+    labelloc="t";
+    label="[Plan-Generate-Execute (PGE) Flow]"
+    splines="FALSE";
+
+    /* Entities */
+    user_prompt [label="User Prompt", shape="circle"]
+    message_history [label="? Message History", shape="square"]
+    LLM [label="LLM (Planner)", shape="square"]
+
+    previous_plan [label="? Previous Plan", shape="circle"]
+    new_plan [label="New Plan", shape="circle"]
+
+    subgraph cluster_Plan {
+        label = "Plan State";
+        planner [label="Planner", shape="square"]
+    }
+
+    subgraph cluster_Generate {
+        label = "Generate State";
+        check_if_prompt [label="New User Prompt?", shape="diamond"]
+        new_functions[label="New Functions + Chat"]
+        yes_has_user_prompt_discard_plan[label="New user prompt, so need to discard plan"]
+        no_has_user_prompt_use_plan[label="Use existing plan"]
+        current_plan[label="Current Plan"]
+        previous_functions[label="Previously generated Function Calls"]
+        user_data[label="User data (also as Function Calls)"]
+        LLM_AGENTS[label="LLM (Agents)" shape="square"]
+
+        current_plan -> agents
+        previous_functions -> agents
+        user_data -> agents
+
+        agents -> LLM_AGENTS
+        LLM_AGENTS -> new_functions
+
+        new_plan -> check_if_prompt
+        check_if_prompt -> yes_has_user_prompt_discard_plan [label="yes"]
+        check_if_prompt -> no_has_user_prompt_use_plan [label="no"]
+        no_has_user_prompt_use_plan -> current_plan
+    }
+
+    subgraph cluster_Execute {
+        label = "Execute State";
+        execute_functions [label="Execute Functions"]
+    }
+
+    /* Relationships */
+    user_prompt -> planner
+    previous_plan -> planner
+    message_history -> planner
+    planner -> LLM
+    LLM -> new_plan
+    yes_has_user_prompt_discard_plan -> user_prompt
+
+    new_functions -> execute_functions
+    execute_functions -> user_prompt
+}

@@ -90,6 +90,18 @@ When integrating, depending on which kind of Agent Definitions are used, the cli
     - the input is a GraphQL schema with any previouly made mutation calls, the output is a set of mutation calls.
     - the agents can communicate generations (modifications to data) by generating GraphQL mutations that match the given schema.
 
+## Overall Flow
+
+The overall flow occurs over 3 states:
+
+1. Plan [fast] - The user collaborates with the AI to generate a high-level plan, using the available Agent Definitions. When the user is happy, the client switches to the Generate state.
+2. Generate [slower] - The plan is used to generate mutations (either Function Calls or GraphQL mutations) to fulfill the user's request. The user can decide to proceed to Execute, or else to go back to Plan.
+3. Execute - The plan is executed by the client, which maps mutations to actual executed code. The client updates its data and then switches back to the Plan state.
+
+This diagram shows the overall flow, for Function Calls. The flow for GraphQL is essentially the same: instead of Function Calls, there are Mutations, and the user data would be in JSON format.
+
+![Plan-Generate-Execute Flow (Function Calls)](./images/plan-and-generate-flow.png)
+
 ## Examples [Function Calls Based Approach]
 
 ### Sim Life world builder
