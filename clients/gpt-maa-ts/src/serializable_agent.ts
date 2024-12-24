@@ -17,6 +17,7 @@ export interface SerializableAgentWithCategories {
   agentName: string;
   description: string;
   // TODO: For more advanced prompting, add `steps: string[]` (also need to add to the REST API and server side framework)
+  // TODO: For more advanced prompting, add `examples: string[]` (also need to add to the REST API and server side framework)
   acceptedFunctionCategories: string[];
   functionCategoriesAllowedToGenerate: string[];
   topics: string[];

@@ -50,7 +50,8 @@ export class PlanReplState extends ReplState {
       context.getUserPrompt(),
       context.getCombinedAgents(),
       context.getChatAgentDescription(),
-      context.executionPlan
+      context.executionPlan,
+      context.blackboardAccessor?.get_previous_messages() ?? null
     );
   }
 }

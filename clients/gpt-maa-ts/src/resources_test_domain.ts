@@ -172,6 +172,11 @@ const furnitureMoverAgent: FunctionAgentDefinitionMinimal = {
   acceptedFunctions: [...furnitureMoverOutputFunctions, mowLawnFunction], // The furniture mover can observe when the lawn-mower needs to access that area
   functionsAllowedToGenerate: furnitureMoverOutputFunctions,
   topics: ["furniture"],
+  agentParameters: {
+    additionalData: {
+      "furniture-kind": [],
+    },
+  },
 };
 
 // note: The WasteDisposer Agent is a 'custom' agent defined in a JSON file ('waste-diposer.agent.json').

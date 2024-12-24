@@ -21,8 +21,10 @@ const convertAgentDefinitionToDescription = (
 ): AgentDescription => {
   let agentParameterNames: string[] = [];
 
-  if (agentDefinition.agentParameters) {
-    agentParameterNames = Object.keys(agentDefinition.agentParameters);
+  if (agentDefinition.agentParameters?.additionalData) {
+    agentParameterNames = Object.keys(
+      agentDefinition.agentParameters.additionalData
+    );
   }
 
   return {

@@ -17,6 +17,7 @@ import {
   startTimer,
   stopSpinner,
 } from "./utils_print.js";
+import { IDictionary } from "./utils.js";
 
 export const generate_mutations_from_function_calls = async (
   client: PostsClient,
@@ -46,17 +47,10 @@ export const generate_mutations_from_function_calls = async (
   );
 };
 
-export const generate_mutations = async (
-  client: PostsClient,
+const _validateUserPromptWillOverridePlan = (
   userPrompt: string,
-  agentDefinitions: FunctionAgentDefinitionMinimal[],
-  chatAgentDescription: string,
-  existing_plan: AgentExecutionPlanSchema | undefined = undefined,
-  blackboardAccessor: FunctionCallBlackboardAccessor | null = null
-): Promise<FunctionCallBlackboardAccessor | null> => {
-  const timer = startTimer("generate_mutations");
-  userPrompt = userPrompt.trim();
-  // xxx extract
+  existing_plan: AgentExecutionPlanSchema | undefined = undefined
+): void => {
   if (existing_plan) {
     if (userPrompt.length > 0) {
       printDetail(`USER: ${userPrompt}`);
@@ -75,6 +69,49 @@ export const generate_mutations = async (
       `Generating from user prompt - the Server will create a new Generation Plan...`
     );
   }
+};
+
+const _fixUpAgentParameters = (
+  existing_plan: AgentExecutionPlanSchema
+): void => {
+  // bug in kiota?
+  // plan RESPONSE: (comes back ok) `"agent_parameters":{"furniture-kind":["outdoor"]}}`
+  // but generate REQUEST: need 'agent_parameters' =>  `"agent_parameters": { additionalData: { {"furniture-kind":["outdoor"]}} }`
+  existing_plan.recommendedAgents?.forEach((agent) => {
+    if (agent.agentParameters) {
+      const newParameters: { additionalData: IDictionary<any> } = {
+        additionalData: {},
+      };
+      const oldParameters = agent.agentParameters as IDictionary<any>;
+      const keysToFix = Object.keys(oldParameters).filter(
+        (k) => k !== "additionalData"
+      );
+      if (keysToFix.length > 0) {
+        printWarning(
+          `Fixing up Agent '${agent.agentName}' Parameters '${keysToFix}': kiota bug? - plan response does not align with generate request.`
+        );
+      }
+      keysToFix.forEach((p) => {
+        newParameters.additionalData[p] = oldParameters[p];
+      });
+      agent.agentParameters = newParameters;
+    }
+  });
+};
+
+export const generate_mutations = async (
+  client: PostsClient,
+  userPrompt: string,
+  agentDefinitions: FunctionAgentDefinitionMinimal[],
+  chatAgentDescription: string,
+  existing_plan: AgentExecutionPlanSchema | undefined = undefined,
+  blackboardAccessor: FunctionCallBlackboardAccessor | null = null
+): Promise<FunctionCallBlackboardAccessor | null> => {
+  const timer = startTimer("generate_mutations");
+
+  userPrompt = userPrompt.trim();
+  _validateUserPromptWillOverridePlan(userPrompt, existing_plan);
+  if (existing_plan) _fixUpAgentParameters(existing_plan);
 
   const function_call_generate_request: FunctionCallGenerateRequest = {
     agentDefinitions: agentDefinitions,

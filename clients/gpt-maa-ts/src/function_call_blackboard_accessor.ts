@@ -4,13 +4,13 @@ import {
   Message,
 } from "../gpt_maa_client/models/index.js";
 
-export enum TypeScriptBlackboardFormat
-{
+export enum TypeScriptBlackboardFormat {
   function_call = "function_call",
 }
 
 export class FunctionCallBlackboardAccessor {
-  public readonly format: TypeScriptBlackboardFormat = TypeScriptBlackboardFormat.function_call;
+  public readonly format: TypeScriptBlackboardFormat =
+    TypeScriptBlackboardFormat.function_call;
   private blackboard: FunctionCallBlackboardOutput; // The inner blackboard - should only be used to send to REST API, not used directly by the client
 
   constructor(blackboard: FunctionCallBlackboardOutput) {
@@ -27,6 +27,11 @@ export class FunctionCallBlackboardAccessor {
     // Gets newly created messages that should be displayed to the user.
     if (!this.blackboard.internalNewlyGeneratedMessages) return [];
     return this.blackboard.internalNewlyGeneratedMessages;
+  }
+
+  public get_previous_messages(): Message[] {
+    if (!this.blackboard.internalPreviousMessages) return [];
+    return this.blackboard.internalPreviousMessages;
   }
 
   private _reset() {
