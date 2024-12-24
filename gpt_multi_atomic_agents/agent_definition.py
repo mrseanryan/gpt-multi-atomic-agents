@@ -53,7 +53,7 @@ class AgentDefinitionBase(CustomBaseModel):
 
     @abstractmethod
     def build_input(
-        self, rewritten_user_prompt: str, blackboard: Blackboard, config: Config
+        self, rewritten_user_prompt: str, blackboard: Blackboard, config: Config, agent_parameters: ParamNameToValues
     ) -> BaseIOSchema:
         raise NotImplementedError
 
@@ -94,17 +94,22 @@ class FunctionAgentDefinition(AgentDefinitionBase):
         return typing.cast(FunctionAgentOutputSchema, response)
 
     def build_input(
-        self, rewritten_user_prompt: str, blackboard: Blackboard, config: Config
+        self, rewritten_user_prompt: str, blackboard: Blackboard, config: Config, agent_parameters: ParamNameToValues
     ) -> BaseIOSchema:
         function_blackboard = self._cast_blackboard(blackboard)
 
         initial_input = self.initial_input
         initial_input.user_input = rewritten_user_prompt
+        initial_input.agent_parameters = agent_parameters
 
         initial_input.previously_generated_functions = (
             function_blackboard.get_generated_functions_matching(
                 self.get_accepted_function_names()
             )
+        )
+
+        util_output.print_debug(
+            f"[{self.agent_name}] build_input(): {initial_input}", config
         )
         util_output.print_debug(
             f"[{self.agent_name}] Previously generated funs: {initial_input.previously_generated_functions}",
@@ -186,13 +191,15 @@ class GraphQLAgentDefinition(AgentDefinitionBase):
         return typing.cast(GraphQLAgentOutputSchema, response)
 
     def build_input(
-        self, rewritten_user_prompt: str, blackboard: Blackboard, config: Config
+        self, rewritten_user_prompt: str, blackboard: Blackboard, config: Config, agent_parameters: ParamNameToValues
     ) -> BaseIOSchema:
         graphql_blackboard = self._cast_blackboard(blackboard)
 
         initial_input = self.initial_input
 
         initial_input.user_input = rewritten_user_prompt
+        initial_input.agent_parameters = agent_parameters
+
         initial_input.graphql_data = graphql_blackboard.get_user_data()
 
         initial_input.previously_generated_mutations = (

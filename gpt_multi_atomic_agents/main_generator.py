@@ -252,6 +252,7 @@ def generate_with_blackboard(
                             recommended_agent.rewritten_user_prompt,
                             blackboard=blackboard,
                             config=_config,
+                            agent_parameters = recommended_agent.agent_parameters
                         )
                     )
                     _fix_agent_name(response, agent_definition)
