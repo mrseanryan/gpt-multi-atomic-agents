@@ -45,8 +45,9 @@ export const printDetail = (...args: any[]): void => {
   console.log("  ", ...cargs);
 };
 
-export const dumpJson = (json: any) => {
+export const dumpJson = (json: any, name: string) => {
   if (isDebugActive()) {
+    printDetail(`DUMP: ${name}`);
     dumpJsonAlways(json);
   }
 };

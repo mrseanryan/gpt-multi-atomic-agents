@@ -2,7 +2,7 @@
 // - helps with handling user's approval of whether to continue
 // - also helps allow for running debug commands, without resetting the state
 
-import { dumpJson, printAssistant, printDetail } from "./utils_print.js";
+import { printAssistant, printDetail } from "./utils_print.js";
 import { FunctionRegistry } from "./function_call_execution_registry.js";
 import {
   AgentExecutionPlanSchema,

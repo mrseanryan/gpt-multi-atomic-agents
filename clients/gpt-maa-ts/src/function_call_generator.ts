@@ -183,7 +183,7 @@ export const generate_mutations = async (
   );
   stopSpinner(spinner);
 
-  dumpJson(blackboard);
+  dumpJson(blackboard, "blackboard");
 
   printTimeTaken(timer);
 

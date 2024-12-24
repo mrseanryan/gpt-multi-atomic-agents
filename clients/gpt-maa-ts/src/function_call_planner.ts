@@ -59,7 +59,7 @@ export const generate_plan = async (
   let spinner = showSpinner();
   const executionPlan = await client.generate_plan.post(generate_plan_request);
   stopSpinner(spinner);
-  dumpJson(executionPlan);
+  dumpJson(executionPlan, "executionPlan");
 
   printTimeTaken(start);
   return executionPlan;

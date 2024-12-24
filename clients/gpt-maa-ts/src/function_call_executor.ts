@@ -72,7 +72,7 @@ export const execute = async (
         .internalPreviouslyGeneratedFunctions!;
   }
 
-  dumpJson(functionsToExecute);
+  dumpJson(functionsToExecute, "functionsToExecute");
   functionsToExecute.forEach((call) => {
     try {
       if (!call.functionName) {

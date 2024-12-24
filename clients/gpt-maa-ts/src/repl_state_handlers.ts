@@ -5,7 +5,6 @@ import {
   ExecutionError,
 } from "./function_call_executor.js";
 import {
-  dumpJson,
   printAssistant,
   printDetail,
   printError,

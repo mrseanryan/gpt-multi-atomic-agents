@@ -38,7 +38,7 @@ if (!blackboardAccessor) {
 // =================================================
 // Display the messages from the Agents
 const messages = blackboardAccessor.get_new_messages();
-dumpJson(messages);
+dumpJson(messages, "blackboard new messages");
 
 // =================================================
 // Execute the Function Calls using our Handlers

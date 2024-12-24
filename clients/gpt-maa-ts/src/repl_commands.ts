@@ -1,4 +1,7 @@
-import { FunctionAgentDefinitionMinimal } from "../gpt_maa_client/models/index.js";
+import {
+  FunctionAgentDefinitionMinimal,
+  Message,
+} from "../gpt_maa_client/models/index.js";
 import { loadCustomAgents } from "./function_call_agent_stores.js";
 import { FunctionCallBlackboardAccessor } from "./function_call_blackboard_accessor.js";
 import {
@@ -68,7 +71,8 @@ class DumpReplCommand extends ReplCommandBase {
       printDetail("(no blackboard to dump)");
       return CommandAction.handled_already;
     }
-    dumpJson(context.blackboardAccessor);
+    dumpJson(context.blackboardAccessor, "blackboardAccessor");
+    dumpJson(context.getPlanMessages(), "plan messages");
     return CommandAction.handled_already;
   }
 }
@@ -234,6 +238,7 @@ export interface IReplCommandContext {
   blackboardAccessor: FunctionCallBlackboardAccessor | null;
   agentDefinitions: FunctionAgentDefinitionMinimal[];
   customAgents: SerializableAgentWithCategories[];
+  getPlanMessages(): Message[];
 }
 
 export const check_user_prompt = async (
