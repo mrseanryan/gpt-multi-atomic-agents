@@ -5,6 +5,7 @@ import {
   FunctionAgentDefinitionMinimal,
   FunctionCallGenerateRequest,
   FunctionCallSchema,
+  RecommendedAgent,
 } from "../gpt_maa_client/models/index.js";
 
 import { FunctionCallBlackboardAccessor } from "./function_call_blackboard_accessor.js";
@@ -71,6 +72,29 @@ const _validateUserPromptWillOverridePlan = (
   }
 };
 
+const _fixUpParameters = (
+  oldParameters: IDictionary<any>,
+  description: string
+): { additionalData: IDictionary<any> } => {
+  const newParameters: { additionalData: IDictionary<any> } = {
+    additionalData: {},
+  };
+
+  const keysToFix = Object.keys(oldParameters).filter(
+    (k) => k !== "additionalData"
+  );
+  if (keysToFix.length > 0) {
+    printWarning(
+      `Fixing up '${description}' Parameters '${keysToFix}': kiota bug? - plan response does not align with generate request.`
+    );
+  }
+  keysToFix.forEach((p) => {
+    newParameters.additionalData[p] = oldParameters[p];
+  });
+
+  return newParameters;
+};
+
 const _fixUpAgentParameters = (
   existing_plan: AgentExecutionPlanSchema
 ): void => {
@@ -79,24 +103,30 @@ const _fixUpAgentParameters = (
   // but generate REQUEST: need 'agent_parameters' =>  `"agent_parameters": { additionalData: { {"furniture-kind":["outdoor"]}} }`
   existing_plan.recommendedAgents?.forEach((agent) => {
     if (agent.agentParameters) {
-      const newParameters: { additionalData: IDictionary<any> } = {
-        additionalData: {},
-      };
       const oldParameters = agent.agentParameters as IDictionary<any>;
-      const keysToFix = Object.keys(oldParameters).filter(
-        (k) => k !== "additionalData"
+      agent.agentParameters = _fixUpParameters(
+        oldParameters,
+        `Agent ${agent.agentName}`
       );
-      if (keysToFix.length > 0) {
-        printWarning(
-          `Fixing up Agent '${agent.agentName}' Parameters '${keysToFix}': kiota bug? - plan response does not align with generate request.`
-        );
-      }
-      keysToFix.forEach((p) => {
-        newParameters.additionalData[p] = oldParameters[p];
-      });
-      agent.agentParameters = newParameters;
     }
   });
+};
+
+const _fixUpPreviouslyGeneratedFunctionCallParameters = (
+  internalPreviouslyGeneratedFunctions: FunctionCallSchema[]
+): FunctionCallSchema[] => {
+  // bug in kiota?
+  // request to generate seems to drop all parameters of previously generated function calls (in the blackboard)
+  internalPreviouslyGeneratedFunctions.forEach((fun) => {
+    if (fun.parameters) {
+      const oldParams = fun.parameters as IDictionary<any>;
+      fun.parameters = _fixUpParameters(
+        oldParams,
+        `Function Call ${fun.functionName}`
+      );
+    }
+  });
+  return internalPreviouslyGeneratedFunctions;
 };
 
 export const EMPTY_USER_PROMPT_TO_ENABLE_PLAN = "";
@@ -131,17 +161,24 @@ export const generate_mutations = async (
   userPrompt = userPrompt.trim();
   _validateUserPromptWillOverridePlan(userPrompt, existing_plan);
   if (existing_plan) _fixUpAgentParameters(existing_plan);
+  let blackboard = blackboardAccessor?.get_internal_blackboard();
+  if (blackboard && blackboard.internalPreviouslyGeneratedFunctions) {
+    blackboard.internalPreviouslyGeneratedFunctions =
+      _fixUpPreviouslyGeneratedFunctionCallParameters(
+        blackboard.internalPreviouslyGeneratedFunctions
+      );
+  }
 
   const function_call_generate_request: FunctionCallGenerateRequest = {
     agentDefinitions: agentDefinitions,
-    blackboard: blackboardAccessor?.get_internal_blackboard(),
+    blackboard: blackboard,
     chatAgentDescription: chatAgentDescription,
     executionPlan: existing_plan,
     userPrompt: userPrompt,
   };
 
   let spinner = showSpinner();
-  const blackboard = await client.generate_function_calls.post(
+  blackboard = await client.generate_function_calls.post(
     function_call_generate_request
   );
   stopSpinner(spinner);

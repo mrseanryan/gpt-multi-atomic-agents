@@ -79,8 +79,6 @@ def generate_plan_via_descriptions(
 
     start = util_time.start_timer()
 
-    # TODO: make router reject irrelevant user prompts (if no matching agents + it does not fit the chat_agent_description)
-
     # TODO: optimizate router:
     # - possibly run it on smaller (and faster) LLM
     # - could allow for Classifier based router, but then cannot rewrite prompts

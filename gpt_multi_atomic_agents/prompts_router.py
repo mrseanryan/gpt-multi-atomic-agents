@@ -113,6 +113,7 @@ def _build_system_prompt_generator_custom() -> SystemPromptGenerator:
             "Check if there is a previous plan - if so, you need to generate a new merged plan",
             "For each agent, consider whether it needs to be run to fulfull the user's prompt",
             "Only select agents that are really relevant to the user's prompt",
+            # done: make router reject irrelevant user prompts (if no matching agents + it does not fit the chat_agent_description)
             "If you find no suitable agent, then generate a polite message to explain to the user that you cannot handle this request",
             "For each selected agent, rewrite the user's prompt to suit that agent",
         ],
