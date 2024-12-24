@@ -128,11 +128,6 @@ export const handleGenerateStateResult = async (
           needsUserInput: false,
         },
         {
-          name: "no",
-          description: "You want to change something",
-          needsUserInput: true,
-        },
-        {
           name: "no - change plan",
           description: "You want to change the plan (start over)",
           needsUserInput: true,
@@ -151,11 +146,9 @@ export const handleGenerateStateResult = async (
         context.previousPrompt = PROCEED_PROMPT;
         return;
       }
-      case "no": {
-        context.previousPrompt = chosen.userInput;
-        return;
-      }
       case "no - change plan": {
+        // The user prompt is only used by the Server at Plan, not Generate (since the user could be asking for something very different)
+        // -> so we need to revert to Plan state.
         context.previousPrompt = chosen.userInput;
         context.setState(new PlanReplState());
         return;

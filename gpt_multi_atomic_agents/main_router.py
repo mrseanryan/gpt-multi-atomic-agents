@@ -5,6 +5,7 @@ from rich.console import Console
 
 from cornsnake import util_time
 
+from .blackboard import Message
 from . import prompts_router
 from .agent_definition import (
     AgentDefinitionBase,
@@ -41,6 +42,7 @@ def generate_plan(
     _config: Config,
     user_prompt: str,
     previous_plan: prompts_router.AgentExecutionPlanSchema | None = None,
+    messages: list[Message]|None = None
 ) -> prompts_router.AgentExecutionPlanSchema:
     agent_descriptions = _convert_agents_to_descriptions(agents=agent_definitions)
     return generate_plan_via_descriptions(
@@ -49,6 +51,7 @@ def generate_plan(
         _config=_config,
         user_prompt=user_prompt,
         previous_plan=previous_plan,
+        messages=messages
     )
 
 
@@ -58,6 +61,7 @@ def generate_plan_via_descriptions(
     _config: Config,
     user_prompt: str,
     previous_plan: prompts_router.AgentExecutionPlanSchema | None = None,
+    messages: list[Message]|None = None
 ) -> prompts_router.AgentExecutionPlanSchema:
     console.log("Routing...")
     """
@@ -83,6 +87,7 @@ def generate_plan_via_descriptions(
                 agent_descriptions=agent_descriptions,
                 chat_agent_description=chat_agent_description,
                 previous_plan=previous_plan,
+                messages=messages
             )
         ),
     )

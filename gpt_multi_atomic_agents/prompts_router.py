@@ -9,6 +9,7 @@ from pydantic import Field
 
 
 from . import util_ai
+from .blackboard import Message
 from .config import Config
 
 
@@ -83,6 +84,10 @@ class RouterAgentInputSchema(BaseIOSchema):
         description="The previously executed plan which the user wants you to modify",
         default=None,
     )
+    messages: list[Message]|None = Field(
+        description="The chat message history, in case user is referring to previous messages. You must take account of the previous messages, but prioritize the user_prompt.",
+        default=None,
+    )
 
 
 class RouterAgentOutputSchema(BaseIOSchema):
@@ -139,6 +144,7 @@ def build_input(
     agent_descriptions: list[AgentDescription],
     chat_agent_description: str,
     previous_plan: AgentExecutionPlanSchema | None = None,
+    messages: list[Message]|None = None
 ) -> RouterAgentInputSchema:
     agent_descriptions.append(_build_chat_agent_description(chat_agent_description))
 
@@ -146,4 +152,5 @@ def build_input(
         user_prompt=user_prompt,
         agent_descriptions=agent_descriptions,
         previous_plan=previous_plan,
+        messages=messages
     )

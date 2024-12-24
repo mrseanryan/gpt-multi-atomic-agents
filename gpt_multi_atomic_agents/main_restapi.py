@@ -3,7 +3,7 @@ import time
 from fastapi import FastAPI, Request
 from pydantic import Field
 
-from .blackboard import FunctionCallBlackboard
+from .blackboard import FunctionCallBlackboard, Message
 from .rest_api_examples import (
     FunctionAgentDefinitionMinimal,
     creature_agent_name,
@@ -109,7 +109,10 @@ class GeneratePlanRequest(CustomBaseModel):
         ],
         default=None,
     )
-
+    messages: list[Message]|None = Field(
+        description="The chat message history, in case user is referring to previous messages. AI must take account of the previous messages, but prioritize the user_prompt.",
+        default=None,
+    )
 
 class FunctionCallGenerateRequest(CustomBaseModel):
     agent_definitions: list[FunctionAgentDefinitionMinimal] = Field(
@@ -128,7 +131,7 @@ class FunctionCallGenerateRequest(CustomBaseModel):
         default=None,
     )
     execution_plan: prompts_router.AgentExecutionPlanSchema | None = Field(
-        description="Optionally also include a previously generated plan, to reduce latency. If no plan is included, then generate will also internally call generate_plan.",
+        description="Optionally also include a previously generated plan, to reduce latency. If no plan is included, OR there is a user prompt, then generate will also internally call generate_plan.",
         examples=[
             {
                 "chat_message": "Certainly! I'll help you add a sheep that eats grass to your ecosystem.",
@@ -155,6 +158,7 @@ async def generate_plan(
         _config=_load_config_from_ini(),
         user_prompt=request.user_prompt,
         previous_plan=request.previous_plan,
+        messages=request.messages
     )
 
 

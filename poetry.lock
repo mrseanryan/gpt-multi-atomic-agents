@@ -410,20 +410,20 @@ files = [
 
 [[package]]
 name = "cornsnake"
-version = "0.0.67"
+version = "0.0.74"
 description = "Wrap common Python utilities for working with files, git, ZIP, lists, processes, dates and times."
 optional = false
 python-versions = ">=3.11"
 files = [
-    {file = "cornsnake-0.0.67-py3-none-any.whl", hash = "sha256:d729f02b47fc6922fb662e8114f1ea6fd94947b66107516514b7c4accbf40527"},
-    {file = "cornsnake-0.0.67.tar.gz", hash = "sha256:a2d2a2b963e2366ee7846ec0b2310f0b91169c585e737d42e784bcf7679d3a4a"},
+    {file = "cornsnake-0.0.74-py3-none-any.whl", hash = "sha256:334820b7c59d6b3e29d115116724bda21a8a610ca8ecc2e310688274231407cd"},
+    {file = "cornsnake-0.0.74.tar.gz", hash = "sha256:0875a23fbe3bc29eae2612469ef475662509b0c9e60a99d3323b0595de24b028"},
 ]
 
 [package.dependencies]
 PyMuPDF = ">=1.24.0,<1.25.0"
 
 [package.extras]
-dev = ["build (>=1.0.3,<1.1.0)", "bumpver (>=2023.1129,<2024.0)", "bumpver (>=2023.1129,<2024.0)", "parameterized (>=0.9.0,<0.10.0)", "parameterized (>=0.9.0,<0.10.0)", "pdoc (>=14.4.0,<14.5.0)", "pip-tools (>=7.3.0,<7.4.0)", "ruff (>=0.3.4,<0.4.0)", "twine (>=4.0.2,<4.1.0)"]
+dev = ["build (>=1.0.3,<1.1.0)", "bumpver (>=2023.1129,<2024.0)", "bumpver (>=2023.1129,<2024.0)", "mypy (>=1.14.0,<1.15.0)", "parameterized (>=0.9.0,<0.10.0)", "parameterized (>=0.9.0,<0.10.0)", "pdoc (>=14.4.0,<14.5.0)", "pip-tools (>=7.3.0,<7.4.0)", "ruff (>=0.3.4,<0.4.0)", "twine (>=4.0.2,<4.1.0)"]
 
 [[package]]
 name = "distro"
@@ -2237,4 +2237,4 @@ propcache = ">=0.2.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "e133781ec3b089591d37baf196e9b190444ad1e2c91ca95100900c857dbd70e4"
+content-hash = "d3fa859aa52113aa801a5f17b2f944703e454447aa22fb99c579dfeeecaa05a7"
