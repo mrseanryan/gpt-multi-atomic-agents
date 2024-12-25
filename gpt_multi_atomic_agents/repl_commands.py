@@ -36,13 +36,13 @@ class ReplCommandBase(ABC):
 
 
 class ClearReplCommand(ReplCommandBase):
-    def get_name(self):
+    def get_name(self) -> str:
         return "clear"
 
-    def get_aliases(self):
+    def get_aliases(self) -> list[str]:
         return ["reset"]
 
-    def get_description(self):
+    def get_description(self) -> str:
         return "Clear the blackboard, starting over."
 
     def do(self, blackboard: Blackboard, config: Config) -> CommandAction:
@@ -52,13 +52,13 @@ class ClearReplCommand(ReplCommandBase):
 
 
 class DumpReplCommand(ReplCommandBase):
-    def get_name(self):
+    def get_name(self) -> str:
         return "dump"
 
-    def get_aliases(self):
+    def get_aliases(self) -> list[str]:
         return ["show"]
 
-    def get_description(self):
+    def get_description(self) -> str:
         return "Dump the current blackboard state to the console"
 
     def do(self, blackboard: Blackboard, config: Config) -> CommandAction:
@@ -67,10 +67,10 @@ class DumpReplCommand(ReplCommandBase):
 
 
 class HelpReplCommand(ReplCommandBase):
-    def get_name(self):
+    def get_name(self) -> str:
         return "help"
 
-    def get_description(self):
+    def get_description(self) -> str:
         return "Display help text"
 
     def do(self, blackboard: Blackboard, config: Config) -> CommandAction:
@@ -79,10 +79,10 @@ class HelpReplCommand(ReplCommandBase):
 
 
 class ListReplCommand(ReplCommandBase):
-    def get_name(self):
+    def get_name(self) -> str:
         return "list"
 
-    def get_description(self):
+    def get_description(self) -> str:
         return "List the local data files from previous blackboards"
 
     def do(self, blackboard: Blackboard, config: Config) -> CommandAction:
@@ -91,10 +91,10 @@ class ListReplCommand(ReplCommandBase):
 
 
 class LoadReplCommand(ReplCommandBase):
-    def get_name(self):
+    def get_name(self) -> str:
         return "load"
 
-    def get_description(self):
+    def get_description(self) -> str:
         return "Load a blackboard from the local data store"
 
     def do(self, blackboard: Blackboard, config: Config) -> CommandAction:
@@ -102,10 +102,10 @@ class LoadReplCommand(ReplCommandBase):
 
 
 class SaveReplCommand(ReplCommandBase):
-    def get_name(self):
+    def get_name(self) -> str:
         return "save"
 
-    def get_description(self):
+    def get_description(self) -> str:
         return "Save the blackboard to the local data store"
 
     def do(self, blackboard: Blackboard, config: Config) -> CommandAction:
@@ -116,13 +116,13 @@ class SaveReplCommand(ReplCommandBase):
 
 
 class QuitReplCommand(ReplCommandBase):
-    def get_name(self):
+    def get_name(self) -> str:
         return "quit"
 
-    def get_aliases(self):
+    def get_aliases(self) -> list[str]:
         return ["bye", "exit", "stop"]
 
-    def get_description(self):
+    def get_description(self) -> str:
         return "Exit the chat loop"
 
     def do(self, blackboard: Blackboard, config: Config) -> CommandAction:

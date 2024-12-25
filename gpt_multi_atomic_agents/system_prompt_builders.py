@@ -21,7 +21,8 @@ class FunctionSystemPromptBuilder(SystemPromptBuilderBase):
     allowed_functions_to_generate: list[FunctionSpecSchema]
     topics: list[str]
 
-    def build_system_prompt(self) -> str:
+    # mypy: disable-error-code="no-any-unimported"
+    def build_system_prompt(self) -> SystemPromptGenerator:
         allowed_functions_to_generate_names = [
             f.function_name for f in self.allowed_functions_to_generate
         ]
@@ -46,7 +47,7 @@ class FunctionSystemPromptBuilder(SystemPromptBuilderBase):
 
 @dataclass
 class GraphQLSystemPromptBuilder(SystemPromptBuilderBase):
-    def build_system_prompt(self) -> str:
+    def build_system_prompt(self) -> SystemPromptGenerator:
         return SystemPromptGenerator(
             background=[
                 "You are a helpful assistant that can only generates GraphQL mutations using the provided definitions."

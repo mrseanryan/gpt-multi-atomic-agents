@@ -110,20 +110,21 @@ def generate(
     ) = None,  # If used as a web service, then would also accept previous state + new data (which the user has updated either by executing its implementation of Function Calls OR by updating via GraphQL mutations).
     execution_plan: AgentExecutionPlanSchema | None = None,
 ) -> BlackboardAccessor:
-    blackboard = generate_with_blackboard(
+    previous_blackboard = blackboard._blackboard if blackboard else None
+    new_blackboard = generate_with_blackboard(
         agent_definitions=agent_definitions,
         chat_agent_description=chat_agent_description,
         _config=_config,
         user_prompt=user_prompt,
-        blackboard=blackboard._blackboard,
+        blackboard=previous_blackboard,
         execution_plan=execution_plan,
     )
-    return _create_blackboard_accessor_from_blackboard(blackboard=blackboard)
+    return _create_blackboard_accessor_from_blackboard(blackboard=new_blackboard)
 
 
 def _create_blackboard(
     agent_definitions: list[AgentDefinitionBase],
-) -> BlackboardAccessor:
+) -> Blackboard:
     if not agent_definitions:
         raise RuntimeError("Expected at least 1 Agent Definition")
     is_function_based = isinstance(agent_definitions[0], FunctionAgentDefinition)

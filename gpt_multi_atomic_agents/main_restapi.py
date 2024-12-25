@@ -1,5 +1,6 @@
 import logging
 import time
+from typing import Any, Callable
 from fastapi import FastAPI, Request
 from pydantic import Field
 
@@ -14,7 +15,11 @@ from .config import load_config, Config
 from .util_pydantic import CustomBaseModel
 
 from . import prompts_router
-from .agent_definition import FunctionAgentDefinition, build_function_agent_definition
+from .agent_definition import (
+    AgentDefinitionBase,
+    FunctionAgentDefinition,
+    build_function_agent_definition,
+)
 
 from . import main_router
 from . import main_generator
@@ -35,13 +40,13 @@ class AsyncIteratorWrapper:
     link: https://www.python.org/dev/peps/pep-0492/#example-2
     """
 
-    def __init__(self, obj):
+    def __init__(self, obj: Any) -> None:
         self._it = iter(obj)
 
-    def __aiter__(self):
+    def __aiter__(self) -> Any:
         return self
 
-    async def __anext__(self):
+    async def __anext__(self) -> Any:
         try:
             value = next(self._it)
         except StopIteration:
@@ -50,7 +55,7 @@ class AsyncIteratorWrapper:
 
 
 @app.middleware("http")
-async def add_request_response_logging(request: Request, call_next):
+async def add_request_response_logging(request: Request, call_next: Callable) -> Any:
     start_time = time.perf_counter()
 
     config = _load_config_from_ini()
@@ -188,14 +193,14 @@ def _build_agent_definition_from_minimal(
 def generate_function_calls(
     request: FunctionCallGenerateRequest,
 ) -> FunctionCallBlackboard:
-    agent_definitions = [
+    agent_definitions: list[AgentDefinitionBase] = [
         _build_agent_definition_from_minimal(a) for a in request.agent_definitions
     ]
 
     if request.blackboard:
         request.blackboard.reset_newly_generated()  # in case client did not clear out
 
-    return main_generator.generate_with_blackboard(
+    blackboard = main_generator.generate_with_blackboard(
         agent_definitions=agent_definitions,
         chat_agent_description=request.chat_agent_description,
         _config=_load_config_from_ini(),
@@ -203,6 +208,9 @@ def generate_function_calls(
         blackboard=request.blackboard,
         execution_plan=request.execution_plan,
     )
+    if not isinstance(blackboard, FunctionCallBlackboard):
+        raise RuntimeError("blackboard is not FunctionCallBlackboard")
+    return blackboard
 
 
 # TODO (someone): Later add generate_graphql()

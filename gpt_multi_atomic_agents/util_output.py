@@ -5,10 +5,10 @@ from . import config
 console = Console()
 
 
-def print_debug(message, config: config.Config):
+def print_debug(message: str, config: config.Config) -> None:
     if config.is_debug:
         print(message)
 
 
-def print_warning(message):
+def print_warning(message: str) -> None:
     console.log(f":warning: {message}", style="yellow")

@@ -52,19 +52,21 @@ def load_blackboard_from_file(
     return None
 
 
-def save_blackboard_to_file(blackboard: Blackboard, filename: str, config: Config):
+def save_blackboard_to_file(
+    blackboard: Blackboard, filename: str, config: Config
+) -> None:
     filename = util_file.change_extension(filename, f".{blackboard.format.value}.json")
     filepath = os.path.join(config.temp_data_dir_path, filename)
 
     console.print(f"Saving blackboard to {filepath}")
 
-    serialized = SerializedBlackboard(format=blackboard.format, blackboard=blackboard)
+    serialized = SerializedBlackboard(blackboard=blackboard)
     json_data = serialized.model_dump_json()
 
     util_file.write_text_to_file(json_data, filepath)
 
 
-def list_blackboard_files(blackboard: Blackboard, config: Config):
+def list_blackboard_files(blackboard: Blackboard, config: Config) -> None:
     files = util_dir.find_files_by_extension(
         dir_path=config.temp_data_dir_path, extension=f"{blackboard.format.value}.json"
     )

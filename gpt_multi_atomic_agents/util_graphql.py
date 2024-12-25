@@ -4,8 +4,9 @@ from cornsnake import util_list, util_string
 logger = logging.getLogger(__file__)
 
 
-def _clean_mutation_name(name):
-    return util_string.filter_string_via_regex(name, "^[a-zA-Z0-9_]+$", "")
+def _clean_mutation_name(name: str) -> str:
+    result: str = util_string.filter_string_via_regex(name, "^[a-zA-Z0-9_]+$", "")
+    return result
 
 
 def parse_out_mutation_names_from_schemas(
@@ -38,9 +39,7 @@ def filter_to_matching_mutation_calls(
 
     matching: list[str] = []
     for previous in previously_generated_mutation_calls:
-        if any(
-            list(filter(lambda a: a in previous, accepted_mutation_names__adjusted))
-        ):
+        if len(util_list.intersecting(previous, accepted_mutation_names__adjusted)):
             matching.append(previous)
 
     return matching

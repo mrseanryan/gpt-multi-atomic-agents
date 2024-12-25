@@ -35,6 +35,7 @@ cornsnake = "^0.0.74"
 fastapi = {extras = ["standard"], version = "^0.115.6"}
 
 [tool.poetry.group.dev.dependencies]
+mypy = "^1.14.0"
 ruff = "^0.8.0"
 
 [tool.poetry.group.test.dependencies]
@@ -46,3 +47,11 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.ruff.format]
 exclude = []
+
+[tool.mypy]
+check_untyped_defs = true
+disallow_untyped_defs = true
+disallow_any_unimported = false
+ignore_missing_imports = true
+warn_return_any = true
+warn_unused_ignores = true

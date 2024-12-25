@@ -9,8 +9,10 @@ from . import config
 
 console = Console()
 
+ClientModel = tuple[instructor.Instructor, str, int | None]  # client, model, max_tokens
 
-def create_client(_config: config.Config):
+
+def create_client(_config: config.Config) -> ClientModel:
     client: instructor.Instructor | None = None
     model: str | None = None
     max_tokens: int | None = None

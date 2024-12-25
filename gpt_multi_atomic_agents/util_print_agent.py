@@ -23,7 +23,7 @@ def print_agent(
     agent: prompts_router.RecommendedAgent,
     _config: config.Config,
     max_prompt_out_len: int = 200,
-    prefix="",
+    prefix: str = "",
 ) -> None:
     rewritten_user_prompt = agent.rewritten_user_prompt
     if not _config.is_debug and len(rewritten_user_prompt) > max_prompt_out_len:
@@ -43,32 +43,40 @@ def print_router_assistant(
         print_agent(agent, _config=_config)
 
 
-def print_assistant_message_only(chat_message: str, agent_name="general"):
+def print_assistant_message_only(
+    chat_message: str, agent_name: str = "general"
+) -> None:
     console.print(
         f":robot: [bold green]Assistant [{agent_name}]: {chat_message}[/bold green]"
     )
 
 
-def _print_assistant_base(chat_message: str, output: typing.Any, agent_name="general"):
+def _print_assistant_base(
+    chat_message: str, output: typing.Any, agent_name: str = "general"
+) -> None:
     print_assistant_message_only(chat_message=chat_message, agent_name=agent_name)
     console.print(Text("  New calls:", style="yellow"))
     console.print(output)
 
 
-def print_assistant_message(message: str):
+def print_assistant_message(message: str) -> None:
     initial_message = FunctionAgentOutputSchema(
         chat_message=message, generated_function_calls=[]
     )
     print_assistant_functions(message=initial_message)
 
 
-def print_assistant_functions(message: FunctionAgentOutputSchema, agent_name="general"):
-    return _print_assistant_base(
+def print_assistant_functions(
+    message: FunctionAgentOutputSchema, agent_name: str = "general"
+) -> None:
+    _print_assistant_base(
         message.chat_message, message.generated_function_calls, agent_name=agent_name
     )
 
 
-def _print_assistant_graphql(message: GraphQLAgentOutputSchema, agent_name="general"):
+def _print_assistant_graphql(
+    message: GraphQLAgentOutputSchema, agent_name: str = "general"
+) -> None:
     return _print_assistant_base(
         message.chat_message, message.generated_mutations, agent_name=agent_name
     )

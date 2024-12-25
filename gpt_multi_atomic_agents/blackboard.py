@@ -93,7 +93,7 @@ class FunctionCallBlackboard(CustomBaseModel):
         self.internal_newly_generated_messages.clear()
         self.internal_newly_generated_functions.clear()
 
-    def _reset(self):
+    def _reset(self) -> None:
         """Resets newly created functions, to prepare for next generation"""
         self.internal_newly_generated_functions.clear()
         self.internal_newly_generated_messages.clear()

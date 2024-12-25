@@ -42,6 +42,6 @@ def _get_path_to_ini(path_to_ini: str) -> str:
 
 def load_config(path_to_ini: str) -> Config:
     path_to_file = _get_path_to_ini(path_to_ini)
-    config = Config
+    config = Config()
     util_toml.read_config_ini_file(path_to_file=path_to_file, config_object=config)
     return config
