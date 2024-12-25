@@ -88,7 +88,7 @@ class RouterAgentInputSchema(BaseIOSchema):
         default=None,
     )
     messages: list[Message] | None = Field(
-        description="The chat message history, in case user is referring to previous messages. You must take account of the previous messages, but prioritize the user_prompt.",
+        description="The chat message history, in case user is referring to previous messages, for example by starting their prompt with 'and' or 'also'. You must take account of the previous messages, but prioritize the user_prompt.",
         default=None,
     )
 
@@ -106,7 +106,7 @@ class RouterAgentOutputSchema(BaseIOSchema):
 def _build_system_prompt_generator_custom() -> SystemPromptGenerator:
     return SystemPromptGenerator(
         background=[
-            "You are a router bot that recommends the most suitable of the available AI agents to handle the user's prompt.",
+            "You are a router bot that recommends the most suitable of the available AI agents to handle the user's prompt, allowing for previous messages.",
         ],
         steps=[
             # TODO: revise/improve these steps
@@ -118,7 +118,7 @@ def _build_system_prompt_generator_custom() -> SystemPromptGenerator:
             "For each selected agent, rewrite the user's prompt to suit that agent",
         ],
         output_instructions=[
-            "Take the user prompt and match it to a sequence of one or more of the available agents. If no suitable agent is available, then generate a polite message to explain to the user that you cannot handle this request."
+            "Take the user prompt and previous messages and match them to a sequence of one or more of the available agents. If no suitable agent is available, then generate a polite message to explain to the user that you cannot handle this request."
         ],
     )
 
