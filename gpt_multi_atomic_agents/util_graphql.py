@@ -39,7 +39,8 @@ def filter_to_matching_mutation_calls(
 
     matching: list[str] = []
     for previous in previously_generated_mutation_calls:
-        if len(util_list.intersecting(previous, accepted_mutation_names__adjusted)):
+        filtered = filter(lambda a: a in previous, accepted_mutation_names__adjusted)
+        if any(list(filtered)):
             matching.append(previous)
 
     return matching
