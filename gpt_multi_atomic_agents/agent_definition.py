@@ -43,6 +43,7 @@ class AgentDefinitionBase(CustomBaseModel):
     agent_name: str = Field(
         description="The name of the agent.", examples=["Creature Creator"]
     )
+    # note: This is only sent to the LLM during Planning - but because we use the LLM to rewrite the user's prompt, it is also effective at Generation state:
     description: str = Field(
         description="Describes the function of the agent. This acts as a mini prompt for the LLM."
     )
