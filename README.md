@@ -1,6 +1,8 @@
 # gpt-multi-atomic-agents
 A simple dynamic multi-agent framework based on [atomic-agents](https://github.com/BrainBlend-AI/atomic-agents) and [Instructor](https://github.com/instructor-ai/instructor). Uses the power of [Pydantic](https://docs.pydantic.dev) for data and schema validation and serialization.
 
+> **_NOTE:_** The `!! framework is at an early stage !!` - breaking changes will be indicated by increasing the *minor* version (major is still at zero).
+
 - compose Agents made of a system prompt, with a shared language of either **Function Calls** or else **GraphQL mutations**
 - convert user input into data modifications (functions or GraphQL mutations)
 - to maximise user engagement, uses a 2-phase process:
@@ -19,8 +21,6 @@ A simple dynamic multi-agent framework based on [atomic-agents](https://github.c
   2. OR run out-of-the-box as a REST API, accepting Agents from the client
     - there is a simple [TypeScript framework](https://github.com/mrseanryan/gpt-multi-atomic-agents/tree/master/clients/gpt-maa-ts), for writing Agent-based TypeScript clients of the REST API
   3. OR as a command line chat-loop
-
-> **_NOTE:_** The `!! framework is at an early stage !!` - breaking changes will be indicated by increasing the *minor* version (major is still at zero).
 
 [url_repo]: https://github.com/mrseanryan/gpt-multi-atomic-agents
 [url_semver_org]: https://semver.org/
@@ -462,3 +462,10 @@ Available commands:
 ```
 ./test.sh
 ```
+
+## Articles
+
+The gpt-multi-atomic-agents framework is further described in these articles:
+
+- [Medium](https://medium.com/@mr.sean.ryan/multi-llm-based-agent-collaboration-via-dynamic-router-and-graphql-handle-composite-prompts-with-83e16a22a1cb)
+- [ReadyTensor](https://app.readytensor.ai/publications/multi-agent-collaboration-via-a-dynamic-router-orchestrator-and-graphql-handle-composite-prompts-havaB1XVCa5A)
